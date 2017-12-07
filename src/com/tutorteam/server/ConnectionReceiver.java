@@ -1,5 +1,7 @@
 package com.tutorteam.server;
 
+import com.tutorteam.server.room.Room;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -8,7 +10,7 @@ final public class ConnectionReceiver extends Thread {
 
     private ServerSocket connectionReceiver;
 
-    public ConnectionReceiver(ServerSocket connectionReceiver) {
+    ConnectionReceiver(ServerSocket connectionReceiver) {
         this.connectionReceiver = connectionReceiver;
     }
 
@@ -17,7 +19,9 @@ final public class ConnectionReceiver extends Thread {
         while (true) {
             try {
                 Socket newConnection = connectionReceiver.accept();
-                User user = new User(newConnection);
+                Room notFullRoom = Server.getNotFullRoom();
+                User user = new User(newConnection, notFullRoom);
+                notFullRoom.addUser(user);
                 user.start();
             } catch (IOException e) {
                 throw new RuntimeException(e);
