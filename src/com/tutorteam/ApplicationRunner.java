@@ -1,20 +1,13 @@
 package com.tutorteam;
 
-import com.tutorteam.server.ConnectionReceiver;
+import com.tutorteam.server.Server;
 
 import java.io.IOException;
-import java.net.ServerSocket;
 
 final public class ApplicationRunner {
 
-    public static void main(String[] args) {
-
-        try {
-            ServerSocket server = new ServerSocket(6501);
-            ConnectionReceiver connectionReceiver = new ConnectionReceiver(server);
-            connectionReceiver.start();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public static void main(String[] args) throws IOException {
+        Server server = new Server(6501);
+        server.up();
     }
 }
