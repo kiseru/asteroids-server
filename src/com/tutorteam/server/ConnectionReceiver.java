@@ -21,7 +21,6 @@ final public class ConnectionReceiver extends Thread {
                 Socket newConnection = connectionReceiver.accept();
                 Room notFullRoom = Server.getNotFullRoom();
                 User user = new User(newConnection, notFullRoom);
-                notFullRoom.addUser(user);
                 user.start();
             } catch (IOException e) {
                 throw new RuntimeException(e);
