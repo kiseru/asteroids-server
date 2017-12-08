@@ -38,6 +38,7 @@ final public class User extends Thread {
             writer.println("You need to keep a space garbage.");
             writer.println("You need to keep a space garbage.");
             writer.println("Good luck, Commander!");
+            room.addUser(this);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

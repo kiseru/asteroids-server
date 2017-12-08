@@ -1,5 +1,6 @@
 package com.tutorteam.server.room;
 
+import com.tutorteam.server.Server;
 import com.tutorteam.server.User;
 
 import java.util.ArrayList;
@@ -14,13 +15,16 @@ final public class Room extends Thread {
     private RoomStatus roomStatus;
 
     public Room() {
-        users = new ArrayList<>(5);
+        users = new ArrayList<>();
+        IntStream.iterate(0, i -> i + 1)
+                .limit(5)
+                .forEach(i -> users.add(null));
         usersCount = 0;
         roomStatus = RoomStatus.WAITING_CONNECTIONS;
     }
 
     public synchronized void addUser(User user) {
-        if (usersCount >= 5) return;
+        if (usersCount >= 5) Server.getNotFullRoom().addUser(user);
 
         int emptyPlaceIndex = IntStream.iterate(0, index -> index + 1)
                 .limit(users.size())
@@ -30,12 +34,12 @@ final public class Room extends Thread {
 
         if (emptyPlaceIndex == -1) return;
 
-        users.set(emptyPlaceIndex, user);
-        usersCount++;
-
         users.stream()
                 .filter(Objects::nonNull)
-                .forEach(roomUser -> roomUser.sendMessage(String.format("User %s join the room.", roomUser.getUserName())));
+                .forEach(roomUser -> roomUser.sendMessage(String.format("User %s join the room.", user.getUserName())));
+
+        users.set(emptyPlaceIndex, user);
+        usersCount++;
     }
 
     public synchronized void removeUser(User user) {
