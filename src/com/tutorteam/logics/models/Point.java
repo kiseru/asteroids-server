@@ -1,23 +1,33 @@
 package com.tutorteam.logics.models;
 
+import com.tutorteam.logics.auxiliary.Coordinates;
+import com.tutorteam.logics.auxiliary.Type;
+
 /**
  * @author Bulat Giniyatullin
  * 08 Декабрь 2017
  */
 
 public abstract class Point {
-    protected int x;
-    protected int y;
+    protected Coordinates coordinates;
     protected boolean isVisible;
+
+    public Point(Coordinates coordinates) {
+        this.coordinates = coordinates;
+    }
 
     abstract public Type getType();
 
     public int getX() {
-        return x;
+        return coordinates.x;
     }
 
     public int getY() {
-        return y;
+        return coordinates.y;
+    }
+
+    public Coordinates getCoordinates() {
+        return coordinates;
     }
 
     public boolean isVisible() {

@@ -1,4 +1,4 @@
-package com.tutorteam.logics.models;
+package com.tutorteam.logics.auxiliary;
 
 /**
  * @author Bulat Giniyatullin

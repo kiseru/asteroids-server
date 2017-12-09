@@ -1,4 +1,4 @@
-package com.tutorteam.logics.models;
+package com.tutorteam.logics.auxiliary;
 
 /**
  * @author Bulat Giniyatullin
@@ -6,5 +6,5 @@ package com.tutorteam.logics.models;
  */
 
 public enum Type {
-    ASTEROID, GARBAGE, SPACESHIP;
+    ASTEROID, GARBAGE, SPACESHIP, WALL;
 }
