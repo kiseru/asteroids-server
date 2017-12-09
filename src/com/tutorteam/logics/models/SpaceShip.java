@@ -27,6 +27,14 @@ public class SpaceShip extends Point implements Model{
         }
     }
 
+    public void go() {
+        //TODO going
+    }
+
+    public void rotate(Direction direction) {
+        // TODO rotate
+    }
+
     /**
      * Вызывается при выявлении столкновения корабля с чем-либо
      * @param type: тип объекта, с которым произошло столкновение

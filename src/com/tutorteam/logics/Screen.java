@@ -46,7 +46,7 @@ public class Screen {
      */
     public void display() {
         for (int i = 0; i < height; i++) {
-            System.out.println("\n");
+            System.out.print("\n");
         }
         for (int i = 1; i < height + 1; i++) {
             for (int j = 0; j < width + 1; j++) {

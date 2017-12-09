@@ -27,6 +27,7 @@ public class Game {
     public Game(Screen screen, int garbageNumber, int asteroidNumber) {
         this.screen = screen;
         this.pointsOnScreen = new ArrayList<>();
+        this.gameObjects = new ArrayList<>();
 
         // генерируем мусор
         for (int i = 0; i < garbageNumber; i++) {
@@ -50,6 +51,14 @@ public class Game {
         SpaceShip spaceShip = new SpaceShip(generateUniqueRandomCoordinates(), user);
         this.pointsOnScreen.add(spaceShip);
         this.gameObjects.add(spaceShip);
+    }
+
+    public void start() {
+        //TODO game process
+    }
+
+    public void stop() {
+        //TODO end of game
     }
 
     private Coordinates generateUniqueRandomCoordinates() {
