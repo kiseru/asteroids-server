@@ -1,6 +1,7 @@
 package com.tutorteam.logics;
 
 import com.tutorteam.logics.auxiliary.Coordinates;
+import com.tutorteam.logics.auxiliary.Type;
 import com.tutorteam.logics.handlers.SpaceShipCrashHandler;
 import com.tutorteam.logics.models.*;
 import com.tutorteam.server.User;
@@ -59,9 +60,28 @@ public class Game {
         spaceShip.setCourseChecker(new CourseChecker(spaceShip, this.pointsOnScreen, this.screen));
     }
 
+    /**
+     * запускает и поддерживает жизненный цикл игры
+     */
     public void start() {
         isGoing = true;
-        //TODO game process
+        while (isGoing) {
+            // TODO Прием изменений от клиентов
+            screen.update();
+            gameObjects.forEach(o -> o.render(screen));
+            crashHandlers.forEach(SpaceShipCrashHandler::check);
+            screen.display();
+            if (! isAnyoneAlive())
+                stop();
+        }
+    }
+
+    private boolean isAnyoneAlive() {
+        return pointsOnScreen.stream()
+                .filter(p -> p.getType() == Type.SPACESHIP)
+                .map(s -> ((SpaceShip)s).isOwnerAlive())
+                .reduce((b1, b2) -> b1 || b2)
+                .get();
     }
 
     public void stop() {

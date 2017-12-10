@@ -110,4 +110,8 @@ public class SpaceShip extends Point implements Model{
     public void setCourseChecker(CourseChecker courseChecker) {
         this.courseChecker = courseChecker;
     }
+
+    public boolean isOwnerAlive() {
+        return owner.isAlive();
+    }
 }
