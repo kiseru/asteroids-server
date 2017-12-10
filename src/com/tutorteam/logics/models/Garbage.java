@@ -9,7 +9,7 @@ import com.tutorteam.logics.auxiliary.Type;
  * 08 Декабрь 2017
  */
 
-public class Garbage extends Point implements Model{
+public class Garbage extends Point implements Model, Crashable{
     public Garbage(Coordinates coordinates) {
         super(coordinates);
     }

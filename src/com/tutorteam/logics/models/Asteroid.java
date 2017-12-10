@@ -9,7 +9,7 @@ import com.tutorteam.logics.auxiliary.Type;
  * 08 Декабрь 2017
  */
 
-public class Asteroid extends Point implements Model{
+public class Asteroid extends Point implements Model, Crashable{
     public Asteroid(Coordinates coordinates) {
         super(coordinates);
     }
