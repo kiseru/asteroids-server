@@ -27,12 +27,23 @@ public class SpaceShip extends Point implements Model{
         }
     }
 
+    /**
+     * делает шаг в текущем направлении
+     */
     public void go() {
-        //TODO going
-    }
-
-    public void rotate(Direction direction) {
-        // TODO rotate
+        switch (direction) {
+            case UP:
+                coordinates = new Coordinates(this.getX(), this.getY() + 1);
+                break;
+            case RIGHT:
+                coordinates = new Coordinates(this.getX() + 1, this.getY());
+                break;
+            case DOWN:
+                coordinates = new Coordinates(this.getX(), this.getY() - 1);
+                break;
+            case LEFT:
+                coordinates = new Coordinates(this.getX() - 1, this.getY());
+        }
     }
 
     /**
@@ -45,10 +56,28 @@ public class SpaceShip extends Point implements Model{
         } else if (type == Type.GARBAGE) {
             owner.addScore();
         } else if (type == Type.WALL) {
+            // возвращаемся назад, чтобы не находится на стене
+            rollbackLastStep();
             owner.substractScore();
         }
         if (! owner.isAlive()) {
             this.destroy();
+        }
+    }
+
+    private void rollbackLastStep() {
+        switch (direction) {
+            case UP:
+                coordinates = new Coordinates(this.getX(), this.getY() - 1);
+                break;
+            case RIGHT:
+                coordinates = new Coordinates(this.getX() - 1, this.getY());
+                break;
+            case DOWN:
+                coordinates = new Coordinates(this.getX(), this.getY() + 1);
+                break;
+            case LEFT:
+                coordinates = new Coordinates(this.getX() + 1, this.getY());
         }
     }
 
