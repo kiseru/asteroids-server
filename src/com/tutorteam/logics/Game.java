@@ -83,4 +83,8 @@ public class Game {
     public List<Point> getPointsOnScreen() {
         return pointsOnScreen;
     }
+
+    public Screen getScreen() {
+        return screen;
+    }
 }
