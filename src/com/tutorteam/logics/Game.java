@@ -1,6 +1,7 @@
 package com.tutorteam.logics;
 
 import com.tutorteam.logics.auxiliary.Coordinates;
+import com.tutorteam.logics.handlers.SpaceShipCrashHandler;
 import com.tutorteam.logics.models.*;
 import com.tutorteam.server.User;
 
@@ -17,6 +18,8 @@ public class Game {
     private List<Model> gameObjects;
     private List<Point> pointsOnScreen;
     private Screen screen;
+    private boolean isGoing;
+    private List<SpaceShipCrashHandler> crashHandlers;
 
     /**
      * Конструктор создания игровой сессии
@@ -28,6 +31,7 @@ public class Game {
         this.screen = screen;
         this.pointsOnScreen = new ArrayList<>();
         this.gameObjects = new ArrayList<>();
+        this.crashHandlers = new ArrayList<>();
 
         // генерируем мусор
         for (int i = 0; i < garbageNumber; i++) {
@@ -51,14 +55,17 @@ public class Game {
         SpaceShip spaceShip = new SpaceShip(generateUniqueRandomCoordinates(), user);
         this.pointsOnScreen.add(spaceShip);
         this.gameObjects.add(spaceShip);
+        crashHandlers.add(new SpaceShipCrashHandler(this, spaceShip));
+        spaceShip.setCourseChecker(new CourseChecker(spaceShip, this.pointsOnScreen, this.screen));
     }
 
     public void start() {
+        isGoing = true;
         //TODO game process
     }
 
     public void stop() {
-        //TODO end of game
+        isGoing = false;
     }
 
     private Coordinates generateUniqueRandomCoordinates() {

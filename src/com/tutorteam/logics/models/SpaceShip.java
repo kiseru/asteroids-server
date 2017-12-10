@@ -4,6 +4,7 @@ import com.tutorteam.logics.Screen;
 import com.tutorteam.logics.auxiliary.Coordinates;
 import com.tutorteam.logics.auxiliary.Direction;
 import com.tutorteam.logics.auxiliary.Type;
+import com.tutorteam.logics.CourseChecker;
 import com.tutorteam.server.User;
 
 /**
@@ -14,6 +15,7 @@ import com.tutorteam.server.User;
 public class SpaceShip extends Point implements Model{
     private User owner;
     private Direction direction;
+    private CourseChecker courseChecker;
 
     public SpaceShip(Coordinates coordinates, User owner) {
         super(coordinates);
@@ -33,13 +35,13 @@ public class SpaceShip extends Point implements Model{
     public void go() {
         switch (direction) {
             case UP:
-                coordinates = new Coordinates(this.getX(), this.getY() + 1);
+                coordinates = new Coordinates(this.getX(), this.getY() - 1);
                 break;
             case RIGHT:
                 coordinates = new Coordinates(this.getX() + 1, this.getY());
                 break;
             case DOWN:
-                coordinates = new Coordinates(this.getX(), this.getY() - 1);
+                coordinates = new Coordinates(this.getX(), this.getY() + 1);
                 break;
             case LEFT:
                 coordinates = new Coordinates(this.getX() - 1, this.getY());
@@ -68,13 +70,13 @@ public class SpaceShip extends Point implements Model{
     private void rollbackLastStep() {
         switch (direction) {
             case UP:
-                coordinates = new Coordinates(this.getX(), this.getY() - 1);
+                coordinates = new Coordinates(this.getX(), this.getY() + 1);
                 break;
             case RIGHT:
                 coordinates = new Coordinates(this.getX() - 1, this.getY());
                 break;
             case DOWN:
-                coordinates = new Coordinates(this.getX(), this.getY() + 1);
+                coordinates = new Coordinates(this.getX(), this.getY() - 1);
                 break;
             case LEFT:
                 coordinates = new Coordinates(this.getX() + 1, this.getY());
@@ -99,5 +101,13 @@ public class SpaceShip extends Point implements Model{
     @Override
     public Type getType() {
         return Type.SPACESHIP;
+    }
+
+    public CourseChecker getCourseChecker() {
+        return courseChecker;
+    }
+
+    public void setCourseChecker(CourseChecker courseChecker) {
+        this.courseChecker = courseChecker;
     }
 }
