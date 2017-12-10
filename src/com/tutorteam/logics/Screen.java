@@ -27,11 +27,11 @@ public class Screen {
      * @param symbol - символ, которым отображается точка
      */
     public void draw(Coordinates coordinates, String symbol) {
-        if (mainMatrix[coordinates.y + 1][coordinates.x + 1].equals("."))
-            mainMatrix[coordinates.y + 1][coordinates.x + 1] = symbol;
+        if (mainMatrix[coordinates.getY() + 1][coordinates.getX() + 1].equals("."))
+            mainMatrix[coordinates.getY() + 1][coordinates.getX() + 1] = symbol;
         else
-            mainMatrix[coordinates.y + 1][coordinates.x + 1] =
-                    String.format("%s|%s", mainMatrix[coordinates.y + 1][coordinates.x + 1], symbol);
+            mainMatrix[coordinates.getY() + 1][coordinates.getX() + 1] =
+                    String.format("%s|%s", mainMatrix[coordinates.getY() + 1][coordinates.getX() + 1], symbol);
     }
 
     /**
