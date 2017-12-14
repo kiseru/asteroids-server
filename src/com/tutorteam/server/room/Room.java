@@ -1,5 +1,7 @@
 package com.tutorteam.server.room;
 
+import com.tutorteam.logics.Game;
+import com.tutorteam.logics.Screen;
 import com.tutorteam.server.Server;
 import com.tutorteam.server.User;
 
@@ -13,6 +15,7 @@ final public class Room extends Thread {
     private ArrayList<User> users;
     private int usersCount;
     private RoomStatus roomStatus;
+    private Game game;
 
     public Room() {
         users = new ArrayList<>();
@@ -73,6 +76,10 @@ final public class Room extends Thread {
         return roomStatus == RoomStatus.GAMING;
     }
 
+    public boolean isGameFinished() {
+        return roomStatus == RoomStatus.FINISHED;
+    }
+
     @Override
     public void run() {
         users.stream()
@@ -81,10 +88,23 @@ final public class Room extends Thread {
 
         roomStatus = RoomStatus.GAMING;
 
+        synchronized (Server.class) {
+            Server.class.notifyAll();
+        }
+        game = new Game(new Screen(10, 10), 15, 15);
+        users.stream()
+                .filter(Objects::nonNull)
+                .forEach(game::registerSpaceShipForUser);
+
+
         roomStatus = RoomStatus.FINISHED;
 
         users.stream()
                 .filter(Objects::nonNull)
                 .forEach(user -> user.sendMessage(this.getRating()));
+    }
+
+    public Game getGame() {
+        return game;
     }
 }

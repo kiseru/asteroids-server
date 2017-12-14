@@ -54,6 +54,7 @@ public class Game {
      */
     public void registerSpaceShipForUser(User user) {
         SpaceShip spaceShip = new SpaceShip(generateUniqueRandomCoordinates(), user);
+        user.setSpaceShip(spaceShip);
         this.pointsOnScreen.add(spaceShip);
         this.gameObjects.add(spaceShip);
         crashHandlers.add(new SpaceShipCrashHandler(this, spaceShip));
