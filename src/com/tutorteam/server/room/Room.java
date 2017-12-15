@@ -39,7 +39,7 @@ final public class Room extends Thread {
 
         users.stream()
                 .filter(Objects::nonNull)
-                .forEach(roomUser -> roomUser.sendMessage(String.format("User %s join the room.", user.getUserName())));
+                .forEach(roomUser -> roomUser.sendMessage(String.format("User %s has joined the room.", user.getUserName())));
 
         users.set(emptyPlaceIndex, user);
         usersCount++;
@@ -84,7 +84,7 @@ final public class Room extends Thread {
     public void run() {
         users.stream()
                 .filter(Objects::nonNull)
-                .forEach(user -> user.sendMessage("Game is started!"));
+                .forEach(user -> user.sendMessage("Game has started!"));
 
         roomStatus = RoomStatus.GAMING;
 
@@ -97,7 +97,14 @@ final public class Room extends Thread {
                 .forEach(game::registerSpaceShipForUser);
 
 
-        roomStatus = RoomStatus.FINISHED;
+        synchronized (this) {
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            roomStatus = RoomStatus.FINISHED;
+        }
 
         users.stream()
                 .filter(Objects::nonNull)

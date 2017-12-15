@@ -64,17 +64,13 @@ public class Game {
     /**
      * запускает и поддерживает жизненный цикл игры
      */
-    public void start() {
-        isGoing = true;
-        while (isGoing) {
-            // TODO Прием изменений от клиентов
-            screen.update();
-            gameObjects.forEach(o -> o.render(screen));
-            crashHandlers.forEach(SpaceShipCrashHandler::check);
-            screen.display();
-            if (! isAnyoneAlive())
-                stop();
-        }
+    public void refresh() {
+        screen.update();
+        gameObjects.forEach(o -> o.render(screen));
+        crashHandlers.forEach(SpaceShipCrashHandler::check);
+        screen.display();
+        if (! isAnyoneAlive())
+            stop();
     }
 
     private boolean isAnyoneAlive() {
@@ -114,5 +110,9 @@ public class Game {
 
     public Screen getScreen() {
         return screen;
+    }
+
+    public List<SpaceShipCrashHandler> getCrashHandlers() {
+        return crashHandlers;
     }
 }

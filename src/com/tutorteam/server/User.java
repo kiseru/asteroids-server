@@ -1,5 +1,6 @@
 package com.tutorteam.server;
 
+import com.tutorteam.logics.auxiliary.Direction;
 import com.tutorteam.logics.models.SpaceShip;
 import com.tutorteam.server.room.Room;
 
@@ -38,7 +39,6 @@ final public class User extends Thread {
             writer.println("Please, introduce yourself!");
             userName = reader.readLine();
             writer.println("You need to keep a space garbage.");
-            writer.println("You need to keep a space garbage.");
             writer.println("Good luck, Commander!");
             synchronized (Server.class) {
                 try {
@@ -51,28 +51,35 @@ final public class User extends Thread {
                     e.printStackTrace();
                 }
             }
-            while (!room.isGameFinished()) {
+            while (!room.isGameFinished() && isAlive) {
                 String userMessage = reader.readLine();
                 System.out.println(String.format("%s sends %s", userName, userMessage));
-                // TODO calling methods
                 if (userMessage.equals("go")) {
-
+                    spaceShip.go();
                 } else if (userMessage.equals("left")) {
-
+                    spaceShip.setDirection(Direction.LEFT);
+                    sendMessage(Integer.toString(score));
+                } else if (userMessage.equals("right")) {
+                    spaceShip.setDirection(Direction.RIGHT);
+                    sendMessage(Integer.toString(score));
                 } else if (userMessage.equals("up")) {
-
+                    spaceShip.setDirection(Direction.UP);
+                    sendMessage(Integer.toString(score));
                 } else if (userMessage.equals("down")) {
-
+                    spaceShip.setDirection(Direction.DOWN);
+                    sendMessage(Integer.toString(score));
                 } else if (userMessage.equals("isAsteroid")) {
-
+                    sendMessage(spaceShip.getCourseChecker().isAsteroid() ? "t" : "f");
                 } else if (userMessage.equals("isGarbage")) {
-
+                    sendMessage(spaceShip.getCourseChecker().isGarbage() ? "t" : "f");
                 } else if (userMessage.equals("isWall")) {
-
+                    sendMessage(spaceShip.getCourseChecker().isWall() ? "t" : "f");
                 } else {
                     sendMessage("Unknown command");
                 }
+                room.getGame().refresh();
             }
+            room.notify();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -109,7 +116,7 @@ final public class User extends Thread {
     public void died() {
         isAlive = false;
         this.sendMessage("You are died!");
-        String scoreMessage = String.format("You collect %d score", this.score);
+        String scoreMessage = String.format("You have collected %d score", this.score);
         this.sendMessage(scoreMessage);
     }
 
