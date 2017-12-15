@@ -5,6 +5,7 @@ import com.tutorteam.server.room.Room;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.Set;
 
 final public class Server {
@@ -21,6 +22,15 @@ final public class Server {
         ServerSocket server = new ServerSocket(port);
         ConnectionReceiver connectionReceiver = new ConnectionReceiver(server);
         connectionReceiver.start();
+        Scanner sc = new Scanner(System.in);
+        while (true) {
+            String command = sc.nextLine();
+            if (command.equals("rating")) {
+                rooms.forEach(room -> System.out.println(room.getRating()));
+            } else if (command.equals("gamefield")) {
+                rooms.forEach(room -> room.getGame().getScreen().display());
+            }
+        }
     }
 
     public static Room getNotFullRoom() {
