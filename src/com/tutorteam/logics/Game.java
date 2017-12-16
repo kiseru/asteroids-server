@@ -66,14 +66,14 @@ public class Game {
      */
     public void refresh() {
         screen.update();
-        gameObjects.forEach(o -> o.render(screen));
         crashHandlers.forEach(SpaceShipCrashHandler::check);
+        gameObjects.forEach(o -> o.render(screen));
         screen.display();
         if (! isAnyoneAlive())
             stop();
     }
 
-    private boolean isAnyoneAlive() {
+    public boolean isAnyoneAlive() {
         return pointsOnScreen.stream()
                 .filter(p -> p.getType() == Type.SPACESHIP)
                 .map(s -> ((SpaceShip)s).isOwnerAlive())

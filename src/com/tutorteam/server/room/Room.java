@@ -68,6 +68,13 @@ final public class Room extends Thread {
                 .reduce("", (acc, userRow) -> acc + userRow + "\n");
     }
 
+    public long aliveCount() {
+        return users.stream()
+                .filter(Objects::nonNull)
+                .filter(User::getIsAlive)
+                .count();
+    }
+
     public boolean isFull() {
         return usersCount == 5;
     }

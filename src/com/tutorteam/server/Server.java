@@ -4,14 +4,12 @@ import com.tutorteam.server.room.Room;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 final public class Server {
 
     private int port;
-    private static final Set<Room> rooms = new HashSet<>();
+    private static final List<Room> rooms = new LinkedList<>();
     private static Room notFullRoom = new Room();
 
     public Server(int port) {
@@ -22,7 +20,6 @@ final public class Server {
         ServerSocket server = new ServerSocket(port);
         ConnectionReceiver connectionReceiver = new ConnectionReceiver(server);
         connectionReceiver.start();
-        // TODO fix!
         Scanner sc = new Scanner(System.in);
         while (true) {
             String command = sc.nextLine();

@@ -45,6 +45,7 @@ final public class User extends Thread {
                 try {
                     room.addUser(this);
                     if (room.isFull()) {
+                        Server.getNotFullRoom(); // Чтобы полная комната добавилась в список комнат
                         room.start();
                     }
                     Server.class.wait();
@@ -52,24 +53,29 @@ final public class User extends Thread {
                     e.printStackTrace();
                 }
             }
+            spaceShip.setDirection(Direction.UP);
             while (!room.isGameFinished() && isAlive) {
-                spaceShip.setDirection(Direction.UP);
                 String userMessage = reader.readLine();
                 System.out.println(String.format("%s sends %s", userName, userMessage));
                 if (userMessage.equals("go")) {
                     spaceShip.go();
+                    room.getGame().refresh();
                     sendMessage(Integer.toString(score));
                 } else if (userMessage.equals("left")) {
                     spaceShip.setDirection(Direction.LEFT);
+                    room.getGame().refresh();
                     sendMessage(Integer.toString(score));
                 } else if (userMessage.equals("right")) {
                     spaceShip.setDirection(Direction.RIGHT);
+                    room.getGame().refresh();
                     sendMessage(Integer.toString(score));
                 } else if (userMessage.equals("up")) {
                     spaceShip.setDirection(Direction.UP);
+                    room.getGame().refresh();
                     sendMessage(Integer.toString(score));
                 } else if (userMessage.equals("down")) {
                     spaceShip.setDirection(Direction.DOWN);
+                    room.getGame().refresh();
                     sendMessage(Integer.toString(score));
                 } else if (userMessage.equals("isAsteroid")) {
                     sendMessage(spaceShip.getCourseChecker().isAsteroid() ? "t" : "f");
@@ -80,13 +86,20 @@ final public class User extends Thread {
                 } else {
                     sendMessage("Unknown command");
                 }
-                room.getGame().refresh();
+                System.out.println(score);
+                if (score < 0) {
+                    died();
+                }
             }
-            synchronized (room) {
-                room.notify();
+            isAlive = false;
+            if (room.aliveCount() == 0 || room.aliveCount() == 1) {
+                synchronized (room) {
+                    room.notify();
+                }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Connection problems with user " + userName);
+            isAlive = false;
         }
     }
 
