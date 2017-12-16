@@ -91,7 +91,7 @@ public class Game {
         // если по случайно сгенерованным координатам уже что-то находится(или они ещё не сгенерированы)
         while (randomCoordinates == null || isGameObjectsContainsCoordinates(randomCoordinates))
             // генерируем новые координаты
-            randomCoordinates = new Coordinates(random.nextInt(screen.getWidth()), random.nextInt(screen.getHeight()));
+            randomCoordinates = new Coordinates(random.nextInt(screen.getWidth()) + 1, random.nextInt(screen.getHeight()) + 1   );
         return randomCoordinates;
     }
 
