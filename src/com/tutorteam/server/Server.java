@@ -22,6 +22,7 @@ final public class Server {
         ServerSocket server = new ServerSocket(port);
         ConnectionReceiver connectionReceiver = new ConnectionReceiver(server);
         connectionReceiver.start();
+        // TODO fix!
         Scanner sc = new Scanner(System.in);
         while (true) {
             String command = sc.nextLine();

@@ -89,13 +89,12 @@ final public class Room extends Thread {
         roomStatus = RoomStatus.GAMING;
 
         synchronized (Server.class) {
+            game = new Game(new Screen(10, 10), 15, 15);
+            users.stream()
+                    .filter(Objects::nonNull)
+                    .forEach(game::registerSpaceShipForUser);
             Server.class.notifyAll();
         }
-        game = new Game(new Screen(10, 10), 15, 15);
-        users.stream()
-                .filter(Objects::nonNull)
-                .forEach(game::registerSpaceShipForUser);
-
 
         synchronized (this) {
             try {

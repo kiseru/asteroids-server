@@ -17,13 +17,13 @@ final public class User extends Thread {
     private String userName;
     private int score;
     private boolean isAlive;
-    private Room room;
+    private final Room room;
     private SpaceShip spaceShip;
 
     User(Socket newConnection, Room room) throws IOException {
         reader = new BufferedReader(new InputStreamReader(newConnection.getInputStream()));
         writer = new PrintWriter(newConnection.getOutputStream(), true);
-        score = 0;
+        score = 100;
         isAlive = true;
         this.room = room;
     }
@@ -38,6 +38,7 @@ final public class User extends Thread {
             writer.println("Welcome To Asteroids Server");
             writer.println("Please, introduce yourself!");
             userName = reader.readLine();
+            System.out.println(userName + " has joined the server!");
             writer.println("You need to keep a space garbage.");
             writer.println("Good luck, Commander!");
             synchronized (Server.class) {
@@ -52,10 +53,12 @@ final public class User extends Thread {
                 }
             }
             while (!room.isGameFinished() && isAlive) {
+                spaceShip.setDirection(Direction.UP);
                 String userMessage = reader.readLine();
                 System.out.println(String.format("%s sends %s", userName, userMessage));
                 if (userMessage.equals("go")) {
                     spaceShip.go();
+                    sendMessage(Integer.toString(score));
                 } else if (userMessage.equals("left")) {
                     spaceShip.setDirection(Direction.LEFT);
                     sendMessage(Integer.toString(score));
@@ -79,7 +82,9 @@ final public class User extends Thread {
                 }
                 room.getGame().refresh();
             }
-            room.notify();
+            synchronized (room) {
+                room.notify();
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
