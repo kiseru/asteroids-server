@@ -14,6 +14,7 @@ public abstract class Point {
 
     public Point(Coordinates coordinates) {
         this.coordinates = coordinates;
+        isVisible = true;
     }
 
     abstract public Type getType();
