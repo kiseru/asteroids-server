@@ -44,17 +44,16 @@ public class Screen {
     /**
      * отображает экран
      */
-    public void display() {
-        // TODO сделать возврат String
-        for (int i = 1; i < height; i++) {
-            System.out.print("\n");
-        }
+    public String display() {
+        StringBuilder result = new StringBuilder("");
         for (int i = 1; i < height + 1; i++) {
             for (int j = 1; j < width + 1; j++) {
-                System.out.print(mainMatrix[i][j] + "\t");
+                result.append(mainMatrix[i][j]);
+                result.append("\t");
             }
-            System.out.println();
+            result.append("\n");
         }
+        return result.toString();
     }
 
     private void generateClearScreen() {

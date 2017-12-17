@@ -59,7 +59,6 @@ final public class User extends Thread {
             spaceShip.setDirection(Direction.UP);
             while (!room.isGameFinished() && isAlive) {
                 String userMessage = reader.readLine();
-                System.out.println(String.format("%s sends %s", userName, userMessage)); // TODO убрать
                 if (userMessage.equals("go")) {
                     spaceShip.go();
                     room.getGame().refresh();
@@ -93,7 +92,6 @@ final public class User extends Thread {
                 if (steps >= 1500) {
                     died();
                 }
-                System.out.println(score); // TODO убрать
                 if (score < 0) {
                     died();
                 }

@@ -26,7 +26,7 @@ final public class Server {
             if (command.equals("rating")) {
                 rooms.forEach(room -> System.out.println(room.getRating()));
             } else if (command.equals("gamefield")) {
-                rooms.forEach(room -> room.getGame().getScreen().display());
+                rooms.forEach(room -> System.out.println(room.getGame().getScreen().display()));
             }
         }
     }

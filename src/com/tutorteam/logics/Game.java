@@ -20,7 +20,6 @@ public class Game {
     private List<Model> gameObjects;
     private List<Point> pointsOnScreen;
     private Screen screen;
-    private boolean isGoing;
     private List<SpaceShipCrashHandler> crashHandlers;
     private AtomicInteger collectedGarbageCount = new AtomicInteger(0);
     private int garbageNumber;
@@ -72,9 +71,6 @@ public class Game {
         screen.update();
         crashHandlers.forEach(SpaceShipCrashHandler::check);
         gameObjects.forEach(o -> o.render(screen));
-        screen.display();
-        if (! isAnyoneAlive())
-            stop();
     }
 
     public boolean isAnyoneAlive() {
@@ -83,10 +79,6 @@ public class Game {
                 .map(s -> ((SpaceShip)s).isOwnerAlive())
                 .reduce((b1, b2) -> b1 || b2)
                 .get();
-    }
-
-    public void stop() {
-        isGoing = false;
     }
 
     private Coordinates generateUniqueRandomCoordinates() {
