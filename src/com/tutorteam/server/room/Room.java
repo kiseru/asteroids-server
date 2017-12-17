@@ -91,12 +91,12 @@ final public class Room extends Thread {
     public void run() {
         users.stream()
                 .filter(Objects::nonNull)
-                .forEach(user -> user.sendMessage("Game has started!"));
+                .forEach(user -> user.sendMessage("start"));
 
         roomStatus = RoomStatus.GAMING;
 
         synchronized (Server.class) {
-            game = new Game(new Screen(10, 10), 15, 15);
+            game = new Game(new Screen(30, 30), 15, 15);
             users.stream()
                     .filter(Objects::nonNull)
                     .forEach(game::registerSpaceShipForUser);
@@ -105,6 +105,7 @@ final public class Room extends Thread {
 
         synchronized (this) {
             try {
+                game.refresh();
                 this.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -114,7 +115,13 @@ final public class Room extends Thread {
 
         users.stream()
                 .filter(Objects::nonNull)
+                .forEach(user -> user.sendMessage("finish"));
+        users.stream()
+                .filter(Objects::nonNull)
                 .forEach(user -> user.sendMessage(this.getRating()));
+        System.out.println("Room released!");
+        System.out.println(getRating());
+        System.out.println();
     }
 
     public Game getGame() {

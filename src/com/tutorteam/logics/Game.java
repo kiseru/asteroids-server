@@ -9,6 +9,7 @@ import com.tutorteam.server.User;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Bulat Giniyatullin
@@ -21,6 +22,8 @@ public class Game {
     private Screen screen;
     private boolean isGoing;
     private List<SpaceShipCrashHandler> crashHandlers;
+    private AtomicInteger collectedGarbageCount = new AtomicInteger(0);
+    private int garbageNumber;
 
     /**
      * Конструктор создания игровой сессии
@@ -29,6 +32,7 @@ public class Game {
      * @param asteroidNumber - количество астероидов для первоначальной генерации
      */
     public Game(Screen screen, int garbageNumber, int asteroidNumber) {
+        this.garbageNumber = garbageNumber;
         this.screen = screen;
         this.pointsOnScreen = new ArrayList<>();
         this.gameObjects = new ArrayList<>();
@@ -112,7 +116,15 @@ public class Game {
         return screen;
     }
 
+    public int getGarbageNumber() {
+        return garbageNumber;
+    }
+
     public List<SpaceShipCrashHandler> getCrashHandlers() {
         return crashHandlers;
+    }
+
+    public int incrementCollectedGarbageCount() {
+        return collectedGarbageCount.incrementAndGet();
     }
 }

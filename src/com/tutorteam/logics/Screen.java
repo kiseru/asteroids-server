@@ -45,6 +45,7 @@ public class Screen {
      * отображает экран
      */
     public void display() {
+        // TODO сделать возврат String
         for (int i = 1; i < height; i++) {
             System.out.print("\n");
         }

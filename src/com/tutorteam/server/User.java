@@ -16,6 +16,7 @@ final public class User extends Thread {
     private PrintWriter writer;
     private String userName;
     private int score;
+    private int steps;
     private boolean isAlive;
     private final Room room;
     private SpaceShip spaceShip;
@@ -24,6 +25,7 @@ final public class User extends Thread {
         reader = new BufferedReader(new InputStreamReader(newConnection.getInputStream()));
         writer = new PrintWriter(newConnection.getOutputStream(), true);
         score = 100;
+        steps = 0;
         isAlive = true;
         this.room = room;
     }
@@ -40,6 +42,7 @@ final public class User extends Thread {
             userName = reader.readLine();
             System.out.println(userName + " has joined the server!");
             writer.println("You need to keep a space garbage.");
+            writer.println("Your ID is " + getId());
             writer.println("Good luck, Commander!");
             synchronized (Server.class) {
                 try {
@@ -56,7 +59,7 @@ final public class User extends Thread {
             spaceShip.setDirection(Direction.UP);
             while (!room.isGameFinished() && isAlive) {
                 String userMessage = reader.readLine();
-                System.out.println(String.format("%s sends %s", userName, userMessage));
+                System.out.println(String.format("%s sends %s", userName, userMessage)); // TODO убрать
                 if (userMessage.equals("go")) {
                     spaceShip.go();
                     room.getGame().refresh();
@@ -64,19 +67,19 @@ final public class User extends Thread {
                 } else if (userMessage.equals("left")) {
                     spaceShip.setDirection(Direction.LEFT);
                     room.getGame().refresh();
-                    sendMessage(Integer.toString(score));
+                    sendMessage("success");
                 } else if (userMessage.equals("right")) {
                     spaceShip.setDirection(Direction.RIGHT);
                     room.getGame().refresh();
-                    sendMessage(Integer.toString(score));
+                    sendMessage("success");
                 } else if (userMessage.equals("up")) {
                     spaceShip.setDirection(Direction.UP);
                     room.getGame().refresh();
-                    sendMessage(Integer.toString(score));
+                    sendMessage("success");
                 } else if (userMessage.equals("down")) {
                     spaceShip.setDirection(Direction.DOWN);
                     room.getGame().refresh();
-                    sendMessage(Integer.toString(score));
+                    sendMessage("success");
                 } else if (userMessage.equals("isAsteroid")) {
                     sendMessage(spaceShip.getCourseChecker().isAsteroid() ? "t" : "f");
                 } else if (userMessage.equals("isGarbage")) {
@@ -86,20 +89,24 @@ final public class User extends Thread {
                 } else {
                     sendMessage("Unknown command");
                 }
-                System.out.println(score);
+                steps++;
+                if (steps >= 1500) {
+                    died();
+                }
+                System.out.println(score); // TODO убрать
                 if (score < 0) {
                     died();
                 }
             }
+        } catch (IOException e) {
+            System.out.println("Connection problems with user " + userName);
+        } finally {
             isAlive = false;
             if (room.aliveCount() == 0 || room.aliveCount() == 1) {
                 synchronized (room) {
                     room.notify();
                 }
             }
-        } catch (IOException e) {
-            System.out.println("Connection problems with user " + userName);
-            isAlive = false;
         }
     }
 
@@ -133,12 +140,16 @@ final public class User extends Thread {
 
     public void died() {
         isAlive = false;
-        this.sendMessage("You are died!");
+        this.sendMessage("died");
         String scoreMessage = String.format("You have collected %d score", this.score);
         this.sendMessage(scoreMessage);
     }
 
     public void setSpaceShip(SpaceShip spaceShip) {
         this.spaceShip = spaceShip;
+    }
+
+    public Room getRoom() {
+        return room;
     }
 }

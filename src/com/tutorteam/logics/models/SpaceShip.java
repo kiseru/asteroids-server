@@ -53,17 +53,25 @@ public class SpaceShip extends Point implements Model{
      * @param type: тип объекта, с которым произошло столкновение
      */
     public void crash(Type type) {
-        if (type == Type.ASTEROID) {
-            owner.substractScore();
-        } else if (type == Type.GARBAGE) {
-            owner.addScore();
-        } else if (type == Type.WALL) {
-            // возвращаемся назад, чтобы не находится на стене
-            rollbackLastStep();
-            owner.substractScore();
-        }
-        if (! owner.isAlive()) {
-            this.destroy();
+        synchronized (owner.getRoom().getGame()) {
+            if (type == Type.ASTEROID) {
+                owner.substractScore();
+            } else if (type == Type.GARBAGE) {
+                owner.addScore();
+                int collected = owner.getRoom().getGame().incrementCollectedGarbageCount();
+                if (collected >= owner.getRoom().getGame().getGarbageNumber()) {
+                    synchronized (owner.getRoom()) {
+                        owner.getRoom().notify();
+                    }
+                }
+            } else if (type == Type.WALL) {
+                // возвращаемся назад, чтобы не находится на стене
+                rollbackLastStep();
+                owner.substractScore();
+            }
+            if (!owner.isAlive()) {
+                this.destroy();
+            }
         }
     }
 
