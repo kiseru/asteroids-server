@@ -100,7 +100,7 @@ final public class User extends Thread {
             System.out.println("Connection problems with user " + userName);
         } finally {
             isAlive = false;
-            if (room.aliveCount() == 0 || room.aliveCount() == 1) {
+            if (room.aliveCount() == 0) {
                 synchronized (room) {
                     room.notify();
                 }
