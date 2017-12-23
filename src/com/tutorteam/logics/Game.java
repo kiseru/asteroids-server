@@ -71,6 +71,7 @@ public class Game {
         screen.update();
         crashHandlers.forEach(SpaceShipCrashHandler::check);
         gameObjects.forEach(o -> o.render(screen));
+        //System.out.println(screen.display());
     }
 
     public boolean isAnyoneAlive() {

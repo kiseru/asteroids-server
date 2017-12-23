@@ -12,6 +12,8 @@ import java.util.stream.IntStream;
 
 final public class Room extends Thread {
 
+    private final int MAX_USERS = 1;
+
     private ArrayList<User> users;
     private int usersCount;
     private RoomStatus roomStatus;
@@ -20,14 +22,14 @@ final public class Room extends Thread {
     public Room() {
         users = new ArrayList<>();
         IntStream.iterate(0, i -> i + 1)
-                .limit(5)
+                .limit(MAX_USERS)
                 .forEach(i -> users.add(null));
         usersCount = 0;
         roomStatus = RoomStatus.WAITING_CONNECTIONS;
     }
 
     public synchronized void addUser(User user) {
-        if (usersCount >= 5) Server.getNotFullRoom().addUser(user);
+        if (usersCount >= MAX_USERS) Server.getNotFullRoom().addUser(user);
 
         int emptyPlaceIndex = IntStream.iterate(0, index -> index + 1)
                 .limit(users.size())
@@ -76,7 +78,7 @@ final public class Room extends Thread {
     }
 
     public boolean isFull() {
-        return usersCount == 5;
+        return usersCount == MAX_USERS;
     }
 
     public boolean isGameStarted() {
@@ -96,7 +98,7 @@ final public class Room extends Thread {
         roomStatus = RoomStatus.GAMING;
 
         synchronized (Server.class) {
-            game = new Game(new Screen(30, 30), 15, 15);
+            game = new Game(new Screen(30, 30), 150, 50);
             users.stream()
                     .filter(Objects::nonNull)
                     .forEach(game::registerSpaceShipForUser);
