@@ -10,9 +10,9 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
-final public class Room extends Thread {
+public final class Room extends Thread {
 
-    private final int MAX_USERS = 1;
+    private static final int MAX_USERS = 1;
 
     private ArrayList<User> users;
     private int usersCount;
@@ -111,6 +111,7 @@ final public class Room extends Thread {
                 this.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
+                interrupt();
             }
             roomStatus = RoomStatus.FINISHED;
         }

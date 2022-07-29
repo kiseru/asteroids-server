@@ -1,9 +1,7 @@
 package com.kiseru.asteroids.server.logics.auxiliary;
 
-/**
- * @author Bulat Giniyatullin
- * 09 Декабрь 2017
- */
+import java.util.Objects;
+
 
 public class Coordinates {
     private int x;
@@ -24,6 +22,19 @@ public class Coordinates {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Coordinates && this.x == ((Coordinates) obj).x && this.y == ((Coordinates) obj).y;
+        if (this == obj) {
+            return true;
+        }
+
+        if (!(obj instanceof Coordinates coordinates)) {
+            return false;
+        }
+
+        return x == coordinates.x && y == coordinates.y;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
     }
 }

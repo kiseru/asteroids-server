@@ -1,12 +1,11 @@
 package com.kiseru.asteroids.server.logics;
 
-import com.kiseru.asteroids.server.logics.models.Point;
 import com.kiseru.asteroids.server.logics.auxiliary.Coordinates;
 import com.kiseru.asteroids.server.logics.auxiliary.Type;
+import com.kiseru.asteroids.server.logics.models.Point;
 import com.kiseru.asteroids.server.logics.models.SpaceShip;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Bulat Giniyatullin
@@ -28,7 +27,7 @@ public class CourseChecker {
         List<Coordinates> asteroidsCoordinates = pointsOnMap.stream()
                 .filter(p -> p.getType() == Type.ASTEROID)
                 .map(Point::getCoordinates)
-                .collect(Collectors.toList());
+                .toList();
         return checkContaining(asteroidsCoordinates);
     }
 
@@ -36,7 +35,7 @@ public class CourseChecker {
         List<Coordinates> garbageCoordinates = pointsOnMap.stream()
                 .filter(p -> p.getType() == Type.GARBAGE)
                 .map(Point::getCoordinates)
-                .collect(Collectors.toList());
+                .toList();
         return checkContaining(garbageCoordinates);
     }
 

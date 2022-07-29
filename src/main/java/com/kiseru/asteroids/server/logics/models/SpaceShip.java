@@ -61,7 +61,7 @@ public class SpaceShip extends Point implements Model{
                 int collected = owner.getRoom().getGame().incrementCollectedGarbageCount();
                 if (collected >= owner.getRoom().getGame().getGarbageNumber()) {
                     synchronized (owner.getRoom()) {
-                        owner.getRoom().notify();
+                        owner.getRoom().notifyAll();
                     }
                 }
             } else if (type == Type.WALL) {

@@ -12,12 +12,12 @@ public abstract class Point {
     protected Coordinates coordinates;
     protected boolean isVisible;
 
-    public Point(Coordinates coordinates) {
+    protected Point(Coordinates coordinates) {
         this.coordinates = coordinates;
         isVisible = true;
     }
 
-    abstract public Type getType();
+    public abstract Type getType();
 
     public int getX() {
         return coordinates.getX();

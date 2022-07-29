@@ -6,26 +6,25 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-final public class ConnectionReceiver extends Thread {
+public final class ConnectionReceiver extends Thread {
 
-    private ServerSocket connectionReceiver;
+    private ServerSocket serverSocket;
 
-    ConnectionReceiver(ServerSocket connectionReceiver) {
-        this.connectionReceiver = connectionReceiver;
+    public ConnectionReceiver(ServerSocket serverSocket) {
+        this.serverSocket = serverSocket;
     }
 
     @Override
     public void run() {
         while (true) {
             try {
-                Socket newConnection = connectionReceiver.accept();
+                Socket newConnection = serverSocket.accept();
                 Room notFullRoom = Server.getNotFullRoom();
                 User user = new User(newConnection, notFullRoom);
                 user.start();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
         }
     }
 }

@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-final public class User extends Thread {
+public final class User extends Thread {
 
     private BufferedReader reader;
     private PrintWriter writer;
@@ -102,7 +102,7 @@ final public class User extends Thread {
             isAlive = false;
             if (room.aliveCount() == 0) {
                 synchronized (room) {
-                    room.notify();
+                    room.notifyAll();
                 }
             }
         }

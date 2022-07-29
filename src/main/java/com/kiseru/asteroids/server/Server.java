@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
-final public class Server {
+public final class Server {
 
     private int port;
     private static final List<Room> rooms = new LinkedList<>();
@@ -25,10 +25,12 @@ final public class Server {
         Scanner sc = new Scanner(System.in);
         while (true) {
             String command = sc.nextLine();
-            if (command.equals("rating")) {
+            if ("rating".equals(command)) {
                 rooms.forEach(room -> System.out.println(room.getRating()));
-            } else if (command.equals("gamefield")) {
+            } else if ("gamefield".equals(command)) {
                 rooms.forEach(room -> System.out.println(room.getGame().getScreen().display()));
+            } else if ("exit".equals(command)) {
+                break;
             }
         }
     }

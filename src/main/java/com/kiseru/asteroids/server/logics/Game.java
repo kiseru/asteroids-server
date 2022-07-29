@@ -21,6 +21,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 
 public class Game {
+
+    private static final Random random = new Random();
+
     private List<Model> gameObjects;
     private List<Point> pointsOnScreen;
     private Screen screen;
@@ -75,7 +78,6 @@ public class Game {
         screen.update();
         crashHandlers.forEach(SpaceShipCrashHandler::check);
         gameObjects.forEach(o -> o.render(screen));
-        //System.out.println(screen.display());
     }
 
     public boolean isAnyoneAlive() {
@@ -83,11 +85,10 @@ public class Game {
                 .filter(p -> p.getType() == Type.SPACESHIP)
                 .map(s -> ((SpaceShip)s).isOwnerAlive())
                 .reduce((b1, b2) -> b1 || b2)
-                .get();
+                .orElseThrow();
     }
 
     private Coordinates generateUniqueRandomCoordinates() {
-        Random random = new Random();
         Coordinates randomCoordinates = null;
         // если по случайно сгенерованным координатам уже что-то находится(или они ещё не сгенерированы)
         while (randomCoordinates == null || isGameObjectsContainsCoordinates(randomCoordinates))
