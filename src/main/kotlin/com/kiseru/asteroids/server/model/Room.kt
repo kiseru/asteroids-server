@@ -11,6 +11,9 @@ import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
+/**
+ * Комната.
+ */
 class Room : Runnable {
 
     val users: MutableList<User> = CopyOnWriteArrayList()
@@ -48,17 +51,6 @@ class Room : Runnable {
         val rating = RoomService.getRoomRating(this)
         sendMessageToUsers("finish\n$rating")
         log.info("Room released! Rating table:\n$rating")
-    }
-
-    /**
-     * Добавляет пользователя в комнату и рассылает уведомление об этом остальным пользователям.
-     */
-    fun addUser(user: User) {
-        if (users.size >= MAX_USERS) {
-            RoomService.getNotFullRoom().addUser(user)
-        }
-        sendMessageToUsers("User ${user.userName} has joined the room.")
-        users.add(user)
     }
 
     /**
@@ -119,6 +111,17 @@ class Room : Runnable {
     }
 
     /**
+     * Добавляет пользователя в комнату и рассылает уведомление об этом остальным пользователям.
+     */
+    private fun addUser(user: User) {
+        if (users.size >= MAX_USERS) {
+            RoomService.getNotFullRoom().addUser(user)
+        }
+        sendMessageToUsers("User ${user.userName} has joined the room.")
+        users.add(user)
+    }
+
+    /**
      * Рассылает сообщение пользователям комнаты.
      *
      * @param message сообщение
@@ -146,6 +149,9 @@ class Room : Runnable {
         private val log = LoggerFactory.getLogger(Room::class.java)
     }
 
+    /**
+     * Статус комнаты.
+     */
     private enum class Status {
         WAITING_CONNECTIONS,
         GAMING,
