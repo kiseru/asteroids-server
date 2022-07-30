@@ -2,10 +2,9 @@ package com.kiseru.asteroids.server.logics.models;
 
 import com.kiseru.asteroids.server.User;
 import com.kiseru.asteroids.server.logics.CourseChecker;
-import com.kiseru.asteroids.server.logics.Screen;
 import com.kiseru.asteroids.server.model.Coordinates;
 import com.kiseru.asteroids.server.model.Direction;
-import com.kiseru.asteroids.server.model.Renderable;
+import com.kiseru.asteroids.server.model.Point;
 import com.kiseru.asteroids.server.model.Type;
 
 import java.util.concurrent.locks.Lock;
@@ -16,7 +15,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * 08 Декабрь 2017
  */
 
-public class SpaceShip extends Point implements Renderable {
+public class SpaceShip extends Point {
 
     private final Lock lock = new ReentrantLock();
 
@@ -30,10 +29,13 @@ public class SpaceShip extends Point implements Renderable {
     }
 
     @Override
-    public void render(Screen screen) {
-        if (isVisible) {
-            screen.draw(coordinates, String.valueOf(owner.getId()));
-        }
+    public String getSymbolToShow() {
+        return String.valueOf(owner.getId());
+    }
+
+    @Override
+    public void destroy() {
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -42,16 +44,16 @@ public class SpaceShip extends Point implements Renderable {
     public void go() {
         switch (direction) {
             case UP:
-                coordinates = new Coordinates(this.getX(), this.getY() - 1);
+                setCoordinates(new Coordinates(this.getX(), this.getY() - 1));
                 break;
             case RIGHT:
-                coordinates = new Coordinates(this.getX() + 1, this.getY());
+                setCoordinates(new Coordinates(this.getX() + 1, this.getY()));
                 break;
             case DOWN:
-                coordinates = new Coordinates(this.getX(), this.getY() + 1);
+                setCoordinates(new Coordinates(this.getX(), this.getY() + 1));
                 break;
             case LEFT:
-                coordinates = new Coordinates(this.getX() - 1, this.getY());
+                setCoordinates(new Coordinates(this.getX() - 1, this.getY()));
         }
     }
 
@@ -88,24 +90,17 @@ public class SpaceShip extends Point implements Renderable {
     private void rollbackLastStep() {
         switch (direction) {
             case UP:
-                coordinates = new Coordinates(this.getX(), this.getY() + 1);
+                setCoordinates(new Coordinates(this.getX(), this.getY() + 1));
                 break;
             case RIGHT:
-                coordinates = new Coordinates(this.getX() - 1, this.getY());
+                setCoordinates(new Coordinates(this.getX() - 1, this.getY()));
                 break;
             case DOWN:
-                coordinates = new Coordinates(this.getX(), this.getY() - 1);
+                setCoordinates(new Coordinates(this.getX(), this.getY() - 1));
                 break;
             case LEFT:
-                coordinates = new Coordinates(this.getX() + 1, this.getY());
+                setCoordinates(new Coordinates(this.getX() + 1, this.getY()));
         }
-    }
-
-    /**
-     * разрушение корабля - прекращение его отображения
-     */
-    private void destroy() {
-        this.isVisible = false;
     }
 
     public Direction getDirection() {

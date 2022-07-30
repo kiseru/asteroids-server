@@ -2,8 +2,7 @@ package com.kiseru.asteroids.server.logics.handlers;
 
 import com.kiseru.asteroids.server.logics.Game;
 import com.kiseru.asteroids.server.model.Type;
-import com.kiseru.asteroids.server.model.Destroyable;
-import com.kiseru.asteroids.server.logics.models.Point;
+import com.kiseru.asteroids.server.model.Point;
 import com.kiseru.asteroids.server.logics.models.SpaceShip;
 
 import java.util.List;
@@ -37,7 +36,7 @@ public class SpaceShipCrashHandler {
         }
         if (isCollision) {
             spaceShip.crash(collisionPoint.getType());
-            ((Destroyable)collisionPoint).destroy();
+            collisionPoint.destroy();
         } else {
             // проверка на столкновение со стеной
             if (spaceShip.getX() == 0 || spaceShip.getY() == 0 ||

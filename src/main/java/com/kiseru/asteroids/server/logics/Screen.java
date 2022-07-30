@@ -1,6 +1,7 @@
 package com.kiseru.asteroids.server.logics;
 
 import com.kiseru.asteroids.server.model.Coordinates;
+import com.kiseru.asteroids.server.model.Point;
 
 import java.util.Arrays;
 
@@ -19,6 +20,10 @@ public class Screen {
         this.height = height;
         mainMatrix = new String[height + 2][width + 2];
         generateClearScreen();
+    }
+
+    public void draw(Coordinates coordinates, Point point) {
+        draw(coordinates, point.getSymbolToShow());
     }
 
     /**

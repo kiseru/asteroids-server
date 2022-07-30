@@ -1,37 +1,29 @@
-package com.kiseru.asteroids.server.logics.models;
+package com.kiseru.asteroids.server.model
 
-import com.kiseru.asteroids.server.model.Coordinates;
-import com.kiseru.asteroids.server.model.Type;
+import com.kiseru.asteroids.server.logics.Screen
 
-/**
- * @author Bulat Giniyatullin
- * 08 Декабрь 2017
- */
+abstract class Point protected constructor(var coordinates: Coordinates) {
 
-public abstract class Point {
-    protected Coordinates coordinates;
-    protected boolean isVisible;
+    var isVisible = true
+        protected set
 
-    protected Point(Coordinates coordinates) {
-        this.coordinates = coordinates;
-        isVisible = true;
+    val x: Int
+        get() = coordinates.x
+
+    val y: Int
+        get() = coordinates.y
+
+    abstract val type: Type
+
+    abstract val symbolToShow: String
+
+    open fun destroy() {
+        isVisible = false
     }
 
-    public abstract Type getType();
-
-    public int getX() {
-        return coordinates.getX();
-    }
-
-    public int getY() {
-        return coordinates.getY();
-    }
-
-    public Coordinates getCoordinates() {
-        return coordinates;
-    }
-
-    public boolean isVisible() {
-        return isVisible;
+    fun render(screen: Screen) {
+        if (isVisible) {
+            screen.draw(coordinates, this)
+        }
     }
 }
