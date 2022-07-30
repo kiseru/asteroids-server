@@ -3,6 +3,7 @@ package com.kiseru.asteroids.server.logics.models;
 import com.kiseru.asteroids.server.logics.Screen;
 import com.kiseru.asteroids.server.logics.auxiliary.Coordinates;
 import com.kiseru.asteroids.server.logics.auxiliary.Type;
+import com.kiseru.asteroids.server.model.Destroyable;
 import com.kiseru.asteroids.server.model.Renderable;
 
 /**
@@ -10,12 +11,12 @@ import com.kiseru.asteroids.server.model.Renderable;
  * 08 Декабрь 2017
  */
 
-public class Garbage extends Point implements Renderable, Crashable{
+public class Garbage extends Point implements Renderable, Destroyable {
     public Garbage(Coordinates coordinates) {
         super(coordinates);
     }
 
-    public void crash() {
+    public void destroy() {
         this.isVisible = false;
     }
 
