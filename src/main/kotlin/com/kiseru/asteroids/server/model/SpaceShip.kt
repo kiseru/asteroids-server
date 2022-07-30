@@ -76,5 +76,5 @@ class SpaceShip(coordinates: Coordinates, private val owner: User) : Point(coord
         get() = Type.SPACESHIP
 
     val isOwnerAlive: Boolean
-        get() = owner.isAlive()
+        get() = owner.isAlive
 }
