@@ -4,12 +4,16 @@ import com.kiseru.asteroids.server.Server;
 import com.kiseru.asteroids.server.User;
 import com.kiseru.asteroids.server.logics.Game;
 import com.kiseru.asteroids.server.logics.Screen;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Objects;
 
-public final class Room extends Thread {
+public final class Room implements Runnable {
+
+    private static final Logger log = LoggerFactory.getLogger(Room.class);
 
     private static final int MAX_USERS = 1;
 
@@ -88,24 +92,25 @@ public final class Room extends Thread {
                 this.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                interrupt();
+                Thread.currentThread().interrupt();
             }
             roomStatus = Status.FINISHED;
         }
 
-        users.stream()
-                .filter(Objects::nonNull)
-                .forEach(user -> user.sendMessage("finish"));
-        users.stream()
-                .filter(Objects::nonNull)
-                .forEach(user -> user.sendMessage(this.getRating()));
-        System.out.println("Room released!");
-        System.out.println(getRating());
-        System.out.println();
+        handleGameFinished();
+        log.info("Room released! Rating table:\n{}", getRating());
     }
 
     public Game getGame() {
         return game;
+    }
+
+    private void handleGameFinished() {
+        for (User user : users) {
+            if (user != null) {
+                user.sendMessage("finish\n" + this.getRating());
+            }
+        }
     }
 
     private enum Status {

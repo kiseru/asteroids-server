@@ -9,8 +9,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public final class User extends Thread {
+
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
 
     private BufferedReader reader;
     private PrintWriter writer;
@@ -49,7 +53,7 @@ public final class User extends Thread {
                     room.addUser(this);
                     if (room.isFull()) {
                         Server.Companion.getNotFullRoom(); // Чтобы полная комната добавилась в список комнат
-                        room.start();
+                        EXECUTOR_SERVICE.execute(room);
                     }
                     Server.class.wait();
                 } catch (InterruptedException e) {
