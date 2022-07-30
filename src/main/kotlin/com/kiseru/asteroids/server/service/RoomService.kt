@@ -23,4 +23,14 @@ object RoomService {
             return notFullRoom
         }
     }
+
+    /**
+     * Возвращает рейтинг пользователей комнаты.
+     *
+     * @return рейтинг пользователей комнаты
+     */
+    fun getRoomRating(room: Room): String {
+        return room.users.sortedBy { it.score }
+            .joinToString("\n") { "${it.userName} ${it.score}" }
+    }
 }

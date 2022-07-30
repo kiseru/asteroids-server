@@ -13,13 +13,13 @@ import kotlin.concurrent.withLock
 
 class Room : Runnable {
 
+    val users: MutableList<User> = CopyOnWriteArrayList()
+
     private val lock: Lock = ReentrantLock()
 
     private val endgameCondition = lock.newCondition()
 
     private val spaceShipCreatedCondition = lock.newCondition()
-
-    private val users: MutableList<User> = CopyOnWriteArrayList()
 
     private var status = Status.WAITING_CONNECTIONS
 
@@ -45,8 +45,9 @@ class Room : Runnable {
             }
         }
 
-        sendMessageToUsers("finish\n${getRating()}")
-        log.info("Room released! Rating table:\n${getRating()}")
+        val rating = RoomService.getRoomRating(this)
+        sendMessageToUsers("finish\n$rating")
+        log.info("Room released! Rating table:\n$rating")
     }
 
     /**
@@ -61,41 +62,25 @@ class Room : Runnable {
     }
 
     /**
-     * Возвращает рейтинг пользователей комнаты.
-     *
-     * @return рейтинг пользователей комнаты
-     */
-    fun getRating(): String {
-        return users.sortedBy { it.score }
-            .joinToString("\n") { "${it.userName} ${it.score}" }
-    }
-
-    /**
      * Возвращает `true` если комната заполнена, иначе `false`.
      *
      * @return `true` если комната заполнена, иначе `false`
      */
-    fun isFull(): Boolean {
-        return users.size >= MAX_USERS
-    }
+    fun isFull(): Boolean = users.size >= MAX_USERS
 
     /**
      * Возвращает `true` если комната играет, иначе `false`.
      *
      * @return `true` если комната играет, иначе `false`
      */
-    fun isGameStarted(): Boolean {
-        return status == Status.GAMING
-    }
+    fun isGameStarted(): Boolean = status == Status.GAMING
 
     /**
      * Возвращает `true` если комната закончила игру, иначе `false`.
      *
      * @return `true` если комната закончила игру, иначе `false`
      */
-    fun isGameFinished(): Boolean {
-        return status == Status.FINISHED
-    }
+    fun isGameFinished(): Boolean = status == Status.FINISHED
 
     /**
      * Проверяет, собрали ли весь мусор

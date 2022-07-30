@@ -28,7 +28,7 @@ class Application(private val port: Int) {
             when (command) {
                 "rating" -> {
                     for (room in RoomService.rooms) {
-                        println(room.getRating())
+                        println(RoomService.getRoomRating(room))
                     }
                 }
 
