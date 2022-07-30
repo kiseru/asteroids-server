@@ -11,11 +11,15 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public final class Room implements Runnable {
+
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
 
     private static final int SCREEN_WIDTH = 30;
 
@@ -32,6 +36,8 @@ public final class Room implements Runnable {
     private final Lock lock = new ReentrantLock();
 
     private final Condition endgameCondition = lock.newCondition();
+
+    private final Condition spaceShipCreatedCondition = lock.newCondition();
 
     private final List<User> users = new CopyOnWriteArrayList<>();
 
@@ -51,27 +57,12 @@ public final class Room implements Runnable {
         users.add(user);
     }
 
-    public void removeUser(User user) {
-        if (users.isEmpty()) {
-            return;
-        }
-
-        users.remove(user);
-    }
-
     public String getRating() {
         return users.stream()
                 .filter(Objects::nonNull)
                 .sorted(Comparator.comparingInt(User::getScore))
                 .map(User::toString)
                 .reduce("", (acc, userRow) -> acc + userRow + "\n");
-    }
-
-    public long aliveUsersCount() {
-        return users.stream()
-                .filter(Objects::nonNull)
-                .filter(User::getIsAlive)
-                .count();
     }
 
     public boolean isFull() {
@@ -94,12 +85,15 @@ public final class Room implements Runnable {
 
         status = Status.GAMING;
 
-        synchronized (Server.class) {
+        lock.lock();
+        try {
             game = new Game(new Screen(SCREEN_WIDTH, SCREEN_HEIGHT), NUMBER_OF_GARBAGE_CELLS, NUMBER_OF_ASTEROID_CELLS);
             users.stream()
                     .filter(Objects::nonNull)
                     .forEach(game::registerSpaceShipForUser);
-            Server.class.notifyAll();
+            spaceShipCreatedCondition.signalAll();
+        } finally {
+            lock.unlock();
         }
 
         game.refresh();
@@ -128,6 +122,26 @@ public final class Room implements Runnable {
             log.info("Game finished");
             status = Status.FINISHED;
             endgameCondition.signalAll();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void addUserToRoom(User user) {
+        lock.lock();
+        try {
+            addUser(user);
+            if (isFull()) {
+                Server.Companion.getNotFullRoom(); // Чтобы полная комната добавилась в список комнат
+                EXECUTOR_SERVICE.execute(this);
+            }
+
+            while (user.getSpaceShip() == null) {
+                spaceShipCreatedCondition.await();
+            }
+        } catch (InterruptedException e) {
+            log.error("Interrupted!", e);
+            Thread.currentThread().interrupt();
         } finally {
             lock.unlock();
         }
