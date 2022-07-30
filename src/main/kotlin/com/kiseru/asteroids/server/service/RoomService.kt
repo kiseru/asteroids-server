@@ -31,7 +31,7 @@ object RoomService {
      */
     fun getRoomRating(room: Room): String {
         return room.users.sortedBy { it.score }
-            .joinToString("\n") { "${it.userName} ${it.score}" }
+            .joinToString("\n") { "${it.username} ${it.score}" }
     }
 
     /**

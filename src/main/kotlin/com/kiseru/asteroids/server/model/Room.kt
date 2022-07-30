@@ -120,7 +120,7 @@ class Room : Runnable {
         if (users.size >= MAX_USERS) {
             RoomService.getNotFullRoom().addUser(user)
         }
-        RoomService.sendMessageToUsers(this, "User ${user.userName} has joined the room.")
+        RoomService.sendMessageToUsers(this, "User ${user.username} has joined the room.")
         users.add(user)
     }
 

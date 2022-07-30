@@ -24,7 +24,7 @@ public final class User implements Runnable {
 
     private final int id;
 
-    private String userName;
+    private final String username;
 
     private int score = 100;
 
@@ -32,14 +32,15 @@ public final class User implements Runnable {
 
     private boolean isAlive = true;
 
-    public User(BufferedReader reader, PrintWriter writer, Room room) {
+    private SpaceShip spaceShip;
+
+    public User(String username, Room room, BufferedReader reader, PrintWriter writer) {
+        this.username = username;
+        this.room = room;
         this.reader = reader;
         this.writer = writer;
-        this.room = room;
         this.id = nextId++;
     }
-
-    private SpaceShip spaceShip;
 
     public int getScore() {
         return score;
@@ -47,7 +48,6 @@ public final class User implements Runnable {
 
     @Override
     public void run() {
-        authorizeUser();
         init();
         try {
             while (!room.isGameFinished() && isAlive) {
@@ -56,15 +56,15 @@ public final class User implements Runnable {
                 incrementSteps();
             }
         } catch (IOException e) {
-            log.error("Connection problems with user " + userName, e);
+            log.error("Connection problems with user " + username, e);
         } finally {
             isAlive = false;
             room.setGameFinished();
         }
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
     public void sendMessage(String message) {
@@ -94,10 +94,6 @@ public final class User implements Runnable {
         room.checkCollectedGarbage(collected);
     }
 
-    public void setSpaceShip(SpaceShip spaceShip) {
-        this.spaceShip = spaceShip;
-    }
-
     public Room getRoom() {
         return room;
     }
@@ -106,36 +102,16 @@ public final class User implements Runnable {
         return spaceShip;
     }
 
+    public void setSpaceShip(SpaceShip spaceShip) {
+        this.spaceShip = spaceShip;
+    }
+
     public int getId() {
         return id;
     }
 
     public boolean isAlive() {
         return isAlive;
-    }
-
-    private void authorizeUser() {
-        try {
-            sendWelcomeMessage();
-            userName = reader.readLine();
-            log.info("{} has joined the server", userName);
-            sendInstructions();
-        } catch (IOException e) {
-            log.error("Failed to authorize user");
-        }
-    }
-
-    private void sendWelcomeMessage() {
-        writer.println("Welcome To Asteroids Server");
-        writer.println("Please, introduce yourself!");
-        writer.flush();
-    }
-
-    private void sendInstructions() {
-        writer.println("You need to keep a space garbage.");
-        writer.println("Your ID is " + getId());
-        writer.println("Good luck, Commander!");
-        writer.flush();
     }
 
     private void sendGameOverMessage() {
