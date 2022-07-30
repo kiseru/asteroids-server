@@ -48,7 +48,7 @@ public final class User extends Thread {
                 try {
                     room.addUser(this);
                     if (room.isFull()) {
-                        Server.getNotFullRoom(); // Чтобы полная комната добавилась в список комнат
+                        Server.Companion.getNotFullRoom(); // Чтобы полная комната добавилась в список комнат
                         room.start();
                     }
                     Server.class.wait();
