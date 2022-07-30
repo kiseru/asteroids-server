@@ -8,6 +8,7 @@ import com.kiseru.asteroids.server.model.Point;
 import com.kiseru.asteroids.server.model.SpaceShip;
 import com.kiseru.asteroids.server.model.Coordinates;
 import com.kiseru.asteroids.server.model.Type;
+import com.kiseru.asteroids.server.service.CourseCheckerService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +69,7 @@ public class Game {
         this.pointsOnScreen.add(spaceShip);
         this.gameObjects.add(spaceShip);
         crashHandlers.add(new SpaceShipCrashHandler(this, spaceShip));
-        spaceShip.setCourseChecker(new CourseChecker(spaceShip, this.pointsOnScreen, this.screen));
+        spaceShip.setCourseChecker(new CourseCheckerService(spaceShip, this.pointsOnScreen, this.screen));
         user.setSpaceShip(spaceShip);
     }
 

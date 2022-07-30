@@ -1,7 +1,7 @@
 package com.kiseru.asteroids.server.model
 
 import com.kiseru.asteroids.server.User
-import com.kiseru.asteroids.server.logics.CourseChecker
+import com.kiseru.asteroids.server.service.CourseCheckerService
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -12,7 +12,7 @@ class SpaceShip(coordinates: Coordinates, private val owner: User) : Point(coord
 
     var direction: Direction? = null
 
-    var courseChecker: CourseChecker? = null
+    lateinit var courseChecker: CourseCheckerService
 
     override val symbolToShow: String
         get() = owner.id.toString()
