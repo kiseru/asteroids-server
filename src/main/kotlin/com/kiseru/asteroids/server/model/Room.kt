@@ -17,6 +17,18 @@ class Room : Runnable {
 
     val users: MutableList<User> = CopyOnWriteArrayList()
 
+    val isFull: Boolean
+        get() = users.size >= MAX_USERS
+
+    val isGameStarted: Boolean
+        get() = status == Status.GAMING
+
+    val isGameFinished: Boolean
+        get() = status == Status.FINISHED
+
+    lateinit var game: Game
+        private set
+
     private val lock: Lock = ReentrantLock()
 
     private val endgameCondition = lock.newCondition()
@@ -24,9 +36,6 @@ class Room : Runnable {
     private val spaceShipCreatedCondition = lock.newCondition()
 
     private var status = Status.WAITING_CONNECTIONS
-
-    lateinit var game: Game
-        private set
 
     override fun run() {
         RoomService.sendMessageToUsers(this, "start")
@@ -51,27 +60,6 @@ class Room : Runnable {
         RoomService.sendMessageToUsers(this, "finish\n$rating")
         log.info("Room released! Rating table:\n$rating")
     }
-
-    /**
-     * Возвращает `true` если комната заполнена, иначе `false`.
-     *
-     * @return `true` если комната заполнена, иначе `false`
-     */
-    fun isFull(): Boolean = users.size >= MAX_USERS
-
-    /**
-     * Возвращает `true` если комната играет, иначе `false`.
-     *
-     * @return `true` если комната играет, иначе `false`
-     */
-    fun isGameStarted(): Boolean = status == Status.GAMING
-
-    /**
-     * Возвращает `true` если комната закончила игру, иначе `false`.
-     *
-     * @return `true` если комната закончила игру, иначе `false`
-     */
-    fun isGameFinished(): Boolean = status == Status.FINISHED
 
     /**
      * Проверяет, собрали ли весь мусор
@@ -99,7 +87,7 @@ class Room : Runnable {
 
     fun addUserToRoom(user: User) = lock.withLock {
         addUser(user)
-        if (isFull()) {
+        if (isFull) {
             RoomService.getNotFullRoom()
             EXECUTOR_SERVICE.execute(this)
         }
