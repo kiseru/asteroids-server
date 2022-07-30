@@ -2,7 +2,7 @@ package com.kiseru.asteroids.server;
 
 import com.kiseru.asteroids.server.logics.auxiliary.Direction;
 import com.kiseru.asteroids.server.logics.models.SpaceShip;
-import com.kiseru.asteroids.server.room.Room;
+import com.kiseru.asteroids.server.model.Room;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -100,7 +100,7 @@ public final class User extends Thread {
             System.out.println("Connection problems with user " + userName);
         } finally {
             isAlive = false;
-            if (room.aliveCount() == 0) {
+            if (room.aliveUsersCount() == 0) {
                 synchronized (room) {
                     room.notifyAll();
                 }

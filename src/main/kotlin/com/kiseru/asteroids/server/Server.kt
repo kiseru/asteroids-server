@@ -1,6 +1,6 @@
 package com.kiseru.asteroids.server
 
-import com.kiseru.asteroids.server.room.Room
+import com.kiseru.asteroids.server.model.Room
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch

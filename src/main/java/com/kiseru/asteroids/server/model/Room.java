@@ -1,65 +1,43 @@
-package com.kiseru.asteroids.server.room;
+package com.kiseru.asteroids.server.model;
 
 import com.kiseru.asteroids.server.Server;
 import com.kiseru.asteroids.server.User;
 import com.kiseru.asteroids.server.logics.Game;
 import com.kiseru.asteroids.server.logics.Screen;
+import com.kiseru.asteroids.server.room.RoomStatus;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.stream.IntStream;
 
 public final class Room extends Thread {
 
     private static final int MAX_USERS = 1;
 
-    private ArrayList<User> users;
-    private int usersCount;
-    private RoomStatus roomStatus;
+    private final ArrayList<User> users = new ArrayList<>();
+
+    private RoomStatus roomStatus = RoomStatus.WAITING_CONNECTIONS;
+
     private Game game;
 
-    public Room() {
-        users = new ArrayList<>();
-        IntStream.iterate(0, i -> i + 1)
-                .limit(MAX_USERS)
-                .forEach(i -> users.add(null));
-        usersCount = 0;
-        roomStatus = RoomStatus.WAITING_CONNECTIONS;
-    }
-
     public synchronized void addUser(User user) {
-        if (usersCount >= MAX_USERS) Server.Companion.getNotFullRoom().addUser(user);
-
-        int emptyPlaceIndex = IntStream.iterate(0, index -> index + 1)
-                .limit(users.size())
-                .filter(index -> users.get(index) == null)
-                .findFirst()
-                .orElse(-1);
-
-        if (emptyPlaceIndex == -1) return;
+        if (users.size() >= MAX_USERS) {
+            Server.Companion.getNotFullRoom().addUser(user);
+        }
 
         users.stream()
                 .filter(Objects::nonNull)
                 .forEach(roomUser -> roomUser.sendMessage(String.format("User %s has joined the room.", user.getUserName())));
 
-        users.set(emptyPlaceIndex, user);
-        usersCount++;
+        users.add(user);
     }
 
     public synchronized void removeUser(User user) {
-        if (usersCount == 0) return;
+        if (users.isEmpty()) {
+            return;
+        }
 
-        User removingUser = users.stream()
-                .filter(user::equals)
-                .findFirst()
-                .orElse(null);
-
-        if (removingUser == null) return;
-
-        users.remove(removingUser);
-
-        usersCount--;
+        users.remove(user);
     }
 
     public String getRating() {
@@ -70,7 +48,7 @@ public final class Room extends Thread {
                 .reduce("", (acc, userRow) -> acc + userRow + "\n");
     }
 
-    public long aliveCount() {
+    public long aliveUsersCount() {
         return users.stream()
                 .filter(Objects::nonNull)
                 .filter(User::getIsAlive)
@@ -78,7 +56,7 @@ public final class Room extends Thread {
     }
 
     public boolean isFull() {
-        return usersCount == MAX_USERS;
+        return users.size() >= MAX_USERS;
     }
 
     public boolean isGameStarted() {
