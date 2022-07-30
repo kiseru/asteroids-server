@@ -2,7 +2,7 @@ package com.kiseru.asteroids.server.logics;
 
 import com.kiseru.asteroids.server.User;
 import com.kiseru.asteroids.server.logics.handlers.SpaceShipCrashHandler;
-import com.kiseru.asteroids.server.logics.models.Asteroid;
+import com.kiseru.asteroids.server.model.Asteroid;
 import com.kiseru.asteroids.server.logics.models.Garbage;
 import com.kiseru.asteroids.server.model.Point;
 import com.kiseru.asteroids.server.logics.models.SpaceShip;

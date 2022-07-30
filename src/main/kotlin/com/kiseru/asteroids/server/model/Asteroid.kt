@@ -1,29 +1,10 @@
-package com.kiseru.asteroids.server.logics.models;
+package com.kiseru.asteroids.server.model
 
-import com.kiseru.asteroids.server.logics.Screen;
-import com.kiseru.asteroids.server.model.Coordinates;
-import com.kiseru.asteroids.server.model.Point;
-import com.kiseru.asteroids.server.model.Type;
-import org.jetbrains.annotations.NotNull;
+class Asteroid(coordinates: Coordinates) : Point(coordinates) {
 
-/**
- * @author Bulat Giniyatullin
- * 08 Декабрь 2017
- */
+    override val type: Type
+        get() = Type.ASTEROID
 
-public class Asteroid extends Point {
-
-    public Asteroid(Coordinates coordinates) {
-        super(coordinates);
-    }
-
-    @Override
-    public Type getType() {
-        return Type.ASTEROID;
-    }
-
-    @Override
-    public String getSymbolToShow() {
-        return "A";
-    }
+    override val symbolToShow: String
+        get() = "A"
 }
