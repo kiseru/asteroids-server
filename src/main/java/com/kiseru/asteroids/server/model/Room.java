@@ -116,6 +116,12 @@ public final class Room implements Runnable {
         return game;
     }
 
+    public void checkCollectedGarbage(int collected) {
+        if (collected >= game.getGarbageNumber()) {
+            setGameFinished();
+        }
+    }
+
     public void setGameFinished() {
         lock.lock();
         try {

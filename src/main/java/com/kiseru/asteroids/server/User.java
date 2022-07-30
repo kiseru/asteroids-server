@@ -132,6 +132,10 @@ public final class User extends Thread {
         this.sendMessage(scoreMessage);
     }
 
+    public void checkCollectedGarbage(int collected) {
+        room.checkCollectedGarbage(collected);
+    }
+
     public void setSpaceShip(SpaceShip spaceShip) {
         this.spaceShip = spaceShip;
     }

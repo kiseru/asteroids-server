@@ -7,12 +7,18 @@ import com.kiseru.asteroids.server.logics.auxiliary.Direction;
 import com.kiseru.asteroids.server.logics.auxiliary.Type;
 import com.kiseru.asteroids.server.User;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * @author Bulat Giniyatullin
  * 08 Декабрь 2017
  */
 
 public class SpaceShip extends Point implements Model{
+
+    private final Lock lock = new ReentrantLock();
+
     private User owner;
     private Direction direction;
     private CourseChecker courseChecker;
@@ -53,17 +59,14 @@ public class SpaceShip extends Point implements Model{
      * @param type: тип объекта, с которым произошло столкновение
      */
     public void crash(Type type) {
-        synchronized (owner.getRoom().getGame()) {
+        lock.lock();
+        try {
             if (type == Type.ASTEROID) {
                 owner.substractScore();
             } else if (type == Type.GARBAGE) {
                 owner.addScore();
                 int collected = owner.getRoom().getGame().incrementCollectedGarbageCount();
-                if (collected >= owner.getRoom().getGame().getGarbageNumber()) {
-                    synchronized (owner.getRoom()) {
-                        owner.getRoom().notifyAll();
-                    }
-                }
+                checkCollectedGarbage(collected);
             } else if (type == Type.WALL) {
                 // возвращаемся назад, чтобы не находится на стене
                 rollbackLastStep();
@@ -72,7 +75,13 @@ public class SpaceShip extends Point implements Model{
             if (!owner.isAlive()) {
                 this.destroy();
             }
+        } finally {
+            lock.unlock();
         }
+    }
+
+    private void checkCollectedGarbage(int collected) {
+        owner.checkCollectedGarbage(collected);
     }
 
     private void rollbackLastStep() {
