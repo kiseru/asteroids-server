@@ -4,7 +4,6 @@ import com.kiseru.asteroids.server.Server;
 import com.kiseru.asteroids.server.User;
 import com.kiseru.asteroids.server.logics.Game;
 import com.kiseru.asteroids.server.logics.Screen;
-import com.kiseru.asteroids.server.room.RoomStatus;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -16,7 +15,7 @@ public final class Room extends Thread {
 
     private final ArrayList<User> users = new ArrayList<>();
 
-    private RoomStatus roomStatus = RoomStatus.WAITING_CONNECTIONS;
+    private Status roomStatus = Status.WAITING_CONNECTIONS;
 
     private Game game;
 
@@ -60,11 +59,11 @@ public final class Room extends Thread {
     }
 
     public boolean isGameStarted() {
-        return roomStatus == RoomStatus.GAMING;
+        return roomStatus == Status.GAMING;
     }
 
     public boolean isGameFinished() {
-        return roomStatus == RoomStatus.FINISHED;
+        return roomStatus == Status.FINISHED;
     }
 
     @Override
@@ -73,7 +72,7 @@ public final class Room extends Thread {
                 .filter(Objects::nonNull)
                 .forEach(user -> user.sendMessage("start"));
 
-        roomStatus = RoomStatus.GAMING;
+        roomStatus = Status.GAMING;
 
         synchronized (Server.class) {
             game = new Game(new Screen(30, 30), 150, 50);
@@ -91,7 +90,7 @@ public final class Room extends Thread {
                 e.printStackTrace();
                 interrupt();
             }
-            roomStatus = RoomStatus.FINISHED;
+            roomStatus = Status.FINISHED;
         }
 
         users.stream()
@@ -107,5 +106,11 @@ public final class Room extends Thread {
 
     public Game getGame() {
         return game;
+    }
+
+    private enum Status {
+        WAITING_CONNECTIONS,
+        GAMING,
+        FINISHED
     }
 }
