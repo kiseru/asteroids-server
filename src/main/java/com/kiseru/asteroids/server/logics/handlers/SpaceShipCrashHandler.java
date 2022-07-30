@@ -1,7 +1,7 @@
 package com.kiseru.asteroids.server.logics.handlers;
 
 import com.kiseru.asteroids.server.logics.Game;
-import com.kiseru.asteroids.server.logics.auxiliary.Type;
+import com.kiseru.asteroids.server.model.Type;
 import com.kiseru.asteroids.server.model.Destroyable;
 import com.kiseru.asteroids.server.logics.models.Point;
 import com.kiseru.asteroids.server.logics.models.SpaceShip;

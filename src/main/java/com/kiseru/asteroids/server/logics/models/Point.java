@@ -1,7 +1,7 @@
 package com.kiseru.asteroids.server.logics.models;
 
 import com.kiseru.asteroids.server.logics.auxiliary.Coordinates;
-import com.kiseru.asteroids.server.logics.auxiliary.Type;
+import com.kiseru.asteroids.server.model.Type;
 
 /**
  * @author Bulat Giniyatullin

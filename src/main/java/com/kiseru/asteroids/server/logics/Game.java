@@ -1,7 +1,7 @@
 package com.kiseru.asteroids.server.logics;
 
 import com.kiseru.asteroids.server.logics.auxiliary.Coordinates;
-import com.kiseru.asteroids.server.logics.auxiliary.Type;
+import com.kiseru.asteroids.server.model.Type;
 import com.kiseru.asteroids.server.logics.handlers.SpaceShipCrashHandler;
 import com.kiseru.asteroids.server.logics.models.Asteroid;
 import com.kiseru.asteroids.server.logics.models.Garbage;

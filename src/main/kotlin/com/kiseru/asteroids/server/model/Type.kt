@@ -1,10 +1,8 @@
-package com.kiseru.asteroids.server.logics.auxiliary;
+package com.kiseru.asteroids.server.model
 
-/**
- * @author Bulat Giniyatullin
- * 08 Декабрь 2017
- */
-
-public enum Type {
-    ASTEROID, GARBAGE, SPACESHIP, WALL;
+enum class Type {
+    ASTEROID,
+    GARBAGE,
+    SPACESHIP,
+    WALL,
 }

@@ -4,7 +4,7 @@ import com.kiseru.asteroids.server.logics.CourseChecker;
 import com.kiseru.asteroids.server.logics.Screen;
 import com.kiseru.asteroids.server.logics.auxiliary.Coordinates;
 import com.kiseru.asteroids.server.model.Direction;
-import com.kiseru.asteroids.server.logics.auxiliary.Type;
+import com.kiseru.asteroids.server.model.Type;
 import com.kiseru.asteroids.server.User;
 import com.kiseru.asteroids.server.model.Renderable;
 
