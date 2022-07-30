@@ -7,9 +7,10 @@ import com.kiseru.asteroids.server.logics.Screen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class Room implements Runnable {
 
@@ -25,13 +26,13 @@ public final class Room implements Runnable {
 
     private static final int MAX_USERS = 1;
 
-    private final ArrayList<User> users = new ArrayList<>();
+    private final List<User> users = new CopyOnWriteArrayList<>();
 
     private Status roomStatus = Status.WAITING_CONNECTIONS;
 
     private Game game;
 
-    public synchronized void addUser(User user) {
+    public void addUser(User user) {
         if (users.size() >= MAX_USERS) {
             Server.Companion.getNotFullRoom().addUser(user);
         }
@@ -43,7 +44,7 @@ public final class Room implements Runnable {
         users.add(user);
     }
 
-    public synchronized void removeUser(User user) {
+    public void removeUser(User user) {
         if (users.isEmpty()) {
             return;
         }
