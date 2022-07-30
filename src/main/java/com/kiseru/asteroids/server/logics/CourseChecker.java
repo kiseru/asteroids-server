@@ -3,7 +3,7 @@ package com.kiseru.asteroids.server.logics;
 import com.kiseru.asteroids.server.model.Coordinates;
 import com.kiseru.asteroids.server.model.Type;
 import com.kiseru.asteroids.server.model.Point;
-import com.kiseru.asteroids.server.logics.models.SpaceShip;
+import com.kiseru.asteroids.server.model.SpaceShip;
 
 import java.util.List;
 

@@ -5,7 +5,7 @@ import com.kiseru.asteroids.server.logics.handlers.SpaceShipCrashHandler;
 import com.kiseru.asteroids.server.model.Asteroid;
 import com.kiseru.asteroids.server.model.Garbage;
 import com.kiseru.asteroids.server.model.Point;
-import com.kiseru.asteroids.server.logics.models.SpaceShip;
+import com.kiseru.asteroids.server.model.SpaceShip;
 import com.kiseru.asteroids.server.model.Coordinates;
 import com.kiseru.asteroids.server.model.Type;
 

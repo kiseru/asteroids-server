@@ -1,130 +1,80 @@
-package com.kiseru.asteroids.server.logics.models;
+package com.kiseru.asteroids.server.model
 
-import com.kiseru.asteroids.server.User;
-import com.kiseru.asteroids.server.logics.CourseChecker;
-import com.kiseru.asteroids.server.model.Coordinates;
-import com.kiseru.asteroids.server.model.Direction;
-import com.kiseru.asteroids.server.model.Point;
-import com.kiseru.asteroids.server.model.Type;
+import com.kiseru.asteroids.server.User
+import com.kiseru.asteroids.server.logics.CourseChecker
+import java.util.concurrent.locks.Lock
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+class SpaceShip(coordinates: Coordinates, private val owner: User) : Point(coordinates) {
 
-/**
- * @author Bulat Giniyatullin
- * 08 Декабрь 2017
- */
+    private val lock: Lock = ReentrantLock()
 
-public class SpaceShip extends Point {
+    var direction: Direction? = null
 
-    private final Lock lock = new ReentrantLock();
+    var courseChecker: CourseChecker? = null
 
-    private User owner;
-    private Direction direction;
-    private CourseChecker courseChecker;
+    override val symbolToShow: String
+        get() = owner.id.toString()
 
-    public SpaceShip(Coordinates coordinates, User owner) {
-        super(coordinates);
-        this.owner = owner;
-    }
-
-    @Override
-    public String getSymbolToShow() {
-        return String.valueOf(owner.getId());
-    }
-
-    @Override
-    public void destroy() {
-        throw new UnsupportedOperationException();
+    override fun destroy() {
+        throw UnsupportedOperationException()
     }
 
     /**
-     * делает шаг в текущем направлении
+     * Делает шаг в текущем направлении.
      */
-    public void go() {
-        switch (direction) {
-            case UP:
-                setCoordinates(new Coordinates(this.getX(), this.getY() - 1));
-                break;
-            case RIGHT:
-                setCoordinates(new Coordinates(this.getX() + 1, this.getY()));
-                break;
-            case DOWN:
-                setCoordinates(new Coordinates(this.getX(), this.getY() + 1));
-                break;
-            case LEFT:
-                setCoordinates(new Coordinates(this.getX() - 1, this.getY()));
+    fun go() {
+        coordinates = when (direction) {
+            Direction.UP -> Coordinates(x, y - 1)
+            Direction.RIGHT -> Coordinates(x + 1, y)
+            Direction.DOWN -> Coordinates(x, y + 1)
+            Direction.LEFT -> Coordinates(x - 1, y)
+            else -> throw UnsupportedOperationException()
         }
     }
 
     /**
      * Вызывается при выявлении столкновения корабля с чем-либо
+     *
      * @param type: тип объекта, с которым произошло столкновение
      */
-    public void crash(Type type) {
-        lock.lock();
-        try {
-            if (type == Type.ASTEROID) {
-                owner.substractScore();
-            } else if (type == Type.GARBAGE) {
-                owner.addScore();
-                int collected = owner.getRoom().getGame().incrementCollectedGarbageCount();
-                checkCollectedGarbage(collected);
-            } else if (type == Type.WALL) {
+    fun crash(type: Type) {
+        lock.withLock {
+            if (type === Type.ASTEROID) {
+                owner.substractScore()
+            } else if (type === Type.GARBAGE) {
+                owner.addScore()
+                val collected = owner.room.game.incrementCollectedGarbageCount()
+                checkCollectedGarbage(collected)
+            } else if (type === Type.WALL) {
                 // возвращаемся назад, чтобы не находится на стене
-                rollbackLastStep();
-                owner.substractScore();
+                rollbackLastStep()
+                owner.substractScore()
             }
             if (!owner.isAlive()) {
-                this.destroy();
+                destroy()
             }
-        } finally {
-            lock.unlock();
         }
     }
 
-    private void checkCollectedGarbage(int collected) {
-        owner.checkCollectedGarbage(collected);
+    private fun checkCollectedGarbage(collected: Int) {
+        owner.checkCollectedGarbage(collected)
     }
 
-    private void rollbackLastStep() {
-        switch (direction) {
-            case UP:
-                setCoordinates(new Coordinates(this.getX(), this.getY() + 1));
-                break;
-            case RIGHT:
-                setCoordinates(new Coordinates(this.getX() - 1, this.getY()));
-                break;
-            case DOWN:
-                setCoordinates(new Coordinates(this.getX(), this.getY() - 1));
-                break;
-            case LEFT:
-                setCoordinates(new Coordinates(this.getX() + 1, this.getY()));
+    private fun rollbackLastStep() {
+        coordinates = when (direction) {
+            Direction.UP -> Coordinates(x, y + 1)
+            Direction.RIGHT -> Coordinates(x - 1, y)
+            Direction.DOWN -> Coordinates(x, y - 1)
+            Direction.LEFT -> Coordinates(x + 1, y)
+            else -> throw UnsupportedOperationException()
         }
     }
 
-    public Direction getDirection() {
-        return direction;
-    }
+    override val type: Type
+        get() = Type.SPACESHIP
 
-    public void setDirection(Direction direction) {
-        this.direction = direction;
-    }
-
-    @Override
-    public Type getType() {
-        return Type.SPACESHIP;
-    }
-
-    public CourseChecker getCourseChecker() {
-        return courseChecker;
-    }
-
-    public void setCourseChecker(CourseChecker courseChecker) {
-        this.courseChecker = courseChecker;
-    }
-
-    public boolean isOwnerAlive() {
-        return owner.isAlive();
-    }
+    val isOwnerAlive: Boolean
+        get() = owner.isAlive()
 }

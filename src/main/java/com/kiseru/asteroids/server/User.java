@@ -1,7 +1,7 @@
 package com.kiseru.asteroids.server;
 
 import com.kiseru.asteroids.server.model.Direction;
-import com.kiseru.asteroids.server.logics.models.SpaceShip;
+import com.kiseru.asteroids.server.model.SpaceShip;
 import com.kiseru.asteroids.server.model.Room;
 
 import java.io.BufferedReader;
