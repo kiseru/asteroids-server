@@ -11,6 +11,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public final class Room implements Runnable {
 
@@ -22,13 +25,17 @@ public final class Room implements Runnable {
 
     private static final int NUMBER_OF_ASTEROID_CELLS = 50;
 
+    private static final int MAX_USERS = 1;
+
     private static final Logger log = LoggerFactory.getLogger(Room.class);
 
-    private static final int MAX_USERS = 1;
+    private final Lock lock = new ReentrantLock();
+
+    private final Condition endgameCondition = lock.newCondition();
 
     private final List<User> users = new CopyOnWriteArrayList<>();
 
-    private Status roomStatus = Status.WAITING_CONNECTIONS;
+    private Status status = Status.WAITING_CONNECTIONS;
 
     private Game game;
 
@@ -72,11 +79,11 @@ public final class Room implements Runnable {
     }
 
     public boolean isGameStarted() {
-        return roomStatus == Status.GAMING;
+        return status == Status.GAMING;
     }
 
     public boolean isGameFinished() {
-        return roomStatus == Status.FINISHED;
+        return status == Status.FINISHED;
     }
 
     @Override
@@ -85,7 +92,7 @@ public final class Room implements Runnable {
                 .filter(Objects::nonNull)
                 .forEach(user -> user.sendMessage("start"));
 
-        roomStatus = Status.GAMING;
+        status = Status.GAMING;
 
         synchronized (Server.class) {
             game = new Game(new Screen(SCREEN_WIDTH, SCREEN_HEIGHT), NUMBER_OF_GARBAGE_CELLS, NUMBER_OF_ASTEROID_CELLS);
@@ -95,15 +102,16 @@ public final class Room implements Runnable {
             Server.class.notifyAll();
         }
 
-        synchronized (this) {
-            try {
-                game.refresh();
-                this.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                Thread.currentThread().interrupt();
+        game.refresh();
+        try {
+            lock.lock();
+            while (status != Status.FINISHED) {
+                endgameCondition.await();
             }
-            roomStatus = Status.FINISHED;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            lock.unlock();
         }
 
         handleGameFinished();
@@ -112,6 +120,17 @@ public final class Room implements Runnable {
 
     public Game getGame() {
         return game;
+    }
+
+    public void setGameFinished() {
+        lock.lock();
+        try {
+            log.info("Game finished");
+            status = Status.FINISHED;
+            endgameCondition.signalAll();
+        } finally {
+            lock.unlock();
+        }
     }
 
     private void handleGameFinished() {

@@ -104,11 +104,7 @@ public final class User extends Thread {
             System.out.println("Connection problems with user " + userName);
         } finally {
             isAlive = false;
-            if (room.aliveUsersCount() == 0) {
-                synchronized (room) {
-                    room.notifyAll();
-                }
-            }
+            room.setGameFinished();
         }
     }
 
