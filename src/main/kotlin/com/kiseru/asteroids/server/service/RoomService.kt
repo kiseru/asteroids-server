@@ -33,4 +33,15 @@ object RoomService {
         return room.users.sortedBy { it.score }
             .joinToString("\n") { "${it.userName} ${it.score}" }
     }
+
+    /**
+     * Рассылает сообщение пользователям комнаты.
+     *
+     * @param message сообщение
+     */
+    fun sendMessageToUsers(room: Room, message: String) {
+        for (user in room.users) {
+            user.sendMessage(message)
+        }
+    }
 }

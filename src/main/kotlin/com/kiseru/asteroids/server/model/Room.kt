@@ -30,7 +30,7 @@ class Room : Runnable {
         private set
 
     override fun run() {
-        sendMessageToUsers("start")
+        RoomService.sendMessageToUsers(this, "start")
         status = Status.GAMING
         lock.withLock {
             game = Game(Screen(SCREEN_WIDTH, SCREEN_HEIGHT), NUMBER_OF_GARBAGE_CELLS, NUMBER_OF_ASTEROID_CELLS)
@@ -49,7 +49,7 @@ class Room : Runnable {
         }
 
         val rating = RoomService.getRoomRating(this)
-        sendMessageToUsers("finish\n$rating")
+        RoomService.sendMessageToUsers(this, "finish\n$rating")
         log.info("Room released! Rating table:\n$rating")
     }
 
@@ -117,19 +117,8 @@ class Room : Runnable {
         if (users.size >= MAX_USERS) {
             RoomService.getNotFullRoom().addUser(user)
         }
-        sendMessageToUsers("User ${user.userName} has joined the room.")
+        RoomService.sendMessageToUsers(this, "User ${user.userName} has joined the room.")
         users.add(user)
-    }
-
-    /**
-     * Рассылает сообщение пользователям комнаты.
-     *
-     * @param message сообщение
-     */
-    private fun sendMessageToUsers(message: String) {
-        for (user in users) {
-            user.sendMessage(message)
-        }
     }
 
     companion object {
