@@ -13,6 +13,14 @@ import java.util.Objects;
 
 public final class Room implements Runnable {
 
+    private static final int SCREEN_WIDTH = 30;
+
+    private static final int SCREEN_HEIGHT = 30;
+
+    private static final int NUMBER_OF_GARBAGE_CELLS = 150;
+
+    private static final int NUMBER_OF_ASTEROID_CELLS = 50;
+
     private static final Logger log = LoggerFactory.getLogger(Room.class);
 
     private static final int MAX_USERS = 1;
@@ -79,7 +87,7 @@ public final class Room implements Runnable {
         roomStatus = Status.GAMING;
 
         synchronized (Server.class) {
-            game = new Game(new Screen(30, 30), 150, 50);
+            game = new Game(new Screen(SCREEN_WIDTH, SCREEN_HEIGHT), NUMBER_OF_GARBAGE_CELLS, NUMBER_OF_ASTEROID_CELLS);
             users.stream()
                     .filter(Objects::nonNull)
                     .forEach(game::registerSpaceShipForUser);
