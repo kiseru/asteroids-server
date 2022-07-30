@@ -5,10 +5,10 @@ import com.kiseru.asteroids.server.logics.auxiliary.Type;
 import com.kiseru.asteroids.server.logics.handlers.SpaceShipCrashHandler;
 import com.kiseru.asteroids.server.logics.models.Asteroid;
 import com.kiseru.asteroids.server.logics.models.Garbage;
-import com.kiseru.asteroids.server.logics.models.Model;
 import com.kiseru.asteroids.server.logics.models.Point;
 import com.kiseru.asteroids.server.logics.models.SpaceShip;
 import com.kiseru.asteroids.server.User;
+import com.kiseru.asteroids.server.model.Renderable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ public class Game {
 
     private static final Random random = new Random();
 
-    private List<Model> gameObjects;
+    private List<Renderable> gameObjects;
     private List<Point> pointsOnScreen;
     private Screen screen;
     private List<SpaceShipCrashHandler> crashHandlers;
@@ -102,7 +102,7 @@ public class Game {
                 .anyMatch(p -> p.getCoordinates().equals(coordinates));
     }
 
-    public List<Model> getGameObjects() {
+    public List<Renderable> getGameObjects() {
         return gameObjects;
     }
 

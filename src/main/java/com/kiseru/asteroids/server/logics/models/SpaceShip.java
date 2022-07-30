@@ -6,6 +6,7 @@ import com.kiseru.asteroids.server.logics.auxiliary.Coordinates;
 import com.kiseru.asteroids.server.logics.auxiliary.Direction;
 import com.kiseru.asteroids.server.logics.auxiliary.Type;
 import com.kiseru.asteroids.server.User;
+import com.kiseru.asteroids.server.model.Renderable;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -15,7 +16,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * 08 Декабрь 2017
  */
 
-public class SpaceShip extends Point implements Model{
+public class SpaceShip extends Point implements Renderable {
 
     private final Lock lock = new ReentrantLock();
 
