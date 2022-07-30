@@ -98,10 +98,6 @@ public final class User implements Runnable {
         return room;
     }
 
-    public SpaceShip getSpaceShip() {
-        return spaceShip;
-    }
-
     public void setSpaceShip(SpaceShip spaceShip) {
         this.spaceShip = spaceShip;
     }
@@ -112,6 +108,10 @@ public final class User implements Runnable {
 
     public boolean isAlive() {
         return isAlive;
+    }
+
+    public boolean hasSpaceShip() {
+        return spaceShip != null;
     }
 
     private void sendGameOverMessage() {

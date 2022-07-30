@@ -92,7 +92,7 @@ class Room : Runnable {
             EXECUTOR_SERVICE.execute(this)
         }
 
-        while (user.spaceShip == null) {
+        while (!user.hasSpaceShip()) {
             spaceShipCreatedCondition.await()
         }
     }
