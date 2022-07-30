@@ -82,7 +82,7 @@ class Server(private val port: Int) {
 
         fun getNotFullRoom(): Room {
             lock.withLock {
-                if (!notFullRoom.isFull) {
+                if (!notFullRoom.isFull()) {
                     return notFullRoom
                 }
 
