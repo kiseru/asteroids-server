@@ -1,26 +1,10 @@
-package com.kiseru.asteroids.server.logics.models;
+package com.kiseru.asteroids.server.model
 
-import com.kiseru.asteroids.server.model.Coordinates;
-import com.kiseru.asteroids.server.model.Point;
-import com.kiseru.asteroids.server.model.Type;
+class Garbage(coordinates: Coordinates) : Point(coordinates) {
 
-/**
- * @author Bulat Giniyatullin
- * 08 Декабрь 2017
- */
+    override val type: Type
+        get() = Type.GARBAGE
 
-public class Garbage extends Point {
-    public Garbage(Coordinates coordinates) {
-        super(coordinates);
-    }
-
-    @Override
-    public Type getType() {
-        return Type.GARBAGE;
-    }
-
-    @Override
-    public String getSymbolToShow() {
-        return "G";
-    }
+    override val symbolToShow: String
+        get() = "G"
 }
