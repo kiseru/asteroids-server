@@ -1,14 +1,14 @@
 package com.kiseru.asteroids.server.logics;
 
-import com.kiseru.asteroids.server.logics.auxiliary.Coordinates;
-import com.kiseru.asteroids.server.model.Type;
+import com.kiseru.asteroids.server.User;
 import com.kiseru.asteroids.server.logics.handlers.SpaceShipCrashHandler;
 import com.kiseru.asteroids.server.logics.models.Asteroid;
 import com.kiseru.asteroids.server.logics.models.Garbage;
 import com.kiseru.asteroids.server.logics.models.Point;
 import com.kiseru.asteroids.server.logics.models.SpaceShip;
-import com.kiseru.asteroids.server.User;
+import com.kiseru.asteroids.server.model.Coordinates;
 import com.kiseru.asteroids.server.model.Renderable;
+import com.kiseru.asteroids.server.model.Type;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +33,9 @@ public class Game {
 
     /**
      * Конструктор создания игровой сессии
-     * @param screen - экран
-     * @param garbageNumber - количество мусора для первоначальной генерации
+     *
+     * @param screen         - экран
+     * @param garbageNumber  - количество мусора для первоначальной генерации
      * @param asteroidNumber - количество астероидов для первоначальной генерации
      */
     public Game(Screen screen, int garbageNumber, int asteroidNumber) {
@@ -60,6 +61,7 @@ public class Game {
 
     /**
      * создает и регистрирует новый корабль
+     *
      * @param user - юзер, для которого регистриуется корабль
      */
     public void registerSpaceShipForUser(User user) {
@@ -83,7 +85,7 @@ public class Game {
     public boolean isAnyoneAlive() {
         return pointsOnScreen.stream()
                 .filter(p -> p.getType() == Type.SPACESHIP)
-                .map(s -> ((SpaceShip)s).isOwnerAlive())
+                .map(s -> ((SpaceShip) s).isOwnerAlive())
                 .reduce((b1, b2) -> b1 || b2)
                 .orElseThrow();
     }
@@ -93,7 +95,7 @@ public class Game {
         // если по случайно сгенерованным координатам уже что-то находится(или они ещё не сгенерированы)
         while (randomCoordinates == null || isGameObjectsContainsCoordinates(randomCoordinates))
             // генерируем новые координаты
-            randomCoordinates = new Coordinates(random.nextInt(screen.getWidth()) + 1, random.nextInt(screen.getHeight()) + 1   );
+            randomCoordinates = new Coordinates(random.nextInt(screen.getWidth()) + 1, random.nextInt(screen.getHeight()) + 1);
         return randomCoordinates;
     }
 

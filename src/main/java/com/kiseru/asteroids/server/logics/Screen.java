@@ -1,6 +1,6 @@
 package com.kiseru.asteroids.server.logics;
 
-import com.kiseru.asteroids.server.logics.auxiliary.Coordinates;
+import com.kiseru.asteroids.server.model.Coordinates;
 
 import java.util.Arrays;
 
