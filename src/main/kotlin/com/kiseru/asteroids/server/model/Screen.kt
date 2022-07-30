@@ -1,83 +1,62 @@
-package com.kiseru.asteroids.server.logics;
+package com.kiseru.asteroids.server.model
 
-import com.kiseru.asteroids.server.model.Coordinates;
-import com.kiseru.asteroids.server.model.Point;
+import java.util.*
 
-import java.util.Arrays;
+class Screen(val width: Int, val height: Int) {
 
-/**
- * @author Bulat Giniyatullin
- * 09 Декабрь 2017
- */
+    private val mainMatrix: Array<Array<String>> = Array(height + 2) { Array(width + 2) { "." } }
 
-public class Screen {
-    private int width;
-    private int height;
-    private String[][] mainMatrix;
-
-    public Screen(int width, int height) {
-        this.width = width;
-        this.height = height;
-        mainMatrix = new String[height + 2][width + 2];
-        generateClearScreen();
-    }
-
-    public void draw(Coordinates coordinates, Point point) {
-        draw(coordinates, point.getSymbolToShow());
+    init {
+        generateClearScreen()
     }
 
     /**
-     * рисует на экране точку
+     * Рисует на экране точку.
+     *
      * @param coordinates - по какой координате
-     * @param symbol - символ, которым отображается точка
+     * @param point - точка, которую необходимо отобразить
      */
-    public void draw(Coordinates coordinates, String symbol) {
-        if (mainMatrix[coordinates.getY()][coordinates.getX()].equals("."))
-            mainMatrix[coordinates.getY()][coordinates.getX()] = symbol;
-        else
-            mainMatrix[coordinates.getY()][coordinates.getX()] =
-                    String.format("%s|%s", mainMatrix[coordinates.getY()][coordinates.getX()], symbol);
-    }
-
-    /**
-     * обновляет экран
-     */
-    public void update() {
-        generateClearScreen();
-    }
-
-    /**
-     * отображает экран
-     */
-    public String display() {
-        StringBuilder result = new StringBuilder("");
-        for (int i = 1; i < height + 1; i++) {
-            for (int j = 1; j < width + 1; j++) {
-                result.append(mainMatrix[i][j]);
-                result.append("\t");
-            }
-            result.append("\n");
+    fun draw(coordinates: Coordinates, point: Point) {
+        val symbol = point.symbolToShow
+        if (mainMatrix[coordinates.y][coordinates.x] == ".") {
+            mainMatrix[coordinates.y][coordinates.x] = symbol
+        } else {
+            mainMatrix[coordinates.y][coordinates.x] =
+                String.format("%s|%s", mainMatrix[coordinates.y][coordinates.x], symbol)
         }
-        return result.toString();
     }
 
-    private void generateClearScreen() {
-        for (int i = 0; i < height + 2; i++) {
+    /**
+     * Обновляет экран.
+     */
+    fun update() {
+        generateClearScreen()
+    }
+
+    /**
+     * Отображает экран.
+     */
+    fun display(): String {
+        val result = StringBuilder("")
+        for (i in 1 until height + 1) {
+            for (j in 1 until width + 1) {
+                result.append(mainMatrix[i][j])
+                result.append("\t")
+            }
+            result.append("\n")
+        }
+        return result.toString()
+    }
+
+    private fun generateClearScreen() {
+        for (i in 0 until height + 2) {
             if (i == 0 || i == height + 1) {
-                Arrays.fill(mainMatrix[i], "*");
+                Arrays.fill(mainMatrix[i], "*")
             } else {
-                Arrays.fill(mainMatrix[i], ".");
-                mainMatrix[i][0] = "*";
-                mainMatrix[i][width + 1] = "*";
+                Arrays.fill(mainMatrix[i], ".")
+                mainMatrix[i][0] = "*"
+                mainMatrix[i][width + 1] = "*"
             }
         }
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public int getWidth() {
-        return width;
     }
 }

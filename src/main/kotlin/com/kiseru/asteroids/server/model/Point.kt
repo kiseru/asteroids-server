@@ -1,7 +1,5 @@
 package com.kiseru.asteroids.server.model
 
-import com.kiseru.asteroids.server.logics.Screen
-
 abstract class Point protected constructor(var coordinates: Coordinates) {
 
     var isVisible = true

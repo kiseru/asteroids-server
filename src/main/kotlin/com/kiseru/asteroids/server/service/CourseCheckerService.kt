@@ -1,6 +1,6 @@
 package com.kiseru.asteroids.server.service
 
-import com.kiseru.asteroids.server.logics.Screen
+import com.kiseru.asteroids.server.model.Screen
 import com.kiseru.asteroids.server.model.*
 
 class CourseCheckerService(
