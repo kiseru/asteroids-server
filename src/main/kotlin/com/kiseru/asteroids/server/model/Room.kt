@@ -4,6 +4,7 @@ import com.kiseru.asteroids.server.Server
 import com.kiseru.asteroids.server.User
 import com.kiseru.asteroids.server.logics.Game
 import com.kiseru.asteroids.server.logics.Screen
+import com.kiseru.asteroids.server.service.RoomService
 import org.slf4j.LoggerFactory
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.Executors
@@ -54,7 +55,7 @@ class Room : Runnable {
      */
     fun addUser(user: User) {
         if (users.size >= MAX_USERS) {
-            Server.getNotFullRoom().addUser(user)
+            RoomService.getNotFullRoom().addUser(user)
         }
         sendMessageToUsers("User ${user.userName} has joined the room.")
         users.add(user)
@@ -124,7 +125,7 @@ class Room : Runnable {
     fun addUserToRoom(user: User) = lock.withLock {
         addUser(user)
         if (isFull()) {
-            Server.getNotFullRoom()
+            RoomService.getNotFullRoom()
             EXECUTOR_SERVICE.execute(this)
         }
 

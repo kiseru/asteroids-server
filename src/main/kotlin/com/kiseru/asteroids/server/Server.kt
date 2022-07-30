@@ -1,6 +1,6 @@
 package com.kiseru.asteroids.server
 
-import com.kiseru.asteroids.server.model.Room
+import com.kiseru.asteroids.server.service.RoomService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory
 import java.net.ServerSocket
 import java.net.Socket
 import java.util.*
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 
 class Server(private val port: Int) {
 
@@ -32,13 +30,13 @@ class Server(private val port: Int) {
             }
             when (command) {
                 "rating" -> {
-                    for (room in rooms) {
+                    for (room in RoomService.rooms) {
                         println(room.getRating())
                     }
                 }
 
                 "gamefield" -> {
-                    for (room in rooms) {
+                    for (room in RoomService.rooms) {
                         println(room.game.screen.display())
                     }
                 }
@@ -65,7 +63,7 @@ class Server(private val port: Int) {
 
     private fun handleNewConnection(newConnection: Socket) {
         log.info("Started handling new connection")
-        val notFullRoom = getNotFullRoom()
+        val notFullRoom = RoomService.getNotFullRoom()
         val user = User(newConnection, notFullRoom)
         user.start()
     }
@@ -73,23 +71,5 @@ class Server(private val port: Int) {
     companion object {
 
         private val log = LoggerFactory.getLogger(Server::class.java)
-
-        private val rooms = mutableListOf<Room>()
-
-        private var notFullRoom = Room()
-
-        private val lock = ReentrantLock()
-
-        fun getNotFullRoom(): Room {
-            lock.withLock {
-                if (!notFullRoom.isFull()) {
-                    return notFullRoom
-                }
-
-                rooms.add(notFullRoom)
-                notFullRoom = Room()
-                return notFullRoom
-            }
-        }
     }
 }
