@@ -42,7 +42,7 @@ class SpaceShip(coordinates: Coordinates, private val owner: User) : Point(coord
     fun crash(type: Type) {
         lock.withLock {
             if (type === Type.ASTEROID) {
-                owner.substractScore()
+                owner.subtractScore()
             } else if (type === Type.GARBAGE) {
                 owner.addScore()
                 val collected = owner.room.game.incrementCollectedGarbageCount()
@@ -50,9 +50,9 @@ class SpaceShip(coordinates: Coordinates, private val owner: User) : Point(coord
             } else if (type === Type.WALL) {
                 // возвращаемся назад, чтобы не находится на стене
                 rollbackLastStep()
-                owner.substractScore()
+                owner.subtractScore()
             }
-            if (!owner.isAlive()) {
+            if (!owner.isAlive) {
                 destroy()
             }
         }

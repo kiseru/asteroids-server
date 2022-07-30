@@ -3,9 +3,13 @@ package com.kiseru.asteroids.server
 import com.kiseru.asteroids.server.service.RoomService
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.io.PrintWriter
 import java.net.ServerSocket
 import java.net.Socket
 import java.util.*
+import java.util.concurrent.Executors
 
 class Application(private val port: Int) {
 
@@ -58,16 +62,22 @@ class Application(private val port: Int) {
         }
     }
 
-    private fun handleNewConnection(newConnection: Socket) {
+    private suspend fun handleNewConnection(newConnection: Socket) {
         log.info("Started handling new connection")
-        val notFullRoom = RoomService.getNotFullRoom()
-        val user = User(newConnection, notFullRoom)
-        user.start()
+        val room = RoomService.getNotFullRoom()
+        val inputStream = withContext(Dispatchers.IO) { newConnection.getInputStream() }
+        val outputStream = withContext(Dispatchers.IO) { newConnection.getOutputStream() }
+        val reader = BufferedReader(InputStreamReader(inputStream))
+        val writer = PrintWriter(outputStream)
+        val user = User(reader, writer, room)
+        executorService.execute(user)
     }
 
     companion object {
 
         private val log = LoggerFactory.getLogger(Application::class.java)
+
+        private val executorService = Executors.newCachedThreadPool()
     }
 }
 

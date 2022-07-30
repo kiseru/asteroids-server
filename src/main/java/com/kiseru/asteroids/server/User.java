@@ -1,38 +1,45 @@
 package com.kiseru.asteroids.server;
 
 import com.kiseru.asteroids.server.model.Direction;
-import com.kiseru.asteroids.server.model.SpaceShip;
 import com.kiseru.asteroids.server.model.Room;
+import com.kiseru.asteroids.server.model.SpaceShip;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-public final class User extends Thread {
+public final class User implements Runnable {
 
-    private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
+    private static final Logger log = LoggerFactory.getLogger(User.class);
 
-    private BufferedReader reader;
-    private PrintWriter writer;
-    private String userName;
-    private int score;
-    private int steps;
-    private boolean isAlive;
+    private static int nextId = 0;
+
+    private final BufferedReader reader;
+
+    private final PrintWriter writer;
+
     private final Room room;
-    private SpaceShip spaceShip;
 
-    User(Socket newConnection, Room room) throws IOException {
-        reader = new BufferedReader(new InputStreamReader(newConnection.getInputStream()));
-        writer = new PrintWriter(newConnection.getOutputStream(), true);
-        score = 100;
-        steps = 0;
-        isAlive = true;
+    private final int id;
+
+    private String userName;
+
+    private int score = 100;
+
+    private int steps = 0;
+
+    private boolean isAlive = true;
+
+    public User(BufferedReader reader, PrintWriter writer, Room room) {
+        this.reader = reader;
+        this.writer = writer;
         this.room = room;
+        this.id = nextId++;
     }
+
+    private SpaceShip spaceShip;
 
     public int getScore() {
         return score;
@@ -40,66 +47,20 @@ public final class User extends Thread {
 
     @Override
     public void run() {
+        authorizeUser();
+        init();
         try {
-            writer.println("Welcome To Asteroids Server");
-            writer.println("Please, introduce yourself!");
-            userName = reader.readLine();
-            System.out.println(userName + " has joined the server!");
-            writer.println("You need to keep a space garbage.");
-            writer.println("Your ID is " + getId());
-            writer.println("Good luck, Commander!");
-            room.addUserToRoom(this);
-            spaceShip.setDirection(Direction.UP);
             while (!room.isGameFinished() && isAlive) {
-                String userMessage = reader.readLine();
-                if (userMessage.equals("go")) {
-                    spaceShip.go();
-                    room.getGame().refresh();
-                    sendMessage(Integer.toString(score));
-                } else if (userMessage.equals("left")) {
-                    spaceShip.setDirection(Direction.LEFT);
-                    room.getGame().refresh();
-                    sendMessage("success");
-                } else if (userMessage.equals("right")) {
-                    spaceShip.setDirection(Direction.RIGHT);
-                    room.getGame().refresh();
-                    sendMessage("success");
-                } else if (userMessage.equals("up")) {
-                    spaceShip.setDirection(Direction.UP);
-                    room.getGame().refresh();
-                    sendMessage("success");
-                } else if (userMessage.equals("down")) {
-                    spaceShip.setDirection(Direction.DOWN);
-                    room.getGame().refresh();
-                    sendMessage("success");
-                } else if (userMessage.equals("isAsteroid")) {
-                    sendMessage(spaceShip.getCourseChecker().isAsteroid() ? "t" : "f");
-                } else if (userMessage.equals("isGarbage")) {
-                    sendMessage(spaceShip.getCourseChecker().isGarbage() ? "t" : "f");
-                } else if (userMessage.equals("isWall")) {
-                    sendMessage(spaceShip.getCourseChecker().isWall() ? "t" : "f");
-                } else {
-                    sendMessage("Unknown command");
-                }
-                steps++;
-                if (steps >= 1500) {
-                    died();
-                }
-                if (score < 0) {
-                    died();
-                }
+                String command = reader.readLine();
+                handleCommand(command);
+                incrementSteps();
             }
         } catch (IOException e) {
-            System.out.println("Connection problems with user " + userName);
+            log.error("Connection problems with user " + userName, e);
         } finally {
             isAlive = false;
             room.setGameFinished();
         }
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%s %d", userName, score);
     }
 
     public String getUserName() {
@@ -108,28 +69,25 @@ public final class User extends Thread {
 
     public void sendMessage(String message) {
         writer.println(message);
+        writer.flush();
     }
 
     public void addScore() {
-        if (room.isGameStarted()) score += 10;
+        if (room.isGameStarted()) {
+            score += 10;
+        }
     }
 
-    public void substractScore() {
+    public void subtractScore() {
         if (room.isGameStarted()) {
             score -= 50;
             if (score < 0) isAlive = false;
         }
     }
 
-    public boolean getIsAlive() {
-        return isAlive;
-    }
-
     public void died() {
         isAlive = false;
-        this.sendMessage("died");
-        String scoreMessage = String.format("You have collected %d score", this.score);
-        this.sendMessage(scoreMessage);
+        sendGameOverMessage();
     }
 
     public void checkCollectedGarbage(int collected) {
@@ -146,5 +104,109 @@ public final class User extends Thread {
 
     public SpaceShip getSpaceShip() {
         return spaceShip;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public boolean isAlive() {
+        return isAlive;
+    }
+
+    private void authorizeUser() {
+        try {
+            sendWelcomeMessage();
+            userName = reader.readLine();
+            log.info("{} has joined the server", userName);
+            sendInstructions();
+        } catch (IOException e) {
+            log.error("Failed to authorize user");
+        }
+    }
+
+    private void sendWelcomeMessage() {
+        writer.println("Welcome To Asteroids Server");
+        writer.println("Please, introduce yourself!");
+        writer.flush();
+    }
+
+    private void sendInstructions() {
+        writer.println("You need to keep a space garbage.");
+        writer.println("Your ID is " + getId());
+        writer.println("Good luck, Commander!");
+        writer.flush();
+    }
+
+    private void sendGameOverMessage() {
+        writer.println("died");
+        writer.println(String.format("You have collected %d score", score));
+        writer.flush();
+    }
+
+    private void init() {
+        room.addUserToRoom(this);
+        spaceShip.setDirection(Direction.UP);
+    }
+
+    private void handleCommand(String command) {
+        switch (command) {
+            case "go" -> handleGo();
+            case "left" -> handleLeft();
+            case "right" -> handleRight();
+            case "up" -> handleUp();
+            case "down" -> handleDown();
+            case "isAsteroid" -> handleIsAsteroid();
+            case "isGarbage" -> handleIsGarbage();
+            case "isWall" -> handleIsWall();
+            default -> sendMessage("Unknown command");
+        }
+    }
+
+    private void handleGo() {
+        spaceShip.go();
+        room.refresh();
+        sendMessage(Integer.toString(score));
+    }
+
+    private void handleLeft() {
+        handleDirection(Direction.LEFT);
+    }
+
+    private void handleRight() {
+        handleDirection(Direction.RIGHT);
+    }
+
+    private void handleUp() {
+        handleDirection(Direction.UP);
+    }
+
+    private void handleDown() {
+        handleDirection(Direction.DOWN);
+    }
+
+    private void handleDirection(Direction direction) {
+        spaceShip.setDirection(direction);
+        room.refresh();
+        sendMessage("success");
+    }
+
+    private void handleIsAsteroid() {
+        sendMessage(spaceShip.getCourseChecker().isAsteroid() ? "t" : "f");
+    }
+
+    private void handleIsGarbage() {
+        sendMessage(spaceShip.getCourseChecker().isGarbage() ? "t" : "f");
+    }
+
+    private void handleIsWall() {
+        sendMessage(spaceShip.getCourseChecker().isWall() ? "t" : "f");
+    }
+
+    private void incrementSteps() {
+        steps++;
+        if (steps >= 1500 || score < 0) {
+            died();
+        }
     }
 }
