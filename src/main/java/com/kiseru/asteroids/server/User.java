@@ -168,15 +168,15 @@ public final class User implements Runnable {
     }
 
     private void handleIsAsteroid() {
-        sendMessage(spaceShip.getCourseChecker().isAsteroid() ? "t" : "f");
+        sendMessage(spaceShip.isAsteroidInFrontOf() ? "t" : "f");
     }
 
     private void handleIsGarbage() {
-        sendMessage(spaceShip.getCourseChecker().isGarbage() ? "t" : "f");
+        sendMessage(spaceShip.isGarbageInFrontOf() ? "t" : "f");
     }
 
     private void handleIsWall() {
-        sendMessage(spaceShip.getCourseChecker().isWall() ? "t" : "f");
+        sendMessage(spaceShip.isWallInFrontOf() ? "t" : "f");
     }
 
     private void incrementSteps() {

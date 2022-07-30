@@ -3,13 +3,12 @@ package com.kiseru.asteroids.server.logics;
 import com.kiseru.asteroids.server.User;
 import com.kiseru.asteroids.server.logics.handlers.SpaceShipCrashHandler;
 import com.kiseru.asteroids.server.model.Asteroid;
+import com.kiseru.asteroids.server.model.Coordinates;
 import com.kiseru.asteroids.server.model.Garbage;
 import com.kiseru.asteroids.server.model.Point;
 import com.kiseru.asteroids.server.model.Screen;
 import com.kiseru.asteroids.server.model.SpaceShip;
-import com.kiseru.asteroids.server.model.Coordinates;
 import com.kiseru.asteroids.server.model.Type;
-import com.kiseru.asteroids.server.service.CourseCheckerService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,11 +65,10 @@ public class Game {
      * @param user - юзер, для которого регистриуется корабль
      */
     public void registerSpaceShipForUser(User user) {
-        SpaceShip spaceShip = new SpaceShip(generateUniqueRandomCoordinates(), user);
-        this.pointsOnScreen.add(spaceShip);
-        this.gameObjects.add(spaceShip);
+        SpaceShip spaceShip = new SpaceShip(user, generateUniqueRandomCoordinates(), pointsOnScreen, screen);
+        pointsOnScreen.add(spaceShip);
+        gameObjects.add(spaceShip);
         crashHandlers.add(new SpaceShipCrashHandler(this, spaceShip));
-        spaceShip.setCourseChecker(new CourseCheckerService(spaceShip, this.pointsOnScreen, this.screen));
         user.setSpaceShip(spaceShip);
     }
 

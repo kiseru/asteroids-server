@@ -6,13 +6,18 @@ import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-class SpaceShip(coordinates: Coordinates, private val owner: User) : Point(coordinates) {
-
-    private val lock: Lock = ReentrantLock()
+class SpaceShip(
+    private val owner: User,
+    coordinates: Coordinates,
+    pointsOnScreen: List<Point>,
+    screen: Screen
+) : Point(coordinates) {
 
     var direction: Direction? = null
 
-    lateinit var courseChecker: CourseCheckerService
+    private val lock: Lock = ReentrantLock()
+
+    private val courseChecker = CourseCheckerService(this, pointsOnScreen, screen)
 
     override val symbolToShow: String
         get() = owner.id.toString()
@@ -57,6 +62,12 @@ class SpaceShip(coordinates: Coordinates, private val owner: User) : Point(coord
             }
         }
     }
+
+    fun isAsteroidInFrontOf() = courseChecker.isAsteroid()
+
+    fun isGarbageInFrontOf() = courseChecker.isGarbage()
+
+    fun isWallInFrontOf() = courseChecker.isWall()
 
     private fun checkCollectedGarbage(collected: Int) {
         owner.checkCollectedGarbage(collected)
