@@ -3,7 +3,7 @@ package com.kiseru.asteroids.server.logics.handlers;
 import com.kiseru.asteroids.server.logics.Game;
 import com.kiseru.asteroids.server.model.Type;
 import com.kiseru.asteroids.server.model.Point;
-import com.kiseru.asteroids.server.model.SpaceShip;
+import com.kiseru.asteroids.server.model.Spaceship;
 
 import java.util.List;
 
@@ -12,12 +12,12 @@ import java.util.List;
  * 08 Декабрь 2017
  */
 
-public class SpaceShipCrashHandler {
-    private SpaceShip spaceShip;
+public class SpaceshipCrashHandler {
+    private Spaceship spaceship;
     private Game game;
 
-    public SpaceShipCrashHandler(Game game, SpaceShip spaceShip) {
-        this.spaceShip = spaceShip;
+    public SpaceshipCrashHandler(Game game, Spaceship spaceship) {
+        this.spaceship = spaceship;
         this.game = game;
     }
 
@@ -28,21 +28,21 @@ public class SpaceShipCrashHandler {
         for (Point point: points) {
             if (point.getType() != Type.SPACESHIP &&
                     point.isVisible() &&
-                    point.getCoordinates().equals(spaceShip.getCoordinates())) {
+                    point.getCoordinates().equals(spaceship.getCoordinates())) {
                 isCollision = true;
                 collisionPoint = point;
                 break;
             }
         }
         if (isCollision) {
-            spaceShip.crash(collisionPoint.getType());
+            spaceship.crash(collisionPoint.getType());
             collisionPoint.destroy();
         } else {
             // проверка на столкновение со стеной
-            if (spaceShip.getX() == 0 || spaceShip.getY() == 0 ||
-                    spaceShip.getX() > game.getScreen().getWidth() ||
-                    spaceShip.getY() > game.getScreen().getHeight()) {
-                spaceShip.crash(Type.WALL);
+            if (spaceship.getX() == 0 || spaceship.getY() == 0 ||
+                    spaceship.getX() > game.getScreen().getWidth() ||
+                    spaceship.getY() > game.getScreen().getHeight()) {
+                spaceship.crash(Type.WALL);
             }
         }
     }

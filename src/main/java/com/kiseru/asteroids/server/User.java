@@ -4,7 +4,7 @@ import com.kiseru.asteroids.server.handler.CommandHandlerFactory;
 import com.kiseru.asteroids.server.handler.impl.CommandHandlerFactoryImpl;
 import com.kiseru.asteroids.server.model.Direction;
 import com.kiseru.asteroids.server.model.Room;
-import com.kiseru.asteroids.server.model.SpaceShip;
+import com.kiseru.asteroids.server.model.Spaceship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +36,7 @@ public final class User implements Runnable {
 
     private boolean isAlive = true;
 
-    private SpaceShip spaceShip;
+    private Spaceship spaceship;
 
     public User(String username, Room room, BufferedReader reader, PrintWriter writer) {
         this.username = username;
@@ -99,7 +99,7 @@ public final class User implements Runnable {
     }
 
     public void moveSpaceship() {
-        spaceShip.go();
+        spaceship.go();
     }
 
     public void refreshRoom() {
@@ -111,19 +111,19 @@ public final class User implements Runnable {
     }
 
     public void setSpaceshipDirection(Direction direction) {
-        spaceShip.setDirection(direction);
+        spaceship.setDirection(direction);
     }
 
     public boolean isAsteroidInFrontOfSpaceship() {
-        return spaceShip.isAsteroidInFrontOf();
+        return spaceship.isAsteroidInFrontOf();
     }
 
     public boolean isGarbageInFrontOfSpaceship() {
-        return spaceShip.isGarbageInFrontOf();
+        return spaceship.isGarbageInFrontOf();
     }
 
     public boolean isWallInFrontOfSpaceship() {
-        return spaceShip.isWallInFrontOf();
+        return spaceship.isWallInFrontOf();
     }
 
     public Room getRoom() {
@@ -138,12 +138,12 @@ public final class User implements Runnable {
         return isAlive;
     }
 
-    public boolean hasSpaceShip() {
-        return spaceShip != null;
+    public boolean hasSpaceship() {
+        return spaceship != null;
     }
 
-    public void setSpaceShip(SpaceShip spaceShip) {
-        this.spaceShip = spaceShip;
+    public void setSpaceship(Spaceship spaceship) {
+        this.spaceship = spaceship;
     }
 
     private void sendGameOverMessage() {
@@ -154,7 +154,7 @@ public final class User implements Runnable {
 
     private void init() {
         room.addUserToRoom(this);
-        spaceShip.setDirection(Direction.UP);
+        spaceship.setDirection(Direction.UP);
     }
 
     private void handleCommand(String command) {

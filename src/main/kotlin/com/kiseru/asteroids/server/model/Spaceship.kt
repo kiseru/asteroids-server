@@ -6,7 +6,7 @@ import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-class SpaceShip(
+class Spaceship(
     private val owner: User,
     coordinates: Coordinates,
     pointsOnScreen: List<Point>,

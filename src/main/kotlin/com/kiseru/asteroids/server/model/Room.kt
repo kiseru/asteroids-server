@@ -33,7 +33,7 @@ class Room : Runnable {
 
     private val endgameCondition = lock.newCondition()
 
-    private val spaceShipCreatedCondition = lock.newCondition()
+    private val spaceshipCreatedCondition = lock.newCondition()
 
     private var status = Status.WAITING_CONNECTIONS
 
@@ -43,9 +43,9 @@ class Room : Runnable {
         lock.withLock {
             game = Game(Screen(SCREEN_WIDTH, SCREEN_HEIGHT), NUMBER_OF_GARBAGE_CELLS, NUMBER_OF_ASTEROID_CELLS)
             for (user in users) {
-                game.registerSpaceShipForUser(user)
+                game.registerSpaceshipForUser(user)
             }
-            spaceShipCreatedCondition.signalAll()
+            spaceshipCreatedCondition.signalAll()
         }
 
         game.refresh()
@@ -92,8 +92,8 @@ class Room : Runnable {
             EXECUTOR_SERVICE.execute(this)
         }
 
-        while (!user.hasSpaceShip()) {
-            spaceShipCreatedCondition.await()
+        while (!user.hasSpaceship()) {
+            spaceshipCreatedCondition.await()
         }
     }
 
