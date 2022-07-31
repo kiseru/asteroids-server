@@ -1,5 +1,7 @@
 package com.kiseru.asteroids.server;
 
+import com.kiseru.asteroids.server.handler.CommandHandlerFactory;
+import com.kiseru.asteroids.server.handler.impl.CommandHandlerFactoryImpl;
 import com.kiseru.asteroids.server.model.Direction;
 import com.kiseru.asteroids.server.model.Room;
 import com.kiseru.asteroids.server.model.SpaceShip;
@@ -13,6 +15,8 @@ import java.io.PrintWriter;
 public final class User implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(User.class);
+
+    private static final CommandHandlerFactory commandHandlerFactory = CommandHandlerFactoryImpl.INSTANCE;
 
     private static int nextId = 0;
 
@@ -94,12 +98,36 @@ public final class User implements Runnable {
         room.checkCollectedGarbage(collected);
     }
 
-    public Room getRoom() {
-        return room;
+    public void moveSpaceship() {
+        spaceShip.go();
     }
 
-    public void setSpaceShip(SpaceShip spaceShip) {
-        this.spaceShip = spaceShip;
+    public void refreshRoom() {
+        room.refresh();
+    }
+
+    public void sendScore() {
+        sendMessage(String.valueOf(score));
+    }
+
+    public void setSpaceshipDirection(Direction direction) {
+        spaceShip.setDirection(direction);
+    }
+
+    public boolean isAsteroidInFrontOfSpaceship() {
+        return spaceShip.isAsteroidInFrontOf();
+    }
+
+    public boolean isGarbageInFrontOfSpaceship() {
+        return spaceShip.isGarbageInFrontOf();
+    }
+
+    public boolean isWallInFrontOfSpaceship() {
+        return spaceShip.isWallInFrontOf();
+    }
+
+    public Room getRoom() {
+        return room;
     }
 
     public int getId() {
@@ -114,6 +142,10 @@ public final class User implements Runnable {
         return spaceShip != null;
     }
 
+    public void setSpaceShip(SpaceShip spaceShip) {
+        this.spaceShip = spaceShip;
+    }
+
     private void sendGameOverMessage() {
         writer.println("died");
         writer.println(String.format("You have collected %d score", score));
@@ -126,57 +158,8 @@ public final class User implements Runnable {
     }
 
     private void handleCommand(String command) {
-        switch (command) {
-            case "go" -> handleGo();
-            case "left" -> handleLeft();
-            case "right" -> handleRight();
-            case "up" -> handleUp();
-            case "down" -> handleDown();
-            case "isAsteroid" -> handleIsAsteroid();
-            case "isGarbage" -> handleIsGarbage();
-            case "isWall" -> handleIsWall();
-            default -> sendMessage("Unknown command");
-        }
-    }
-
-    private void handleGo() {
-        spaceShip.go();
-        room.refresh();
-        sendMessage(Integer.toString(score));
-    }
-
-    private void handleLeft() {
-        handleDirection(Direction.LEFT);
-    }
-
-    private void handleRight() {
-        handleDirection(Direction.RIGHT);
-    }
-
-    private void handleUp() {
-        handleDirection(Direction.UP);
-    }
-
-    private void handleDown() {
-        handleDirection(Direction.DOWN);
-    }
-
-    private void handleDirection(Direction direction) {
-        spaceShip.setDirection(direction);
-        room.refresh();
-        sendMessage("success");
-    }
-
-    private void handleIsAsteroid() {
-        sendMessage(spaceShip.isAsteroidInFrontOf() ? "t" : "f");
-    }
-
-    private void handleIsGarbage() {
-        sendMessage(spaceShip.isGarbageInFrontOf() ? "t" : "f");
-    }
-
-    private void handleIsWall() {
-        sendMessage(spaceShip.isWallInFrontOf() ? "t" : "f");
+        var commandHandler = commandHandlerFactory.create(command);
+        commandHandler.handle(this);
     }
 
     private void incrementSteps() {
