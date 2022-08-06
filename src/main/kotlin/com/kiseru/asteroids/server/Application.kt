@@ -71,16 +71,16 @@ class Application(private val port: Int) {
         val outputStream = withContext(Dispatchers.IO) { newConnection.getOutputStream() }
         val reader = BufferedReader(InputStreamReader(inputStream))
         val writer = PrintWriter(outputStream)
-        val user = authorizeUser(reader, writer, room)
+        val user = authorizeUser(reader, writer, room, newConnection)
         executorService.execute(user)
     }
 
-    private suspend fun authorizeUser(reader: BufferedReader, writer: PrintWriter, room: Room): User {
+    private suspend fun authorizeUser(reader: BufferedReader, writer: PrintWriter, room: Room, socket: Socket): User {
         try {
             sendWelcomeMessage(writer)
             val username = withContext(Dispatchers.IO) { reader.readLine() }
             log.info("{} has joined the server", username)
-            val user = User(username, room, reader, writer)
+            val user = User(username, room, reader, writer, socket)
             sendInstructions(writer, user)
             return user
         } catch (e: IOException) {

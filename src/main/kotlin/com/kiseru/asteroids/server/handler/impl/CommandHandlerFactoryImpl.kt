@@ -14,6 +14,7 @@ object CommandHandlerFactoryImpl : CommandHandlerFactory {
         "isAsteroid" -> IsAsteroidCommandHandler()
         "isGarbage" -> IsGarbageCommandHandler()
         "isWall" -> IsWallCommandHandler()
+        "exit" -> ExitCommandHandler()
         else -> UnknownCommandHandler()
     }
 }

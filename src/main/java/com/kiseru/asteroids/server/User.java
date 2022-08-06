@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.SocketException;
 
 public final class User implements Runnable {
 
@@ -30,6 +32,8 @@ public final class User implements Runnable {
 
     private final String username;
 
+    private final Socket socket;
+
     private int score = 100;
 
     private int steps = 0;
@@ -38,11 +42,12 @@ public final class User implements Runnable {
 
     private Spaceship spaceship;
 
-    public User(String username, Room room, BufferedReader reader, PrintWriter writer) {
+    public User(String username, Room room, BufferedReader reader, PrintWriter writer, Socket socket) {
         this.username = username;
         this.room = room;
         this.reader = reader;
         this.writer = writer;
+        this.socket = socket;
         this.id = nextId++;
     }
 
@@ -59,6 +64,7 @@ public final class User implements Runnable {
                 handleCommand(command);
                 incrementSteps();
             }
+        } catch (SocketException ignored) {
         } catch (IOException e) {
             log.error("Connection problems with user " + username, e);
         } finally {
@@ -144,6 +150,16 @@ public final class User implements Runnable {
 
     public void setSpaceship(Spaceship spaceship) {
         this.spaceship = spaceship;
+    }
+
+    public void closeConnection() {
+        try {
+            log.info("Closing connection with {}", username);
+            socket.close();
+            log.info("Connection with {} has been closed", username);
+        } catch (IOException e) {
+            log.error("Failed to close connection", e);
+        }
     }
 
     private void sendGameOverMessage() {
