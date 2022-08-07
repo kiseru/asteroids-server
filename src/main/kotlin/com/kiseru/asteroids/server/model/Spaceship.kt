@@ -13,7 +13,7 @@ class Spaceship(
     screen: Screen
 ) : Point(coordinates) {
 
-    var direction: Direction? = null
+    var direction = Direction.UP
 
     private val lock: Lock = ReentrantLock()
 
@@ -35,7 +35,6 @@ class Spaceship(
             Direction.RIGHT -> Coordinates(x + 1, y)
             Direction.DOWN -> Coordinates(x, y + 1)
             Direction.LEFT -> Coordinates(x - 1, y)
-            else -> throw UnsupportedOperationException()
         }
     }
 
@@ -79,7 +78,6 @@ class Spaceship(
             Direction.RIGHT -> Coordinates(x - 1, y)
             Direction.DOWN -> Coordinates(x, y - 1)
             Direction.LEFT -> Coordinates(x + 1, y)
-            else -> throw UnsupportedOperationException()
         }
     }
 

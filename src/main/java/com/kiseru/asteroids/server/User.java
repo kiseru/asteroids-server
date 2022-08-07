@@ -65,6 +65,7 @@ public final class User implements Runnable {
                 incrementSteps();
             }
         } catch (SocketException ignored) {
+            log.info("User {} have left the server", username);
         } catch (IOException e) {
             log.error("Connection problems with user " + username, e);
         } finally {
@@ -172,7 +173,6 @@ public final class User implements Runnable {
 
     private void init() {
         room.addUserToRoom(this);
-        spaceship.setDirection(Direction.UP);
     }
 
     private void handleCommand(String command) {

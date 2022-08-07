@@ -22,7 +22,6 @@ class CourseCheckerService(
         Direction.DOWN -> spaceship.y == screen.height
         Direction.RIGHT -> spaceship.x == screen.width
         Direction.LEFT -> spaceship.x == 1
-        else -> throw IllegalStateException()
     }
 
     private fun checkContaining(coordinates: List<Coordinates>): Boolean = when (spaceship.direction) {
@@ -30,6 +29,5 @@ class CourseCheckerService(
         Direction.DOWN -> coordinates.contains(Coordinates(spaceship.x, spaceship.y + 1))
         Direction.LEFT -> coordinates.contains(Coordinates(spaceship.x - 1, spaceship.y))
         Direction.RIGHT -> coordinates.contains(Coordinates(spaceship.x + 1, spaceship.y))
-        else -> throw IllegalStateException()
     }
 }
