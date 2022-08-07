@@ -154,12 +154,20 @@ public final class User implements Runnable {
     public void closeConnection() {
         try {
             log.info("Closing connection with {}", username);
-            sendMessage("exit");
+            messageSenderService.sendExit();
             socket.close();
             log.info("Connection with {} has been closed", username);
         } catch (IOException e) {
             log.error("Failed to close connection", e);
         }
+    }
+
+    public void sendSuccessMessage() {
+        messageSenderService.sendSuccess();
+    }
+
+    public void sendUnknownCommandMessage() {
+        messageSenderService.sendUnknownCommand();
     }
 
     private void init() {

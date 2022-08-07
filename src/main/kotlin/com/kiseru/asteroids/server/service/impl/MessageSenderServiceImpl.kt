@@ -17,6 +17,14 @@ class MessageSenderServiceImpl(outputStream: OutputStream) : MessageSenderServic
         send(score.toString())
     }
 
+    override fun sendSuccess() {
+        send("success")
+    }
+
+    override fun sendUnknownCommand() {
+        send("Unknown command")
+    }
+
     override fun send(message: String) {
         writer.println(message)
         writer.flush()

@@ -6,6 +6,6 @@ import com.kiseru.asteroids.server.handler.CommandHandler
 class UnknownCommandHandler : CommandHandler {
 
     override fun handle(user: User) {
-        user.sendMessage("Unknown command")
+        user.sendUnknownCommandMessage()
     }
 }

@@ -8,6 +8,6 @@ interface DirectionCommandHandler : CommandHandler {
     fun handleDirection(user: User, direction: Direction) {
         user.setSpaceshipDirection(direction)
         user.refreshRoom()
-        user.sendMessage("success")
+        user.sendSuccessMessage()
     }
 }
