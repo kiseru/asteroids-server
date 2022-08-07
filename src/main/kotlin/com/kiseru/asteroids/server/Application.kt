@@ -2,8 +2,8 @@ package com.kiseru.asteroids.server
 
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.service.MessageSenderService
-import com.kiseru.asteroids.server.service.MessageSenderServiceImpl
 import com.kiseru.asteroids.server.service.RoomService
+import com.kiseru.asteroids.server.service.impl.MessageSenderServiceImpl
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import java.io.BufferedReader

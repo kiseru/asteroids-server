@@ -1,6 +1,7 @@
-package com.kiseru.asteroids.server.service
+package com.kiseru.asteroids.server.service.impl
 
 import com.kiseru.asteroids.server.User
+import com.kiseru.asteroids.server.service.MessageSenderService
 import java.io.OutputStream
 import java.io.PrintWriter
 
