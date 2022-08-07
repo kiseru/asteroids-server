@@ -5,12 +5,12 @@ import com.kiseru.asteroids.server.handler.impl.CommandHandlerFactoryImpl;
 import com.kiseru.asteroids.server.model.Direction;
 import com.kiseru.asteroids.server.model.Room;
 import com.kiseru.asteroids.server.model.Spaceship;
+import com.kiseru.asteroids.server.service.MessageSenderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -24,8 +24,6 @@ public final class User implements Runnable {
 
     private final BufferedReader reader;
 
-    private final PrintWriter writer;
-
     private final Room room;
 
     private final int id;
@@ -33,6 +31,8 @@ public final class User implements Runnable {
     private final String username;
 
     private final Socket socket;
+
+    private final MessageSenderService messageSenderService;
 
     private int score = 100;
 
@@ -42,12 +42,12 @@ public final class User implements Runnable {
 
     private Spaceship spaceship;
 
-    public User(String username, Room room, BufferedReader reader, PrintWriter writer, Socket socket) {
+    public User(String username, Room room, BufferedReader reader, Socket socket, MessageSenderService messageSenderService) {
         this.username = username;
         this.room = room;
         this.reader = reader;
-        this.writer = writer;
         this.socket = socket;
+        this.messageSenderService = messageSenderService;
         this.id = nextId++;
     }
 
@@ -78,8 +78,7 @@ public final class User implements Runnable {
     }
 
     public void sendMessage(String message) {
-        writer.println(message);
-        writer.flush();
+        messageSenderService.send(message);
     }
 
     public void addScore() {
@@ -97,7 +96,7 @@ public final class User implements Runnable {
 
     public void died() {
         isAlive = false;
-        sendGameOverMessage();
+        messageSenderService.sendGameOver(score);
     }
 
     public void checkCollectedGarbage(int collected) {
@@ -113,7 +112,7 @@ public final class User implements Runnable {
     }
 
     public void sendScore() {
-        sendMessage(String.valueOf(score));
+        messageSenderService.sendScore(score);
     }
 
     public void setSpaceshipDirection(Direction direction) {
@@ -161,12 +160,6 @@ public final class User implements Runnable {
         } catch (IOException e) {
             log.error("Failed to close connection", e);
         }
-    }
-
-    private void sendGameOverMessage() {
-        writer.println("died");
-        writer.println(String.format("You have collected %d score", score));
-        writer.flush();
     }
 
     private void init() {

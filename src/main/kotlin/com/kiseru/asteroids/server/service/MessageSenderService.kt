@@ -1,0 +1,18 @@
+package com.kiseru.asteroids.server.service
+
+import com.kiseru.asteroids.server.User
+
+interface MessageSenderService {
+
+    fun sendExit()
+
+    fun sendScore(score: Int)
+
+    fun send(message: String)
+
+    fun sendGameOver(score: Int)
+
+    fun sendWelcomeMessage()
+
+    fun sendInstructions(user: User)
+}

@@ -1,13 +1,14 @@
 package com.kiseru.asteroids.server
 
 import com.kiseru.asteroids.server.model.Room
+import com.kiseru.asteroids.server.service.MessageSenderService
+import com.kiseru.asteroids.server.service.MessageSenderServiceImpl
 import com.kiseru.asteroids.server.service.RoomService
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
-import java.io.PrintWriter
 import java.net.ServerSocket
 import java.net.Socket
 import java.util.*
@@ -68,38 +69,30 @@ class Application(private val port: Int) {
         log.info("Started handling new connection")
         val room = RoomService.getNotFullRoom()
         val inputStream = withContext(Dispatchers.IO) { newConnection.getInputStream() }
-        val outputStream = withContext(Dispatchers.IO) { newConnection.getOutputStream() }
+        val messageSenderService =
+            withContext(Dispatchers.IO) { MessageSenderServiceImpl(newConnection.getOutputStream()) }
         val reader = BufferedReader(InputStreamReader(inputStream))
-        val writer = PrintWriter(outputStream)
-        val user = authorizeUser(reader, writer, room, newConnection)
+        val user = authorizeUser(reader, room, newConnection, messageSenderService)
         executorService.execute(user)
     }
 
-    private suspend fun authorizeUser(reader: BufferedReader, writer: PrintWriter, room: Room, socket: Socket): User {
+    private suspend fun authorizeUser(
+        reader: BufferedReader,
+        room: Room,
+        socket: Socket,
+        messageSenderService: MessageSenderService,
+    ): User {
         try {
-            sendWelcomeMessage(writer)
+            messageSenderService.sendWelcomeMessage()
             val username = withContext(Dispatchers.IO) { reader.readLine() }
             log.info("{} has joined the server", username)
-            val user = User(username, room, reader, writer, socket)
-            sendInstructions(writer, user)
+            val user = User(username, room, reader, socket, messageSenderService)
+            messageSenderService.sendInstructions(user)
             return user
         } catch (e: IOException) {
             log.error("Failed to authorize user", e)
             throw e
         }
-    }
-
-    private fun sendWelcomeMessage(writer: PrintWriter) {
-        writer.println("Welcome To Asteroids Server")
-        writer.println("Please, introduce yourself!")
-        writer.flush()
-    }
-
-    private fun sendInstructions(writer: PrintWriter, user: User) {
-        writer.println("You need to keep a space garbage.")
-        writer.println("Your ID is ${user.id}")
-        writer.println("Good luck, Commander!")
-        writer.flush()
     }
 
     companion object {
