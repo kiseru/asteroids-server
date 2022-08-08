@@ -18,6 +18,15 @@ class Spaceship(
     override val type: Type
         get() = Type.SPACESHIP
 
+    val isAsteroidInFrontOf
+        get() = courseCheckerService.isAsteroid()
+
+    val isGarbageInFrontOf
+        get() = courseCheckerService.isGarbage()
+
+    val isWallInFrontOf
+        get() = courseCheckerService.isWall()
+
     var direction = Direction.UP
 
     private val lock: Lock = ReentrantLock()
@@ -61,12 +70,6 @@ class Spaceship(
             }
         }
     }
-
-    fun isAsteroidInFrontOf() = courseCheckerService.isAsteroid()
-
-    fun isGarbageInFrontOf() = courseCheckerService.isGarbage()
-
-    fun isWallInFrontOf() = courseCheckerService.isWall()
 
     private fun checkCollectedGarbage(collected: Int) {
         owner.checkCollectedGarbage(collected)
