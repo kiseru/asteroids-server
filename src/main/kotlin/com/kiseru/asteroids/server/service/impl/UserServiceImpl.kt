@@ -2,6 +2,7 @@ package com.kiseru.asteroids.server.service.impl
 
 import com.kiseru.asteroids.server.User
 import com.kiseru.asteroids.server.factory.MessageReceiverServiceFactory
+import com.kiseru.asteroids.server.factory.MessageSenderServiceFactory
 import com.kiseru.asteroids.server.service.RoomService
 import com.kiseru.asteroids.server.service.UserService
 import kotlinx.coroutines.Dispatchers
@@ -12,12 +13,13 @@ import java.net.Socket
 
 class UserServiceImpl(
     private val messageReceiverServiceFactory: MessageReceiverServiceFactory,
+    private val messageSenderServiceFactory: MessageSenderServiceFactory,
     private val roomService: RoomService
 ) : UserService {
 
     override suspend fun authorizeUser(socket: Socket): User {
         val messageReceiverService = messageReceiverServiceFactory.create(socket)
-        val messageSenderService = withContext(Dispatchers.IO) { MessageSenderServiceImpl(socket.getOutputStream()) }
+        val messageSenderService = messageSenderServiceFactory.create(socket)
         val room = roomService.getNotFullRoom()
         try {
             messageSenderService.sendWelcomeMessage()
@@ -37,3 +39,4 @@ class UserServiceImpl(
         private val log = LoggerFactory.getLogger(UserServiceImpl::class.java)
     }
 }
+

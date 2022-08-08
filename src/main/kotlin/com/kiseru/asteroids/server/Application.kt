@@ -1,6 +1,7 @@
 package com.kiseru.asteroids.server
 
 import com.kiseru.asteroids.server.factory.impl.MessageReceiverServiceFactoryImpl
+import com.kiseru.asteroids.server.factory.impl.MessageSenderServiceFactoryImpl
 import com.kiseru.asteroids.server.service.RoomService
 import com.kiseru.asteroids.server.service.UserService
 import com.kiseru.asteroids.server.service.impl.RoomServiceImpl
@@ -84,8 +85,9 @@ class Application(
 
 fun main() = runBlocking {
     val messageReceiverServiceFactory = MessageReceiverServiceFactoryImpl()
+    val messageSenderServiceFactory = MessageSenderServiceFactoryImpl()
     val roomService = RoomServiceImpl()
-    val userService = UserServiceImpl(messageReceiverServiceFactory, roomService)
+    val userService = UserServiceImpl(messageReceiverServiceFactory, messageSenderServiceFactory, roomService)
     val application = Application(roomService, userService)
     application.startServer()
 }
