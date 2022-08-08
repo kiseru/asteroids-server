@@ -1,14 +1,11 @@
 package com.kiseru.asteroids.server
 
-import com.kiseru.asteroids.server.model.Room
-import com.kiseru.asteroids.server.service.MessageSenderService
 import com.kiseru.asteroids.server.service.RoomService
+import com.kiseru.asteroids.server.service.impl.MessageReceiverServiceImpl
 import com.kiseru.asteroids.server.service.impl.MessageSenderServiceImpl
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
-import java.io.BufferedReader
 import java.io.IOException
-import java.io.InputStreamReader
 import java.net.ServerSocket
 import java.net.Socket
 import java.util.*
@@ -67,26 +64,19 @@ class Application(private val port: Int) {
 
     private suspend fun handleNewConnection(newConnection: Socket) {
         log.info("Started handling new connection")
-        val room = RoomService.getNotFullRoom()
-        val inputStream = withContext(Dispatchers.IO) { newConnection.getInputStream() }
-        val messageSenderService =
-            withContext(Dispatchers.IO) { MessageSenderServiceImpl(newConnection.getOutputStream()) }
-        val reader = BufferedReader(InputStreamReader(inputStream))
-        val user = authorizeUser(reader, room, newConnection, messageSenderService)
+        val user = authorizeUser(newConnection)
         executorService.execute(user)
     }
 
-    private suspend fun authorizeUser(
-        reader: BufferedReader,
-        room: Room,
-        socket: Socket,
-        messageSenderService: MessageSenderService,
-    ): User {
+    private suspend fun authorizeUser(socket: Socket): User {
+        val messageReceiverService = withContext(Dispatchers.IO) { MessageReceiverServiceImpl(socket.getInputStream()) }
+        val messageSenderService = withContext(Dispatchers.IO) { MessageSenderServiceImpl(socket.getOutputStream()) }
+        val room = RoomService.getNotFullRoom()
         try {
             messageSenderService.sendWelcomeMessage()
-            val username = withContext(Dispatchers.IO) { reader.readLine() }
+            val username = withContext(Dispatchers.IO) { messageReceiverService.receive() }
             log.info("{} has joined the server", username)
-            val user = User(username, room, reader, socket, messageSenderService)
+            val user = User(username, room, socket, messageReceiverService, messageSenderService)
             messageSenderService.sendInstructions(user)
             return user
         } catch (e: IOException) {

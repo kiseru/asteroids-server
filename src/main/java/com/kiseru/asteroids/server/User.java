@@ -5,14 +5,13 @@ import com.kiseru.asteroids.server.handler.impl.CommandHandlerFactoryImpl;
 import com.kiseru.asteroids.server.model.Direction;
 import com.kiseru.asteroids.server.model.Room;
 import com.kiseru.asteroids.server.model.Spaceship;
+import com.kiseru.asteroids.server.service.MessageReceiverService;
 import com.kiseru.asteroids.server.service.MessageSenderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 
 public final class User implements Runnable {
 
@@ -22,8 +21,6 @@ public final class User implements Runnable {
 
     private static int nextId = 0;
 
-    private final BufferedReader reader;
-
     private final Room room;
 
     private final int id;
@@ -31,6 +28,8 @@ public final class User implements Runnable {
     private final String username;
 
     private final Socket socket;
+
+    private final MessageReceiverService messageReceiverService;
 
     private final MessageSenderService messageSenderService;
 
@@ -42,11 +41,15 @@ public final class User implements Runnable {
 
     private Spaceship spaceship;
 
-    public User(String username, Room room, BufferedReader reader, Socket socket, MessageSenderService messageSenderService) {
+    public User(String username,
+                Room room,
+                Socket socket,
+                MessageReceiverService messageReceiverService,
+                MessageSenderService messageSenderService) {
         this.username = username;
         this.room = room;
-        this.reader = reader;
         this.socket = socket;
+        this.messageReceiverService = messageReceiverService;
         this.messageSenderService = messageSenderService;
         this.id = nextId++;
     }
@@ -60,14 +63,10 @@ public final class User implements Runnable {
         init();
         try {
             while (!room.isGameFinished() && isAlive) {
-                String command = reader.readLine();
+                String command = messageReceiverService.receive();
                 handleCommand(command);
                 incrementSteps();
             }
-        } catch (SocketException ignored) {
-            log.info("User {} have left the server", username);
-        } catch (IOException e) {
-            log.error("Connection problems with user " + username, e);
         } finally {
             isAlive = false;
             room.setGameFinished();
