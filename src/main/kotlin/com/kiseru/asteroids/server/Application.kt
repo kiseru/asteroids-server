@@ -69,8 +69,7 @@ class Application(
 
     private suspend fun handleNewConnection(newConnection: Socket) {
         log.info("Started handling new connection")
-        val room = roomService.getNotFullRoom()
-        val user = userService.authorizeUser(newConnection, room)
+        val user = userService.authorizeUser(newConnection)
         executorService.execute(user)
     }
 
@@ -83,6 +82,8 @@ class Application(
 }
 
 fun main() = runBlocking {
-    val application = Application(RoomServiceImpl, UserServiceImpl)
+    val roomService = RoomServiceImpl()
+    val userService = UserServiceImpl(roomService)
+    val application = Application(roomService, userService)
     application.startServer()
 }

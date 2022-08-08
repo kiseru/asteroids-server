@@ -5,7 +5,7 @@ import com.kiseru.asteroids.server.service.RoomService
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-object RoomServiceImpl : RoomService {
+class RoomServiceImpl : RoomService {
 
     override val rooms = mutableListOf<Room>()
 
