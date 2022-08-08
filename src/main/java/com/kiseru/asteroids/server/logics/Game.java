@@ -2,13 +2,8 @@ package com.kiseru.asteroids.server.logics;
 
 import com.kiseru.asteroids.server.User;
 import com.kiseru.asteroids.server.logics.handlers.SpaceshipCrashHandler;
-import com.kiseru.asteroids.server.model.Asteroid;
-import com.kiseru.asteroids.server.model.Coordinates;
-import com.kiseru.asteroids.server.model.Garbage;
-import com.kiseru.asteroids.server.model.Point;
-import com.kiseru.asteroids.server.model.Screen;
-import com.kiseru.asteroids.server.model.Spaceship;
-import com.kiseru.asteroids.server.model.Type;
+import com.kiseru.asteroids.server.model.*;
+import com.kiseru.asteroids.server.service.impl.CourseCheckerServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,12 +19,17 @@ public class Game {
 
     private static final Random random = new Random();
 
-    private List<Point> gameObjects;
-    private List<Point> pointsOnScreen;
-    private Screen screen;
-    private List<SpaceshipCrashHandler> crashHandlers;
-    private AtomicInteger collectedGarbageCount = new AtomicInteger(0);
-    private int garbageNumber;
+    private final List<Point> gameObjects;
+
+    private final List<Point> pointsOnScreen;
+
+    private final Screen screen;
+
+    private final List<SpaceshipCrashHandler> crashHandlers;
+
+    private final AtomicInteger collectedGarbageCount = new AtomicInteger(0);
+
+    private final int garbageNumber;
 
     /**
      * Конструктор создания игровой сессии
@@ -65,7 +65,9 @@ public class Game {
      * @param user - юзер, для которого регистриуется корабль
      */
     public void registerSpaceshipForUser(User user) {
-        Spaceship spaceship = new Spaceship(user, generateUniqueRandomCoordinates(), pointsOnScreen, screen);
+        var courseCheckerService = new CourseCheckerServiceImpl(pointsOnScreen, screen);
+        Spaceship spaceship = new Spaceship(user, courseCheckerService, generateUniqueRandomCoordinates());
+        courseCheckerService.setSpaceship(spaceship);
         pointsOnScreen.add(spaceship);
         gameObjects.add(spaceship);
         crashHandlers.add(new SpaceshipCrashHandler(this, spaceship));
@@ -79,14 +81,6 @@ public class Game {
         screen.update();
         crashHandlers.forEach(SpaceshipCrashHandler::check);
         gameObjects.forEach(o -> o.render(screen));
-    }
-
-    public boolean isAnyoneAlive() {
-        return pointsOnScreen.stream()
-                .filter(p -> p.getType() == Type.SPACESHIP)
-                .map(s -> ((Spaceship) s).isOwnerAlive())
-                .reduce((b1, b2) -> b1 || b2)
-                .orElseThrow();
     }
 
     private Coordinates generateUniqueRandomCoordinates() {
@@ -103,10 +97,6 @@ public class Game {
                 .anyMatch(p -> p.getCoordinates().equals(coordinates));
     }
 
-    public List<Point> getGameObjects() {
-        return gameObjects;
-    }
-
     public List<Point> getPointsOnScreen() {
         return pointsOnScreen;
     }
@@ -117,10 +107,6 @@ public class Game {
 
     public int getGarbageNumber() {
         return garbageNumber;
-    }
-
-    public List<SpaceshipCrashHandler> getCrashHandlers() {
-        return crashHandlers;
     }
 
     public int incrementCollectedGarbageCount() {

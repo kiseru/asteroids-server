@@ -8,16 +8,13 @@ import kotlin.concurrent.withLock
 
 class Spaceship(
     private val owner: User,
+    private val courseCheckerService: CourseCheckerService,
     coordinates: Coordinates,
-    pointsOnScreen: List<Point>,
-    screen: Screen
 ) : Point(coordinates) {
 
     var direction = Direction.UP
 
     private val lock: Lock = ReentrantLock()
-
-    private val courseChecker = CourseCheckerService(this, pointsOnScreen, screen)
 
     override val symbolToShow: String
         get() = owner.id.toString()
@@ -62,11 +59,11 @@ class Spaceship(
         }
     }
 
-    fun isAsteroidInFrontOf() = courseChecker.isAsteroid()
+    fun isAsteroidInFrontOf() = courseCheckerService.isAsteroid()
 
-    fun isGarbageInFrontOf() = courseChecker.isGarbage()
+    fun isGarbageInFrontOf() = courseCheckerService.isGarbage()
 
-    fun isWallInFrontOf() = courseChecker.isWall()
+    fun isWallInFrontOf() = courseCheckerService.isWall()
 
     private fun checkCollectedGarbage(collected: Int) {
         owner.checkCollectedGarbage(collected)
@@ -83,7 +80,4 @@ class Spaceship(
 
     override val type: Type
         get() = Type.SPACESHIP
-
-    val isOwnerAlive: Boolean
-        get() = owner.isAlive
 }
