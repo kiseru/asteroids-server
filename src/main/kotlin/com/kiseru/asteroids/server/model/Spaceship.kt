@@ -12,12 +12,15 @@ class Spaceship(
     coordinates: Coordinates,
 ) : Point(coordinates) {
 
+    override val symbolToShow: String
+        get() = owner.id.toString()
+
+    override val type: Type
+        get() = Type.SPACESHIP
+
     var direction = Direction.UP
 
     private val lock: Lock = ReentrantLock()
-
-    override val symbolToShow: String
-        get() = owner.id.toString()
 
     override fun destroy() {
         throw UnsupportedOperationException()
@@ -77,7 +80,4 @@ class Spaceship(
             Direction.LEFT -> Coordinates(x + 1, y)
         }
     }
-
-    override val type: Type
-        get() = Type.SPACESHIP
 }
