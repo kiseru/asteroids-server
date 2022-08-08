@@ -1,12 +1,11 @@
 package com.kiseru.asteroids.server
 
 import com.kiseru.asteroids.server.service.RoomService
-import com.kiseru.asteroids.server.service.impl.MessageReceiverServiceImpl
-import com.kiseru.asteroids.server.service.impl.MessageSenderServiceImpl
+import com.kiseru.asteroids.server.service.UserService
 import com.kiseru.asteroids.server.service.impl.RoomServiceImpl
+import com.kiseru.asteroids.server.service.impl.UserServiceImpl
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
-import java.io.IOException
 import java.net.ServerSocket
 import java.net.Socket
 import java.util.*
@@ -14,7 +13,10 @@ import java.util.concurrent.Executors
 
 const val PORT = 6501
 
-class Application(private val roomService: RoomService) {
+class Application(
+    private val roomService: RoomService,
+    private val userService: UserService,
+) {
 
     private lateinit var serverSocket: ServerSocket
 
@@ -67,25 +69,9 @@ class Application(private val roomService: RoomService) {
 
     private suspend fun handleNewConnection(newConnection: Socket) {
         log.info("Started handling new connection")
-        val user = authorizeUser(newConnection)
-        executorService.execute(user)
-    }
-
-    private suspend fun authorizeUser(socket: Socket): User {
-        val messageReceiverService = withContext(Dispatchers.IO) { MessageReceiverServiceImpl(socket.getInputStream()) }
-        val messageSenderService = withContext(Dispatchers.IO) { MessageSenderServiceImpl(socket.getOutputStream()) }
         val room = roomService.getNotFullRoom()
-        try {
-            messageSenderService.sendWelcomeMessage()
-            val username = withContext(Dispatchers.IO) { messageReceiverService.receive() }
-            log.info("{} has joined the server", username)
-            val user = User(username, room, socket, messageReceiverService, messageSenderService)
-            messageSenderService.sendInstructions(user)
-            return user
-        } catch (e: IOException) {
-            log.error("Failed to authorize user", e)
-            throw e
-        }
+        val user = userService.authorizeUser(newConnection, room)
+        executorService.execute(user)
     }
 
     companion object {
@@ -97,6 +83,6 @@ class Application(private val roomService: RoomService) {
 }
 
 fun main() = runBlocking {
-    val application = Application(RoomServiceImpl)
+    val application = Application(RoomServiceImpl, UserServiceImpl)
     application.startServer()
 }
