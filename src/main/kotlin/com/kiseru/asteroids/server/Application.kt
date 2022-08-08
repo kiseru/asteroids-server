@@ -3,6 +3,7 @@ package com.kiseru.asteroids.server
 import com.kiseru.asteroids.server.service.RoomService
 import com.kiseru.asteroids.server.service.impl.MessageReceiverServiceImpl
 import com.kiseru.asteroids.server.service.impl.MessageSenderServiceImpl
+import com.kiseru.asteroids.server.service.impl.RoomServiceImpl
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -11,14 +12,16 @@ import java.net.Socket
 import java.util.*
 import java.util.concurrent.Executors
 
-class Application(private val port: Int) {
+const val PORT = 6501
+
+class Application(private val roomService: RoomService) {
 
     private lateinit var serverSocket: ServerSocket
 
     suspend fun startServer() = coroutineScope {
         log.info("Server started")
         serverSocket = withContext(Dispatchers.IO) {
-            ServerSocket(port)
+            ServerSocket(PORT)
         }
         launch {
             startAcceptingConnections()
@@ -31,13 +34,13 @@ class Application(private val port: Int) {
             }
             when (command) {
                 "rating" -> {
-                    for (room in RoomService.rooms) {
-                        println(RoomService.getRoomRating(room))
+                    for (room in roomService.rooms) {
+                        println(roomService.getRoomRating(room))
                     }
                 }
 
                 "gamefield" -> {
-                    for (room in RoomService.rooms) {
+                    for (room in roomService.rooms) {
                         println(room.game.screen.display())
                     }
                 }
@@ -71,7 +74,7 @@ class Application(private val port: Int) {
     private suspend fun authorizeUser(socket: Socket): User {
         val messageReceiverService = withContext(Dispatchers.IO) { MessageReceiverServiceImpl(socket.getInputStream()) }
         val messageSenderService = withContext(Dispatchers.IO) { MessageSenderServiceImpl(socket.getOutputStream()) }
-        val room = RoomService.getNotFullRoom()
+        val room = roomService.getNotFullRoom()
         try {
             messageSenderService.sendWelcomeMessage()
             val username = withContext(Dispatchers.IO) { messageReceiverService.receive() }
@@ -94,6 +97,6 @@ class Application(private val port: Int) {
 }
 
 fun main() = runBlocking {
-    val application = Application(6501)
+    val application = Application(RoomServiceImpl)
     application.startServer()
 }

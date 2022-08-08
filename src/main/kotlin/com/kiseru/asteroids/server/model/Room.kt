@@ -13,7 +13,7 @@ import kotlin.concurrent.withLock
 /**
  * Комната.
  */
-class Room : Runnable {
+class Room(private val roomService: RoomService) : Runnable {
 
     val users: MutableList<User> = CopyOnWriteArrayList()
 
@@ -38,7 +38,7 @@ class Room : Runnable {
     private var status = Status.WAITING_CONNECTIONS
 
     override fun run() {
-        RoomService.sendMessageToUsers(this, "start")
+        roomService.sendMessageToUsers(this, "start")
         status = Status.GAMING
         lock.withLock {
             game = Game(Screen(SCREEN_WIDTH, SCREEN_HEIGHT), NUMBER_OF_GARBAGE_CELLS, NUMBER_OF_ASTEROID_CELLS)
@@ -56,8 +56,8 @@ class Room : Runnable {
             }
         }
 
-        val rating = RoomService.getRoomRating(this)
-        RoomService.sendMessageToUsers(this, "finish\n$rating")
+        val rating = roomService.getRoomRating(this)
+        roomService.sendMessageToUsers(this, "finish\n$rating")
         log.info("Room released! Rating table:\n$rating")
     }
 
@@ -88,7 +88,7 @@ class Room : Runnable {
     fun addUserToRoom(user: User) = lock.withLock {
         addUser(user)
         if (isFull) {
-            RoomService.getNotFullRoom()
+            roomService.getNotFullRoom()
             EXECUTOR_SERVICE.execute(this)
         }
 
@@ -106,9 +106,9 @@ class Room : Runnable {
      */
     private fun addUser(user: User) {
         if (users.size >= MAX_USERS) {
-            RoomService.getNotFullRoom().addUser(user)
+            roomService.getNotFullRoom().addUser(user)
         }
-        RoomService.sendMessageToUsers(this, "User ${user.username} has joined the room.")
+        roomService.sendMessageToUsers(this, "User ${user.username} has joined the room.")
         users.add(user)
     }
 

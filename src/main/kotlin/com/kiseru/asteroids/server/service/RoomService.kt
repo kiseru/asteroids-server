@@ -1,47 +1,14 @@
 package com.kiseru.asteroids.server.service
 
 import com.kiseru.asteroids.server.model.Room
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 
-object RoomService {
+interface RoomService {
 
-    val rooms = mutableListOf<Room>()
+    val rooms: List<Room>
 
-    private var notFullRoom = Room()
+    fun getNotFullRoom(): Room
 
-    private val lock = ReentrantLock()
+    fun getRoomRating(room: Room): String
 
-    fun getNotFullRoom(): Room {
-        lock.withLock {
-            if (!notFullRoom.isFull) {
-                return notFullRoom
-            }
-
-            rooms.add(notFullRoom)
-            notFullRoom = Room()
-            return notFullRoom
-        }
-    }
-
-    /**
-     * Возвращает рейтинг пользователей комнаты.
-     *
-     * @return рейтинг пользователей комнаты
-     */
-    fun getRoomRating(room: Room): String {
-        return room.users.sortedBy { it.score }
-            .joinToString("\n") { "${it.username} ${it.score}" }
-    }
-
-    /**
-     * Рассылает сообщение пользователям комнаты.
-     *
-     * @param message сообщение
-     */
-    fun sendMessageToUsers(room: Room, message: String) {
-        for (user in room.users) {
-            user.sendMessage(message)
-        }
-    }
+    fun sendMessageToUsers(room: Room, message: String)
 }
