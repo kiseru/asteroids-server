@@ -1,31 +1,32 @@
 package com.kiseru.asteroids.server
 
-import com.kiseru.asteroids.server.factory.impl.MessageReceiverServiceFactoryImpl
-import com.kiseru.asteroids.server.factory.impl.MessageSenderServiceFactoryImpl
 import com.kiseru.asteroids.server.service.RoomService
 import com.kiseru.asteroids.server.service.UserService
-import com.kiseru.asteroids.server.service.impl.RoomServiceImpl
-import com.kiseru.asteroids.server.service.impl.UserServiceImpl
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
 import java.net.ServerSocket
 import java.net.Socket
 import java.util.*
 import java.util.concurrent.Executors
 
-const val PORT = 6501
-
-class Application(
+@Component
+class Server(
     private val roomService: RoomService,
     private val userService: UserService,
+    @Value("\${asteroids.server.port}") private val port: Int,
 ) {
 
     private lateinit var serverSocket: ServerSocket
 
     suspend fun startServer() = coroutineScope {
-        log.info("Server started")
+        log.info("Server started at port $port")
         serverSocket = withContext(Dispatchers.IO) {
-            ServerSocket(PORT)
+            ServerSocket(port)
         }
         launch {
             startAcceptingConnections()
@@ -77,17 +78,8 @@ class Application(
 
     companion object {
 
-        private val log = LoggerFactory.getLogger(Application::class.java)
+        private val log = LoggerFactory.getLogger(Server::class.java)
 
         private val executorService = Executors.newCachedThreadPool()
     }
-}
-
-fun main() = runBlocking {
-    val messageReceiverServiceFactory = MessageReceiverServiceFactoryImpl()
-    val messageSenderServiceFactory = MessageSenderServiceFactoryImpl()
-    val roomService = RoomServiceImpl()
-    val userService = UserServiceImpl(messageReceiverServiceFactory, messageSenderServiceFactory, roomService)
-    val application = Application(roomService, userService)
-    application.startServer()
 }

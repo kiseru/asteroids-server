@@ -8,9 +8,11 @@ import com.kiseru.asteroids.server.service.UserService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Service
 import java.io.IOException
 import java.net.Socket
 
+@Service
 class UserServiceImpl(
     private val messageReceiverServiceFactory: MessageReceiverServiceFactory,
     private val messageSenderServiceFactory: MessageSenderServiceFactory,

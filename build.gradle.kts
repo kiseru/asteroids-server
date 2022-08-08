@@ -1,8 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    id("org.springframework.boot") version "2.7.2"
+    id("io.spring.dependency-management") version "1.0.12.RELEASE"
     kotlin("jvm") version "1.6.21"
-    application
+    kotlin("plugin.spring") version "1.6.21"
 }
 
 repositories {
@@ -10,16 +12,12 @@ repositories {
 }
 
 dependencies {
+    implementation("org.springframework.boot:spring-boot-starter")
     implementation(kotlin("stdlib"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation("org.slf4j:slf4j-simple:1.7.36")
 }
 
-application {
-    mainClass.set("com.kiseru.asteroids.server.ApplicationKt")
-}
-
-tasks.named<JavaExec>("run") {
+tasks.named<JavaExec>("bootRun") {
     standardInput = System.`in`
 }
 
