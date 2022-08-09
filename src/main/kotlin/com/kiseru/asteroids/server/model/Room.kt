@@ -44,7 +44,7 @@ class Room(
         roomService.sendMessageToUsers(this, "start")
         status = Status.GAMING
         lock.withLock {
-            game = Game(Screen(SCREEN_WIDTH, SCREEN_HEIGHT), NUMBER_OF_GARBAGE_CELLS, NUMBER_OF_ASTEROID_CELLS)
+            game = roomService.createGame()
             for (user in users) {
                 game.registerSpaceshipForUser(user)
             }
@@ -120,14 +120,6 @@ class Room(
     }
 
     companion object {
-
-        private const val SCREEN_WIDTH = 30
-
-        private const val SCREEN_HEIGHT = 30
-
-        private const val NUMBER_OF_GARBAGE_CELLS = 150
-
-        private const val NUMBER_OF_ASTEROID_CELLS = 50
 
         private const val MAX_USERS = 1
 

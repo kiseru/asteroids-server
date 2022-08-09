@@ -1,3 +1,8 @@
 asteroids:
+  number-of-asteroid-cells: 50
+  number-of-garbage-cells: 150
+  screen:
+    height: 30
+    width: 30
   server:
     port: 6501
