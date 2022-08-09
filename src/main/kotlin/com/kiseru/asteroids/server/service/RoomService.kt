@@ -1,6 +1,5 @@
 package com.kiseru.asteroids.server.service
 
-import com.kiseru.asteroids.server.logics.Game
 import com.kiseru.asteroids.server.model.Room
 
 interface RoomService {
@@ -14,6 +13,4 @@ interface RoomService {
     fun showAllRatings()
 
     fun showAllGameFields()
-
-    fun createGame(): Game
 }

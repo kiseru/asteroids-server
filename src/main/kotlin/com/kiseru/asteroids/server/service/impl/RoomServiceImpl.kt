@@ -19,7 +19,7 @@ class RoomServiceImpl(
 
     private val rooms = mutableListOf<Room>()
 
-    private var notFullRoom = Room(mainExecutorService, this)
+    private var notFullRoom = createRoom()
 
     private val lock = ReentrantLock()
 
@@ -30,7 +30,7 @@ class RoomServiceImpl(
             }
 
             rooms.add(notFullRoom)
-            notFullRoom = Room(mainExecutorService, this)
+            notFullRoom = createRoom()
             return notFullRoom
         }
     }
@@ -68,5 +68,7 @@ class RoomServiceImpl(
         }
     }
 
-    override fun createGame(): Game = gameFactory.createGame(screenFactory.createScreen())
+    private fun createRoom() = Room(createGame(), mainExecutorService, this)
+
+    private fun createGame(): Game = gameFactory.createGame(screenFactory.createScreen())
 }

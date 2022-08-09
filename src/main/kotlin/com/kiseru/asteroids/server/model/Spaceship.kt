@@ -58,7 +58,7 @@ class Spaceship(
                 owner.subtractScore()
             } else if (type === Type.GARBAGE) {
                 owner.addScore()
-                val collected = owner.room.game.incrementCollectedGarbageCount()
+                val collected = owner.room.incrementCollectedGarbageCount()
                 checkCollectedGarbage(collected)
             } else if (type === Type.WALL) {
                 // возвращаемся назад, чтобы не находится на стене

@@ -14,6 +14,7 @@ import kotlin.concurrent.withLock
  * Комната.
  */
 class Room(
+    private val game: Game,
     private val mainExecutorService: ExecutorService,
     private val roomService: RoomService,
 ) : Runnable {
@@ -29,9 +30,6 @@ class Room(
     val isGameFinished: Boolean
         get() = status == Status.FINISHED
 
-    lateinit var game: Game
-        private set
-
     private val lock: Lock = ReentrantLock()
 
     private val endgameCondition = lock.newCondition()
@@ -44,10 +42,6 @@ class Room(
         roomService.sendMessageToUsers(this, "start")
         status = Status.GAMING
         lock.withLock {
-            game = roomService.createGame()
-            for (user in users) {
-                game.registerSpaceshipForUser(user)
-            }
             spaceshipCreatedCondition.signalAll()
         }
 
@@ -108,6 +102,10 @@ class Room(
         game.showField()
     }
 
+    fun incrementCollectedGarbageCount(): Int {
+        return game.incrementCollectedGarbageCount()
+    }
+
     /**
      * Добавляет пользователя в комнату и рассылает уведомление об этом остальным пользователям.
      */
@@ -116,6 +114,7 @@ class Room(
             roomService.getNotFullRoom().addUser(user)
         }
         roomService.sendMessageToUsers(this, "User ${user.username} has joined the room.")
+        game.registerSpaceshipForUser(user)
         users.add(user)
     }
 
