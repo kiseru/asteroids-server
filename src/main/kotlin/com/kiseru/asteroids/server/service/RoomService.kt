@@ -13,4 +13,6 @@ interface RoomService {
     fun showAllRatings()
 
     fun showAllGameFields()
+
+    fun startRoom(room: Room)
 }

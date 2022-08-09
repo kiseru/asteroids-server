@@ -68,7 +68,11 @@ class RoomServiceImpl(
         }
     }
 
-    private fun createRoom() = Room(createGame(), mainExecutorService, this)
+    override fun startRoom(room: Room) {
+        mainExecutorService.execute(room)
+    }
+
+    private fun createRoom() = Room(createGame(), this)
 
     private fun createGame(): Game = gameFactory.createGame(screenFactory.createScreen())
 }
