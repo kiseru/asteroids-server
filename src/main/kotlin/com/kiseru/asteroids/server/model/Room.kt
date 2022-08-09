@@ -5,7 +5,7 @@ import com.kiseru.asteroids.server.logics.Game
 import com.kiseru.asteroids.server.service.RoomService
 import org.slf4j.LoggerFactory
 import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.Executors
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -13,7 +13,10 @@ import kotlin.concurrent.withLock
 /**
  * Комната.
  */
-class Room(private val roomService: RoomService) : Runnable {
+class Room(
+    private val mainExecutorService: ExecutorService,
+    private val roomService: RoomService,
+) : Runnable {
 
     val users: MutableList<User> = CopyOnWriteArrayList()
 
@@ -89,7 +92,7 @@ class Room(private val roomService: RoomService) : Runnable {
         addUser(user)
         if (isFull) {
             roomService.getNotFullRoom()
-            EXECUTOR_SERVICE.execute(this)
+            mainExecutorService.execute(this)
         }
 
         while (!user.hasSpaceship()) {
@@ -117,8 +120,6 @@ class Room(private val roomService: RoomService) : Runnable {
     }
 
     companion object {
-
-        private val EXECUTOR_SERVICE = Executors.newCachedThreadPool()
 
         private const val SCREEN_WIDTH = 30
 

@@ -3,15 +3,18 @@ package com.kiseru.asteroids.server.service.impl
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.service.RoomService
 import org.springframework.stereotype.Service
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 @Service
-class RoomServiceImpl : RoomService {
+class RoomServiceImpl(
+    private val mainExecutorService: ExecutorService,
+) : RoomService {
 
     private val rooms = mutableListOf<Room>()
 
-    private var notFullRoom = Room(this)
+    private var notFullRoom = Room(mainExecutorService, this)
 
     private val lock = ReentrantLock()
 
@@ -22,7 +25,7 @@ class RoomServiceImpl : RoomService {
             }
 
             rooms.add(notFullRoom)
-            notFullRoom = Room(this)
+            notFullRoom = Room(mainExecutorService, this)
             return notFullRoom
         }
     }

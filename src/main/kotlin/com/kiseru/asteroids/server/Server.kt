@@ -11,10 +11,11 @@ import org.springframework.stereotype.Component
 import java.net.ServerSocket
 import java.net.Socket
 import java.util.*
-import java.util.concurrent.Executors
+import java.util.concurrent.ExecutorService
 
 @Component
 class Server(
+    private val mainExecutorService: ExecutorService,
     private val roomService: RoomService,
     private val serverSocket: ServerSocket,
     private val userService: UserService,
@@ -56,13 +57,11 @@ class Server(
     private suspend fun handleNewConnection(newConnection: Socket) {
         log.info("Started handling new connection")
         val user = userService.authorizeUser(newConnection)
-        executorService.execute(user)
+        mainExecutorService.execute(user)
     }
 
     companion object {
 
         private val log = LoggerFactory.getLogger(Server::class.java)
-
-        private val executorService = Executors.newCachedThreadPool()
     }
 }
