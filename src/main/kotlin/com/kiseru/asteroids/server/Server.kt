@@ -7,7 +7,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.net.ServerSocket
 import java.net.Socket
@@ -17,17 +16,11 @@ import java.util.concurrent.Executors
 @Component
 class Server(
     private val roomService: RoomService,
+    private val serverSocket: ServerSocket,
     private val userService: UserService,
-    @Value("\${asteroids.server.port}") private val port: Int,
 ) {
 
-    private lateinit var serverSocket: ServerSocket
-
     suspend fun startServer() = coroutineScope {
-        log.info("Server started at port $port")
-        serverSocket = withContext(Dispatchers.IO) {
-            ServerSocket(port)
-        }
         launch {
             startAcceptingConnections()
         }
