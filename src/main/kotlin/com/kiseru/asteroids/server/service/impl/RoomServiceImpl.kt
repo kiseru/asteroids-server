@@ -9,7 +9,7 @@ import kotlin.concurrent.withLock
 @Service
 class RoomServiceImpl : RoomService {
 
-    override val rooms = mutableListOf<Room>()
+    private val rooms = mutableListOf<Room>()
 
     private var notFullRoom = Room(this)
 
@@ -45,6 +45,18 @@ class RoomServiceImpl : RoomService {
     override fun sendMessageToUsers(room: Room, message: String) {
         for (user in room.users) {
             user.sendMessage(message)
+        }
+    }
+
+    override fun showAllRatings() {
+        for (room in rooms) {
+            println(getRoomRating(room))
+        }
+    }
+
+    override fun showAllGameFields() {
+        for (room in rooms) {
+            room.showGameField()
         }
     }
 }

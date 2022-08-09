@@ -31,18 +31,8 @@ class Server(
                 scanner.nextLine()
             }
             when (command) {
-                "rating" -> {
-                    for (room in roomService.rooms) {
-                        println(roomService.getRoomRating(room))
-                    }
-                }
-
-                "gamefield" -> {
-                    for (room in roomService.rooms) {
-                        println(room.game.screen.display())
-                    }
-                }
-
+                "rating" -> roomService.showAllRatings()
+                "gamefield" -> roomService.showAllGameFields()
                 "exit" -> break
             }
         }

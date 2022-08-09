@@ -101,6 +101,10 @@ class Room(private val roomService: RoomService) : Runnable {
         game.refresh()
     }
 
+    fun showGameField() {
+        game.showField()
+    }
+
     /**
      * Добавляет пользователя в комнату и рассылает уведомление об этом остальным пользователям.
      */

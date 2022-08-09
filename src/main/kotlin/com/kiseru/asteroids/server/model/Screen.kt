@@ -36,7 +36,7 @@ class Screen(val width: Int, val height: Int) {
     /**
      * Отображает экран.
      */
-    fun display(): String {
+    fun display() {
         val result = StringBuilder("")
         for (i in 1 until height + 1) {
             for (j in 1 until width + 1) {
@@ -45,7 +45,8 @@ class Screen(val width: Int, val height: Int) {
             }
             result.append("\n")
         }
-        return result.toString()
+
+        println(result.toString())
     }
 
     private fun generateClearScreen() {

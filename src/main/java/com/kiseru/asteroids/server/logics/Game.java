@@ -97,6 +97,10 @@ public class Game {
                 .anyMatch(p -> p.getCoordinates().equals(coordinates));
     }
 
+    public void showField() {
+        screen.display();
+    }
+
     public List<Point> getPointsOnScreen() {
         return pointsOnScreen;
     }
