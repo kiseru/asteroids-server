@@ -83,9 +83,11 @@ public final class User implements Runnable {
     }
 
     public void addScore() {
-        if (room.isGameStarted()) {
-            score += 10;
+        if (!room.isGameStarted()) {
+            throw new GameFinishedException();
         }
+
+        score += 10;
     }
 
     public void subtractScore() {
