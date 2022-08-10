@@ -1,5 +1,6 @@
 package com.kiseru.asteroids.server;
 
+import com.kiseru.asteroids.server.exception.GameFinishedException;
 import com.kiseru.asteroids.server.handler.CommandHandlerFactory;
 import com.kiseru.asteroids.server.handler.impl.CommandHandlerFactoryImpl;
 import com.kiseru.asteroids.server.model.Direction;
@@ -88,9 +89,13 @@ public final class User implements Runnable {
     }
 
     public void subtractScore() {
-        if (room.isGameStarted()) {
-            score -= 50;
-            if (score < 0) isAlive = false;
+        if (!room.isGameStarted()) {
+            throw new GameFinishedException();
+        }
+
+        score -= 50;
+        if (score < 0) {
+            isAlive = false;
         }
     }
 
