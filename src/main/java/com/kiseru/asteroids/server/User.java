@@ -67,6 +67,7 @@ public final class User implements Runnable {
                 String command = messageReceiverService.receive();
                 handleCommand(command);
                 incrementSteps();
+                checkIsAlive();
             }
         } finally {
             isAlive = false;
@@ -187,7 +188,14 @@ public final class User implements Runnable {
     }
 
     private void incrementSteps() {
+        if (!isAlive) {
+            throw new GameFinishedException();
+        }
+
         steps++;
+    }
+
+    private void checkIsAlive() {
         if (steps >= 1500 || score < 0) {
             died();
         }
