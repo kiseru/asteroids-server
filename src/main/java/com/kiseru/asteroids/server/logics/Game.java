@@ -1,7 +1,8 @@
 package com.kiseru.asteroids.server.logics;
 
 import com.kiseru.asteroids.server.User;
-import com.kiseru.asteroids.server.logics.handlers.SpaceshipCrashHandler;
+import com.kiseru.asteroids.server.handler.SpaceshipCrashHandler;
+import com.kiseru.asteroids.server.handler.impl.SpaceshipCrashHandlerImpl;
 import com.kiseru.asteroids.server.model.*;
 import com.kiseru.asteroids.server.service.impl.CourseCheckerServiceImpl;
 
@@ -70,7 +71,7 @@ public class Game {
         courseCheckerService.setSpaceship(spaceship);
         pointsOnScreen.add(spaceship);
         gameObjects.add(spaceship);
-        crashHandlers.add(new SpaceshipCrashHandler(this, spaceship));
+        crashHandlers.add(new SpaceshipCrashHandlerImpl(this, spaceship));
         user.setSpaceship(spaceship);
     }
 

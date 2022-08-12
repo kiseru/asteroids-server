@@ -1,0 +1,30 @@
+package com.kiseru.asteroids.server.handler.impl
+
+import com.kiseru.asteroids.server.handler.SpaceshipCrashHandler
+import com.kiseru.asteroids.server.logics.Game
+import com.kiseru.asteroids.server.model.Point
+import com.kiseru.asteroids.server.model.Spaceship
+import com.kiseru.asteroids.server.model.Type
+
+class SpaceshipCrashHandlerImpl(
+    private val game: Game,
+    private val spaceship: Spaceship,
+) : SpaceshipCrashHandler {
+
+    override fun check() {
+        val pointsOnScreen = game.pointsOnScreen
+        val collisionPoint = pointsOnScreen.first {
+            it.type != Type.SPACESHIP && it.isVisible && it.coordinates == spaceship.coordinates
+        }
+        checkSpaceshipCrashing(collisionPoint)
+    }
+
+    private fun checkSpaceshipCrashing(collisionPoint: Point?) {
+        if (collisionPoint != null) {
+            spaceship.crash(collisionPoint.type)
+            collisionPoint.destroy()
+        } else if (spaceship.x !in 1..game.screen.width || spaceship.y !in 1..game.screen.height) {
+            spaceship.crash(Type.WALL)
+        }
+    }
+}
