@@ -10,7 +10,6 @@ import com.kiseru.asteroids.server.service.MessageReceiverService;
 import com.kiseru.asteroids.server.service.MessageSenderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.Socket;
 
@@ -65,6 +64,10 @@ public final class User implements Runnable {
         try {
             while (!room.isGameFinished() && isAlive) {
                 String command = messageReceiverService.receive();
+                if (command == null) {
+                    break;
+                }
+
                 handleCommand(command);
                 incrementSteps();
                 checkIsAlive();

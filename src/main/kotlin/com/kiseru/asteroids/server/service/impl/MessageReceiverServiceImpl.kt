@@ -9,7 +9,7 @@ class MessageReceiverServiceImpl(inputStream: InputStream) : MessageReceiverServ
 
     private val reader = BufferedReader(InputStreamReader(inputStream))
 
-    override fun receive(): String {
+    override fun receive(): String? {
         return reader.readLine()
     }
 }
