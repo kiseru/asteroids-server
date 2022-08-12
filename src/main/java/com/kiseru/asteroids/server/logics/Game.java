@@ -3,9 +3,13 @@ package com.kiseru.asteroids.server.logics;
 import com.kiseru.asteroids.server.User;
 import com.kiseru.asteroids.server.handler.SpaceshipCrashHandler;
 import com.kiseru.asteroids.server.handler.impl.SpaceshipCrashHandlerImpl;
-import com.kiseru.asteroids.server.model.*;
+import com.kiseru.asteroids.server.model.Asteroid;
+import com.kiseru.asteroids.server.model.Coordinates;
+import com.kiseru.asteroids.server.model.Garbage;
+import com.kiseru.asteroids.server.model.Point;
+import com.kiseru.asteroids.server.model.Screen;
+import com.kiseru.asteroids.server.model.Spaceship;
 import com.kiseru.asteroids.server.service.impl.CourseCheckerServiceImpl;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -20,15 +24,17 @@ public class Game {
 
     private static final Random random = new Random();
 
-    private final List<Point> gameObjects;
+    private final List<Point> gameObjects = new ArrayList<>();
 
-    private final List<Point> pointsOnScreen;
+    private final List<Point> pointsOnScreen = new ArrayList<>();
 
     private final Screen screen;
 
-    private final List<SpaceshipCrashHandler> crashHandlers;
+    private final List<SpaceshipCrashHandler> crashHandlers = new ArrayList<>();
 
     private final AtomicInteger collectedGarbageCount = new AtomicInteger(0);
+
+    private final int asteroidNumber;
 
     private final int garbageNumber;
 
@@ -42,22 +48,8 @@ public class Game {
     public Game(Screen screen, int garbageNumber, int asteroidNumber) {
         this.garbageNumber = garbageNumber;
         this.screen = screen;
-        this.pointsOnScreen = new ArrayList<>();
-        this.gameObjects = new ArrayList<>();
-        this.crashHandlers = new ArrayList<>();
-
-        // генерируем мусор
-        for (int i = 0; i < garbageNumber; i++) {
-            Garbage garbage = new Garbage(generateUniqueRandomCoordinates());
-            pointsOnScreen.add(garbage);
-            gameObjects.add(garbage);
-        }
-        // генерируем астероиды
-        for (int i = 0; i < asteroidNumber; i++) {
-            Asteroid asteroid = new Asteroid(generateUniqueRandomCoordinates());
-            pointsOnScreen.add(asteroid);
-            gameObjects.add(asteroid);
-        }
+        this.asteroidNumber = asteroidNumber;
+        init();
     }
 
     /**
@@ -85,12 +77,37 @@ public class Game {
     }
 
     private Coordinates generateUniqueRandomCoordinates() {
-        Coordinates randomCoordinates = null;
-        // если по случайно сгенерованным координатам уже что-то находится(или они ещё не сгенерированы)
-        while (randomCoordinates == null || isGameObjectsContainsCoordinates(randomCoordinates))
-            // генерируем новые координаты
-            randomCoordinates = new Coordinates(random.nextInt(screen.getWidth()) + 1, random.nextInt(screen.getHeight()) + 1);
+        Coordinates randomCoordinates = generateCoordinates();
+        while (isGameObjectsContainsCoordinates(randomCoordinates)) {
+            randomCoordinates = generateCoordinates();
+        }
         return randomCoordinates;
+    }
+
+    private Coordinates generateCoordinates() {
+        return new Coordinates(random.nextInt(screen.getWidth()) + 1,
+                               random.nextInt(screen.getHeight()) + 1);
+    }
+
+    private void init() {
+        generateGarbage();
+        generateAsteroids();
+    }
+
+    private void generateAsteroids() {
+        for (int i = 0; i < asteroidNumber; i++) {
+            Asteroid asteroid = new Asteroid(generateUniqueRandomCoordinates());
+            pointsOnScreen.add(asteroid);
+            gameObjects.add(asteroid);
+        }
+    }
+
+    private void generateGarbage() {
+        for (int i = 0; i < garbageNumber; i++) {
+            Garbage garbage = new Garbage(generateUniqueRandomCoordinates());
+            pointsOnScreen.add(garbage);
+            gameObjects.add(garbage);
+        }
     }
 
     private boolean isGameObjectsContainsCoordinates(Coordinates coordinates) {
