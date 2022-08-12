@@ -2,14 +2,13 @@ package com.kiseru.asteroids.server.factory.impl
 
 import com.kiseru.asteroids.server.factory.ScreenFactory
 import com.kiseru.asteroids.server.model.Screen
-import org.springframework.beans.factory.annotation.Value
+import com.kiseru.asteroids.server.properties.AsteroidsProperties
 import org.springframework.stereotype.Component
 
 @Component
 class ScreenFactoryImpl(
-    @Value("\${asteroids.screen.height}") private val height: Int,
-    @Value("\${asteroids.screen.width}") private val width: Int,
+    private val asteroidsProperties: AsteroidsProperties,
 ) : ScreenFactory {
 
-    override fun createScreen(): Screen = Screen(width, height)
+    override fun createScreen(): Screen = Screen(asteroidsProperties.screen.width, asteroidsProperties.screen.height)
 }

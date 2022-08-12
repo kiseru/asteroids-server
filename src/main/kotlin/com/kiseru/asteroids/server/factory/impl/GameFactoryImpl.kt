@@ -3,16 +3,13 @@ package com.kiseru.asteroids.server.factory.impl
 import com.kiseru.asteroids.server.factory.GameFactory
 import com.kiseru.asteroids.server.logics.Game
 import com.kiseru.asteroids.server.model.*
-import org.springframework.beans.factory.annotation.Value
+import com.kiseru.asteroids.server.properties.AsteroidsProperties
 import org.springframework.stereotype.Component
 import kotlin.random.Random
 
 @Component
 class GameFactoryImpl(
-    @Value("\${asteroids.screen.height}") private val screenHeight: Int,
-    @Value("\${asteroids.screen.width}") private val screenWidth: Int,
-    @Value("\${asteroids.number-of-asteroid-cells}") private val numberOfAsteroidCells: Int,
-    @Value("\${asteroids.number-of-garbage-cells}") private val numberOfGarbageCells: Int,
+    private val asteroidsProperties: AsteroidsProperties,
 ) : GameFactory {
 
     override fun createGame(screen: Screen): Game {
@@ -20,11 +17,11 @@ class GameFactoryImpl(
         val gameObjects = mutableListOf<Point>()
         generateAsteroids(pointsOnScreen, gameObjects)
         generateGarbage(pointsOnScreen, gameObjects)
-        return Game(screen, numberOfGarbageCells, pointsOnScreen, gameObjects)
+        return Game(screen, asteroidsProperties.numberOfGarbageCells, pointsOnScreen, gameObjects)
     }
 
     private fun generateAsteroids(pointsOnScreen: MutableList<Point>, gameObjects: MutableList<Point>) {
-        for (i in 0 until numberOfAsteroidCells) {
+        for (i in 0 until asteroidsProperties.numberOfAsteroidCells) {
             val asteroid = Asteroid(generateUniqueRandomCoordinates(pointsOnScreen))
             pointsOnScreen.add(asteroid)
             gameObjects.add(asteroid)
@@ -32,7 +29,7 @@ class GameFactoryImpl(
     }
 
     private fun generateGarbage(pointsOnScreen: MutableList<Point>, gameObjects: MutableList<Point>) {
-        for (i in 0 until numberOfGarbageCells) {
+        for (i in 0 until asteroidsProperties.numberOfGarbageCells) {
             val garbage = Garbage(generateUniqueRandomCoordinates(pointsOnScreen))
             pointsOnScreen.add(garbage)
             gameObjects.add(garbage)
@@ -47,8 +44,10 @@ class GameFactoryImpl(
         return randomCoordinates
     }
 
-    private fun generateCoordinates(): Coordinates =
-        Coordinates(Random.nextInt(screenWidth) + 1, Random.nextInt(screenHeight) + 1)
+    private fun generateCoordinates(): Coordinates = Coordinates(
+        Random.nextInt(asteroidsProperties.screen.width) + 1,
+        Random.nextInt(asteroidsProperties.screen.height) + 1,
+    )
 
     private fun isGameObjectsContainsCoordinates(
         coordinates: Coordinates,
