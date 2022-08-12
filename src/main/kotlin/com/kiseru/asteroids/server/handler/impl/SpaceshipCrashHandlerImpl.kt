@@ -13,7 +13,7 @@ class SpaceshipCrashHandlerImpl(
 
     override fun check() {
         val pointsOnScreen = game.pointsOnScreen
-        val collisionPoint = pointsOnScreen.first {
+        val collisionPoint = pointsOnScreen.firstOrNull {
             it.type != Type.SPACESHIP && it.isVisible && it.coordinates == spaceship.coordinates
         }
         checkSpaceshipCrashing(collisionPoint)
