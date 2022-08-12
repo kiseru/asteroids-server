@@ -8,8 +8,13 @@ import org.springframework.boot.context.properties.ConstructorBinding
 data class AsteroidsProperties(
     var numberOfAsteroidCells: Int,
     var numberOfGarbageCells: Int,
+    var server: ServerProperties,
     var screen: ScreenProperties,
 ) {
+
+    data class ServerProperties(
+        var port: Int,
+    )
 
     data class ScreenProperties(
         var height: Int,
