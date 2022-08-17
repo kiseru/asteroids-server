@@ -125,6 +125,7 @@ class User(
 
     private fun init() {
         room.addUserToRoom(this)
+        room.awaitCreatingSpaceship(this)
     }
 
     private fun handleCommand(command: String) {

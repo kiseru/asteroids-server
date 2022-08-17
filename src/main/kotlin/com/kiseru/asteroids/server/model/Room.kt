@@ -35,10 +35,6 @@ class Room(
     override fun run() {
         roomService.sendMessageToUsers(this, "start")
         status = Status.GAMING
-        lock.withLock {
-            spaceshipCreatedCondition.signalAll()
-        }
-
         game.refresh()
 
         lock.withLock {
@@ -82,7 +78,9 @@ class Room(
             roomService.getNotFullRoom()
             roomService.startRoom(this)
         }
+    }
 
+    fun awaitCreatingSpaceship(user: User) = lock.withLock {
         while (!user.hasSpaceship()) {
             spaceshipCreatedCondition.await()
         }
@@ -109,6 +107,9 @@ class Room(
         }
         roomService.sendMessageToUsers(this, "User ${user.username} has joined the room.")
         game.registerSpaceshipForUser(user)
+        lock.withLock {
+            spaceshipCreatedCondition.signalAll()
+        }
         users = users + user
     }
 
