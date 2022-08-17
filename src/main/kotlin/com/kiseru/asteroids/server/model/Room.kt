@@ -36,13 +36,7 @@ class Room(
         roomService.sendMessageToUsers(this, "start")
         status = Status.GAMING
         game.refresh()
-
-        lock.withLock {
-            while (status != Status.FINISHED) {
-                endgameCondition.await()
-            }
-        }
-
+        awaitEndgame()
         val rating = roomService.getRoomRating(this)
         roomService.sendMessageToUsers(this, "finish\n$rating")
         log.info("Room released! Rating table:\n$rating")
@@ -111,6 +105,12 @@ class Room(
             spaceshipCreatedCondition.signalAll()
         }
         users = users + user
+    }
+
+    private fun awaitEndgame() = lock.withLock {
+        while (status != Status.FINISHED) {
+            endgameCondition.await()
+        }
     }
 
     companion object {
