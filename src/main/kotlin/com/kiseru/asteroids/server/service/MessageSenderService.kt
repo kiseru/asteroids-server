@@ -1,6 +1,6 @@
 package com.kiseru.asteroids.server.service
 
-import com.kiseru.asteroids.server.User
+import com.kiseru.asteroids.server.model.User
 
 interface MessageSenderService {
 

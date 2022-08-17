@@ -1,6 +1,6 @@
 package com.kiseru.asteroids.server.handler
 
-import com.kiseru.asteroids.server.User
+import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.model.Direction
 
 interface DirectionCommandHandler : CommandHandler {

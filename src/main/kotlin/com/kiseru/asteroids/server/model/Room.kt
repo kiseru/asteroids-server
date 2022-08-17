@@ -1,6 +1,5 @@
 package com.kiseru.asteroids.server.model
 
-import com.kiseru.asteroids.server.User
 import com.kiseru.asteroids.server.logics.Game
 import com.kiseru.asteroids.server.service.RoomService
 import org.slf4j.LoggerFactory
@@ -21,9 +20,6 @@ class Room(
 
     val isFull: Boolean
         get() = users.size >= MAX_USERS
-
-    val isGameStarted: Boolean
-        get() = status == Status.GAMING
 
     val isGameFinished: Boolean
         get() = status == Status.FINISHED

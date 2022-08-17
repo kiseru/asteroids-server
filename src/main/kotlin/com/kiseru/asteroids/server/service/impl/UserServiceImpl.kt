@@ -1,8 +1,8 @@
 package com.kiseru.asteroids.server.service.impl
 
-import com.kiseru.asteroids.server.User
 import com.kiseru.asteroids.server.factory.MessageReceiverServiceFactory
 import com.kiseru.asteroids.server.factory.MessageSenderServiceFactory
+import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.RoomService
 import com.kiseru.asteroids.server.service.UserService
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +27,7 @@ class UserServiceImpl(
             messageSenderService.sendWelcomeMessage()
             val username = withContext(Dispatchers.IO) { messageReceiverService.receive() }
             log.info("{} has joined the server", username)
+            checkNotNull(username)
             val user = User(username, room, socket, messageReceiverService, messageSenderService)
             messageSenderService.sendInstructions(user)
             return user
