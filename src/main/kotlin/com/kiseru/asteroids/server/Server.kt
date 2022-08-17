@@ -11,11 +11,9 @@ import org.springframework.stereotype.Component
 import java.net.ServerSocket
 import java.net.Socket
 import java.util.*
-import java.util.concurrent.ExecutorService
 
 @Component
 class Server(
-    private val mainExecutorService: ExecutorService,
     private val roomService: RoomService,
     private val serverSocket: ServerSocket,
     private val userService: UserService,
@@ -54,10 +52,16 @@ class Server(
         }
     }
 
-    private suspend fun handleNewConnection(newConnection: Socket) {
+    private suspend fun handleNewConnection(newConnection: Socket) = coroutineScope {
         log.info("Started handling new connection")
         val user = userService.authorizeUser(newConnection)
-        mainExecutorService.execute(user)
+        launch(Dispatchers.Default) {
+            launch {
+                user.init()
+            }
+            user.awaitCreatingSpaceship()
+            user.run()
+        }
     }
 
     companion object {

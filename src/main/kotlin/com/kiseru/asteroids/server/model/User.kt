@@ -4,9 +4,7 @@ import com.kiseru.asteroids.server.exception.GameFinishedException
 import com.kiseru.asteroids.server.handler.impl.CommandHandlerFactoryImpl
 import com.kiseru.asteroids.server.service.MessageReceiverService
 import com.kiseru.asteroids.server.service.MessageSenderService
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.coroutineScope
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.net.Socket
@@ -17,7 +15,7 @@ class User(
     private val socket: Socket,
     private val messageReceiverService: MessageReceiverService,
     private val messageSenderService: MessageSenderService,
-) : Runnable {
+) {
 
     val id = nextId++
 
@@ -40,24 +38,26 @@ class User(
 
     private var steps = 0
 
-    override fun run() {
-        val self = this
-        runBlocking(Dispatchers.Default) {
-            launch {
-                init()
+    suspend fun init() {
+        room.addUserToRoom(this)
+        room.start()
+    }
+
+    suspend fun awaitCreatingSpaceship() {
+        room.awaitCreatingSpaceship(this)
+    }
+
+    suspend fun run() = coroutineScope {
+        try {
+            while (!room.isGameFinished && isAlive) {
+                val command = messageReceiverService.receive() ?: break
+                handleCommand(command)
+                incrementSteps()
+                checkIsAlive()
             }
-            room.awaitCreatingSpaceship(self)
-            try {
-                while (!room.isGameFinished && isAlive) {
-                    val command = messageReceiverService.receive() ?: break
-                    handleCommand(command)
-                    incrementSteps()
-                    checkIsAlive()
-                }
-            } finally {
-                isAlive = false
-                room.setGameFinished()
-            }
+        } finally {
+            isAlive = false
+            room.setGameFinished()
         }
     }
 
@@ -130,11 +130,6 @@ class User(
 
     fun sendUnknownCommandMessage() {
         messageSenderService.sendUnknownCommand()
-    }
-
-    private suspend fun init() {
-        room.addUserToRoom(this)
-        room.start()
     }
 
     private fun handleCommand(command: String) {
