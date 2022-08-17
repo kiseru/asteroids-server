@@ -4,6 +4,9 @@ import com.kiseru.asteroids.server.exception.GameFinishedException
 import com.kiseru.asteroids.server.handler.impl.CommandHandlerFactoryImpl
 import com.kiseru.asteroids.server.service.MessageReceiverService
 import com.kiseru.asteroids.server.service.MessageSenderService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.net.Socket
@@ -38,17 +41,23 @@ class User(
     private var steps = 0
 
     override fun run() {
-        init()
-        try {
-            while (!room.isGameFinished && isAlive) {
-                val command = messageReceiverService.receive() ?: break
-                handleCommand(command)
-                incrementSteps()
-                checkIsAlive()
+        val self = this
+        runBlocking(Dispatchers.Default) {
+            launch {
+                init()
             }
-        } finally {
-            isAlive = false
-            room.setGameFinished()
+            room.awaitCreatingSpaceship(self)
+            try {
+                while (!room.isGameFinished && isAlive) {
+                    val command = messageReceiverService.receive() ?: break
+                    handleCommand(command)
+                    incrementSteps()
+                    checkIsAlive()
+                }
+            } finally {
+                isAlive = false
+                room.setGameFinished()
+            }
         }
     }
 
@@ -123,9 +132,9 @@ class User(
         messageSenderService.sendUnknownCommand()
     }
 
-    private fun init() {
+    private suspend fun init() {
         room.addUserToRoom(this)
-        room.awaitCreatingSpaceship(this)
+        room.start()
     }
 
     private fun handleCommand(command: String) {

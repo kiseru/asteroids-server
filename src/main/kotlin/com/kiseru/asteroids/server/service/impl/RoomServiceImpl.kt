@@ -6,14 +6,12 @@ import com.kiseru.asteroids.server.logics.Game
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.service.RoomService
 import org.springframework.stereotype.Service
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 @Service
 class RoomServiceImpl(
     private val gameFactory: GameFactory,
-    private val mainExecutorService: ExecutorService,
     private val screenFactory: ScreenFactory,
 ) : RoomService {
 
@@ -68,8 +66,8 @@ class RoomServiceImpl(
         }
     }
 
-    override fun startRoom(room: Room) {
-        mainExecutorService.execute(room)
+    override suspend fun startRoom(room: Room) {
+        room.run()
     }
 
     private fun createRoom() = Room(createGame(), this)

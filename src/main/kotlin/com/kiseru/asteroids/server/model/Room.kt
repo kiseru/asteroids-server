@@ -2,10 +2,8 @@ package com.kiseru.asteroids.server.model
 
 import com.kiseru.asteroids.server.logics.Game
 import com.kiseru.asteroids.server.service.RoomService
+import kotlinx.coroutines.yield
 import org.slf4j.LoggerFactory
-import java.util.concurrent.locks.Lock
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 
 /**
  * Комната.
@@ -13,7 +11,7 @@ import kotlin.concurrent.withLock
 class Room(
     private val game: Game,
     private val roomService: RoomService,
-) : Runnable {
+) {
 
     var users = emptyList<User>()
         private set
@@ -24,15 +22,9 @@ class Room(
     val isGameFinished: Boolean
         get() = status == Status.FINISHED
 
-    private val lock: Lock = ReentrantLock()
-
-    private val endgameCondition = lock.newCondition()
-
-    private val spaceshipCreatedCondition = lock.newCondition()
-
     private var status = Status.WAITING_CONNECTIONS
 
-    override fun run() {
+    suspend fun run() {
         roomService.sendMessageToUsers(this, "start")
         status = Status.GAMING
         game.refresh()
@@ -56,27 +48,29 @@ class Room(
     /**
      * Переводит игру в статус завершен.
      */
-    fun setGameFinished() = lock.withLock {
+    fun setGameFinished() {
         if (status == Status.FINISHED) {
             return
         }
 
         status = Status.FINISHED
         log.info("Game finished")
-        endgameCondition.signalAll()
     }
 
-    fun addUserToRoom(user: User) = lock.withLock {
+    fun addUserToRoom(user: User) {
         addUser(user)
         if (isFull) {
             roomService.getNotFullRoom()
-            roomService.startRoom(this)
         }
     }
 
-    fun awaitCreatingSpaceship(user: User) = lock.withLock {
+    suspend fun start() {
+        roomService.startRoom(this)
+    }
+
+    suspend fun awaitCreatingSpaceship(user: User) {
         while (!user.hasSpaceship()) {
-            spaceshipCreatedCondition.await()
+            yield()
         }
     }
 
@@ -101,15 +95,12 @@ class Room(
         }
         roomService.sendMessageToUsers(this, "User ${user.username} has joined the room.")
         game.registerSpaceshipForUser(user)
-        lock.withLock {
-            spaceshipCreatedCondition.signalAll()
-        }
         users = users + user
     }
 
-    private fun awaitEndgame() = lock.withLock {
+    private suspend fun awaitEndgame() {
         while (status != Status.FINISHED) {
-            endgameCondition.await()
+            yield()
         }
     }
 
