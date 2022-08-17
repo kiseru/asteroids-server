@@ -3,7 +3,6 @@ package com.kiseru.asteroids.server.model
 import com.kiseru.asteroids.server.logics.Game
 import com.kiseru.asteroids.server.service.RoomService
 import org.slf4j.LoggerFactory
-import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -16,7 +15,8 @@ class Room(
     private val roomService: RoomService,
 ) : Runnable {
 
-    val users: MutableList<User> = CopyOnWriteArrayList()
+    var users = emptyList<User>()
+        private set
 
     val isFull: Boolean
         get() = users.size >= MAX_USERS
@@ -109,7 +109,7 @@ class Room(
         }
         roomService.sendMessageToUsers(this, "User ${user.username} has joined the room.")
         game.registerSpaceshipForUser(user)
-        users.add(user)
+        users = users + user
     }
 
     companion object {
