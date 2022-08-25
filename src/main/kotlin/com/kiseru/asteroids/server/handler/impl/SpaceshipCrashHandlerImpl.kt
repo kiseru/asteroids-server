@@ -1,7 +1,7 @@
 package com.kiseru.asteroids.server.handler.impl
 
 import com.kiseru.asteroids.server.handler.SpaceshipCrashHandler
-import com.kiseru.asteroids.server.logics.Game
+import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.Point
 import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.Type

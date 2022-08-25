@@ -1,6 +1,5 @@
 package com.kiseru.asteroids.server.model
 
-import com.kiseru.asteroids.server.logics.Game
 import com.kiseru.asteroids.server.service.RoomService
 import kotlinx.coroutines.yield
 import org.slf4j.LoggerFactory

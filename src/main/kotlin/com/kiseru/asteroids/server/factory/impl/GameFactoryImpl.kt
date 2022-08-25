@@ -1,7 +1,6 @@
 package com.kiseru.asteroids.server.factory.impl
 
 import com.kiseru.asteroids.server.factory.GameFactory
-import com.kiseru.asteroids.server.logics.Game
 import com.kiseru.asteroids.server.model.*
 import com.kiseru.asteroids.server.properties.AsteroidsProperties
 import org.springframework.stereotype.Component

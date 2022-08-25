@@ -2,7 +2,7 @@ package com.kiseru.asteroids.server.service.impl
 
 import com.kiseru.asteroids.server.factory.GameFactory
 import com.kiseru.asteroids.server.factory.ScreenFactory
-import com.kiseru.asteroids.server.logics.Game
+import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.service.RoomService
 import org.springframework.stereotype.Service
