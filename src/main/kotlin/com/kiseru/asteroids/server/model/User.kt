@@ -124,10 +124,6 @@ class User(
         }
     }
 
-    fun sendSuccessMessage() {
-        messageSenderService.sendSuccess()
-    }
-
     fun sendUnknownCommandMessage() {
         messageSenderService.sendUnknownCommand()
     }

@@ -8,8 +8,6 @@ interface MessageSenderService {
 
     fun sendScore(score: Int)
 
-    fun sendSuccess()
-
     fun sendUnknownCommand()
 
     fun send(message: String)

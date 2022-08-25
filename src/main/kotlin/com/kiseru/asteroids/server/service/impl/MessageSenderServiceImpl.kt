@@ -1,11 +1,16 @@
 package com.kiseru.asteroids.server.service.impl
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.kiseru.asteroids.server.dto.ScoreDto
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.MessageSenderService
 import java.io.OutputStream
 import java.io.PrintWriter
 
-class MessageSenderServiceImpl(outputStream: OutputStream) : MessageSenderService {
+class MessageSenderServiceImpl(
+    private val objectMapper: ObjectMapper,
+    outputStream: OutputStream,
+) : MessageSenderService {
 
     private val writer = PrintWriter(outputStream)
 
@@ -14,11 +19,9 @@ class MessageSenderServiceImpl(outputStream: OutputStream) : MessageSenderServic
     }
 
     override fun sendScore(score: Int) {
-        send(score.toString())
-    }
-
-    override fun sendSuccess() {
-        send("success")
+        val scoreDto = ScoreDto(score)
+        val msg = objectMapper.writeValueAsString(scoreDto)
+        send(msg)
     }
 
     override fun sendUnknownCommand() {
