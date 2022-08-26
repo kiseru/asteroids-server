@@ -63,6 +63,8 @@ class Spaceship(
         }
     }
 
+    fun isWall(screen: Screen) = direction.isWall(this, screen)
+
     private fun checkCollectedGarbage(collected: Int) {
         owner.checkCollectedGarbage(collected)
     }

@@ -19,12 +19,7 @@ class CourseCheckerServiceImpl(
         .map { it.x to it.y }
         .let { checkContaining(it) }
 
-    override fun isWall(): Boolean = when (spaceship.direction) {
-        Direction.UP -> spaceship.y == 1
-        Direction.DOWN -> spaceship.y == screen.height
-        Direction.RIGHT -> spaceship.x == screen.width
-        Direction.LEFT -> spaceship.x == 1
-    }
+    override fun isWall(): Boolean = spaceship.isWall(screen)
 
     private fun checkContaining(coordinates: List<Pair<Int, Int>>): Boolean = when (spaceship.direction) {
         Direction.UP -> coordinates.contains(spaceship.x to spaceship.y - 1)
