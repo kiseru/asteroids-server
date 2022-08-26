@@ -6,7 +6,7 @@ enum class Direction {
             point.y -= 1
         }
 
-        override fun rollbackLastStep(point: Point) {
+        override fun rollback(point: Point) {
             point.y += 1
         }
     },
@@ -15,7 +15,7 @@ enum class Direction {
             point.y += 1
         }
 
-        override fun rollbackLastStep(point: Point) {
+        override fun rollback(point: Point) {
             point.y -= 1
         }
     },
@@ -24,7 +24,7 @@ enum class Direction {
             point.x -= 1
         }
 
-        override fun rollbackLastStep(point: Point) {
+        override fun rollback(point: Point) {
             point.x += 1
         }
     },
@@ -33,12 +33,12 @@ enum class Direction {
             point.x += 1
         }
 
-        override fun rollbackLastStep(point: Point) {
+        override fun rollback(point: Point) {
             point.x -= 1
         }
     };
 
     abstract fun go(point: Point)
 
-    abstract fun rollbackLastStep(point: Point)
+    abstract fun rollback(point: Point)
 }
