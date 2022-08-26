@@ -1,6 +1,6 @@
 package com.kiseru.asteroids.server.model
 
-class Garbage(coordinates: Coordinates) : Point(coordinates) {
+class Garbage(x: Int, y: Int) : Point(x, y) {
 
     override val type: Type
         get() = Type.GARBAGE

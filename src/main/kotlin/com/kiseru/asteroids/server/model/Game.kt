@@ -19,7 +19,8 @@ class Game(
 
     fun registerSpaceshipForUser(user: User) {
         val courseCheckerService = CourseCheckerServiceImpl(pointsOnScreen, screen)
-        val spaceship = Spaceship(user, courseCheckerService, generateUniqueRandomCoordinates())
+        val (x, y) = generateUniqueRandomCoordinates()
+        val spaceship = Spaceship(user, courseCheckerService, x, y)
         courseCheckerService.spaceship = spaceship
         pointsOnScreen.add(spaceship)
         gameObjects.add(spaceship)
@@ -42,17 +43,19 @@ class Game(
 
     fun incrementCollectedGarbageCount(): Int = collectedGarbageCount.getAndIncrement()
 
-    private fun generateUniqueRandomCoordinates(): Coordinates {
-        var randomCoordinates = generateCoordinates()
-        while (isGameObjectsContainsCoordinates(randomCoordinates)) {
-            randomCoordinates = generateCoordinates()
+    private fun generateUniqueRandomCoordinates(): Pair<Int, Int> {
+        while (true) {
+            val coordinates = generateCoordinates()
+            val (x, y) = coordinates
+            if (!isGameObjectsContainsCoordinates(x, y)) {
+                return coordinates
+            }
         }
-        return randomCoordinates
     }
 
-    private fun generateCoordinates(): Coordinates =
-        Coordinates(Random.nextInt(screen.width) + 1, Random.nextInt(screen.height) + 1)
+    private fun generateCoordinates(): Pair<Int, Int> =
+        Random.nextInt(screen.width) + 1 to Random.nextInt(screen.height) + 1
 
-    private fun isGameObjectsContainsCoordinates(coordinates: Coordinates): Boolean =
-        pointsOnScreen.any { it.coordinates == coordinates }
+    private fun isGameObjectsContainsCoordinates(x: Int, y: Int): Boolean =
+        pointsOnScreen.any { it.x == x && it.y == y }
 }

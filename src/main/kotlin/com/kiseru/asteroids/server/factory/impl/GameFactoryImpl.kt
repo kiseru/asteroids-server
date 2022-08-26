@@ -21,7 +21,8 @@ class GameFactoryImpl(
 
     private fun generateAsteroids(pointsOnScreen: MutableList<Point>, gameObjects: MutableList<Point>) {
         for (i in 0 until asteroidsProperties.numberOfAsteroidCells) {
-            val asteroid = Asteroid(generateUniqueRandomCoordinates(pointsOnScreen))
+            val (x, y) = generateUniqueRandomCoordinates(pointsOnScreen)
+            val asteroid = Asteroid(x, y)
             pointsOnScreen.add(asteroid)
             gameObjects.add(asteroid)
         }
@@ -29,28 +30,27 @@ class GameFactoryImpl(
 
     private fun generateGarbage(pointsOnScreen: MutableList<Point>, gameObjects: MutableList<Point>) {
         for (i in 0 until asteroidsProperties.numberOfGarbageCells) {
-            val garbage = Garbage(generateUniqueRandomCoordinates(pointsOnScreen))
+            val (x, y) = generateUniqueRandomCoordinates(pointsOnScreen)
+            val garbage = Garbage(x, y)
             pointsOnScreen.add(garbage)
             gameObjects.add(garbage)
         }
     }
 
-    private fun generateUniqueRandomCoordinates(pointsOnScreen: MutableList<Point>): Coordinates {
-        var randomCoordinates = generateCoordinates()
-        while (isGameObjectsContainsCoordinates(randomCoordinates, pointsOnScreen)) {
-            randomCoordinates = generateCoordinates()
+    private fun generateUniqueRandomCoordinates(pointsOnScreen: MutableList<Point>): Pair<Int, Int> {
+        while (true) {
+            val coordinates = generateCoordinates()
+            val (x, y) = coordinates
+            if (!isGameObjectsContainsCoordinates(x, y, pointsOnScreen)) {
+                return coordinates
+            }
         }
-        return randomCoordinates
     }
 
-    private fun generateCoordinates(): Coordinates = Coordinates(
-        Random.nextInt(asteroidsProperties.screen.width) + 1,
-        Random.nextInt(asteroidsProperties.screen.height) + 1,
-    )
+    private fun generateCoordinates(): Pair<Int, Int> =
+        Random.nextInt(asteroidsProperties.screen.width) + 1 to Random.nextInt(asteroidsProperties.screen.height) + 1
 
-    private fun isGameObjectsContainsCoordinates(
-        coordinates: Coordinates,
-        pointsOnScreen: MutableList<Point>
-    ): Boolean = pointsOnScreen.stream()
-        .anyMatch { p: Point -> p.coordinates == coordinates }
+
+    private fun isGameObjectsContainsCoordinates(x: Int, y: Int, pointsOnScreen: MutableList<Point>): Boolean =
+        pointsOnScreen.any { it.x == x && it.y == y }
 }

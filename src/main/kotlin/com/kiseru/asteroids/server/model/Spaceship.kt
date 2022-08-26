@@ -8,8 +8,9 @@ import kotlin.concurrent.withLock
 class Spaceship(
     private val owner: User,
     private val courseCheckerService: CourseCheckerService,
-    coordinates: Coordinates,
-) : Point(coordinates) {
+    x: Int,
+    y: Int,
+) : Point(x, y) {
 
     override val symbolToShow: String
         get() = owner.id.toString()
@@ -37,13 +38,11 @@ class Spaceship(
     /**
      * Делает шаг в текущем направлении.
      */
-    fun go() {
-        coordinates = when (direction) {
-            Direction.UP -> Coordinates(x, y - 1)
-            Direction.RIGHT -> Coordinates(x + 1, y)
-            Direction.DOWN -> Coordinates(x, y + 1)
-            Direction.LEFT -> Coordinates(x - 1, y)
-        }
+    fun go() = when (direction) {
+        Direction.UP -> y -= 1
+        Direction.RIGHT -> x += 1
+        Direction.DOWN -> y += 1
+        Direction.LEFT -> x -= 1
     }
 
     /**
@@ -74,12 +73,10 @@ class Spaceship(
         owner.checkCollectedGarbage(collected)
     }
 
-    private fun rollbackLastStep() {
-        coordinates = when (direction) {
-            Direction.UP -> Coordinates(x, y + 1)
-            Direction.RIGHT -> Coordinates(x - 1, y)
-            Direction.DOWN -> Coordinates(x, y - 1)
-            Direction.LEFT -> Coordinates(x + 1, y)
-        }
+    private fun rollbackLastStep() = when (direction) {
+        Direction.UP -> y += 1
+        Direction.RIGHT -> x -= 1
+        Direction.DOWN -> y -= 1
+        Direction.LEFT -> x += 1
     }
 }

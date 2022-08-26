@@ -1,6 +1,6 @@
 package com.kiseru.asteroids.server.model
 
-class Asteroid(coordinates: Coordinates) : Point(coordinates) {
+class Asteroid(x: Int, y: Int) : Point(x, y) {
 
     override val type: Type
         get() = Type.ASTEROID

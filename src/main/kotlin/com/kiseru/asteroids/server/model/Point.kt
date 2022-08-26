@@ -1,15 +1,9 @@
 package com.kiseru.asteroids.server.model
 
-abstract class Point protected constructor(var coordinates: Coordinates) {
+abstract class Point protected constructor(var x: Int, var y: Int) {
 
     var isVisible = true
         protected set
-
-    val x: Int
-        get() = coordinates.x
-
-    val y: Int
-        get() = coordinates.y
 
     abstract val type: Type
 
@@ -21,7 +15,7 @@ abstract class Point protected constructor(var coordinates: Coordinates) {
 
     fun render(screen: Screen) {
         if (isVisible) {
-            screen.draw(coordinates, this)
+            screen.draw(this)
         }
     }
 }

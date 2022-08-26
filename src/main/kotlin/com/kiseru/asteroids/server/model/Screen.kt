@@ -10,19 +10,13 @@ class Screen(val width: Int, val height: Int) {
         generateClearScreen()
     }
 
-    /**
-     * Рисует на экране точку.
-     *
-     * @param coordinates - по какой координате
-     * @param point - точка, которую необходимо отобразить
-     */
-    fun draw(coordinates: Coordinates, point: Point) {
+    fun draw(point: Point) {
         val symbol = point.symbolToShow
-        if (mainMatrix[coordinates.y][coordinates.x] == ".") {
-            mainMatrix[coordinates.y][coordinates.x] = symbol
+        if (mainMatrix[point.y][point.x] == ".") {
+            mainMatrix[point.y][point.x] = symbol
         } else {
-            mainMatrix[coordinates.y][coordinates.x] =
-                String.format("%s|%s", mainMatrix[coordinates.y][coordinates.x], symbol)
+            mainMatrix[point.y][point.x] =
+                String.format("%s|%s", mainMatrix[point.y][point.x], symbol)
         }
     }
 
