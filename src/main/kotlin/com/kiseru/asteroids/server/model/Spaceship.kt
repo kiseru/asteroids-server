@@ -65,6 +65,8 @@ class Spaceship(
 
     fun isWall(screen: Screen) = direction.isWall(this, screen)
 
+    fun checkContaining(coordinates: List<Point>): Boolean = direction.checkContaining(this, coordinates)
+
     private fun checkCollectedGarbage(collected: Int) {
         owner.checkCollectedGarbage(collected)
     }

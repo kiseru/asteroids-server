@@ -12,19 +12,10 @@ class CourseCheckerServiceImpl(
     lateinit var spaceship: Spaceship
 
     override fun isAsteroid(): Boolean = pointsOnMap.filter { it.type == Type.ASTEROID }
-        .map { it.x to it.y }
-        .let { checkContaining(it) }
+        .let { spaceship.checkContaining(it) }
 
     override fun isGarbage(): Boolean = pointsOnMap.filter { it.type == Type.GARBAGE }
-        .map { it.x to it.y }
-        .let { checkContaining(it) }
+        .let { spaceship.checkContaining(it) }
 
     override fun isWall(): Boolean = spaceship.isWall(screen)
-
-    private fun checkContaining(coordinates: List<Pair<Int, Int>>): Boolean = when (spaceship.direction) {
-        Direction.UP -> coordinates.contains(spaceship.x to spaceship.y - 1)
-        Direction.DOWN -> coordinates.contains(spaceship.x to spaceship.y + 1)
-        Direction.LEFT -> coordinates.contains(spaceship.x - 1 to spaceship.y)
-        Direction.RIGHT -> coordinates.contains(spaceship.x + 1 to spaceship.y)
-    }
 }
