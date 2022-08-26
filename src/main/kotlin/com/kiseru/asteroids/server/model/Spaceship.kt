@@ -38,12 +38,7 @@ class Spaceship(
     /**
      * Делает шаг в текущем направлении.
      */
-    fun go() = when (direction) {
-        Direction.UP -> y -= 1
-        Direction.RIGHT -> x += 1
-        Direction.DOWN -> y += 1
-        Direction.LEFT -> x -= 1
-    }
+    fun go() = direction.go(this)
 
     /**
      * Вызывается при выявлении столкновения корабля с чем-либо
@@ -59,8 +54,7 @@ class Spaceship(
                 val collected = owner.room.incrementCollectedGarbageCount()
                 checkCollectedGarbage(collected)
             } else if (type === Type.WALL) {
-                // возвращаемся назад, чтобы не находится на стене
-                rollbackLastStep()
+                direction.rollbackLastStep(this)
                 owner.subtractScore()
             }
             if (!owner.isAlive) {
@@ -71,12 +65,5 @@ class Spaceship(
 
     private fun checkCollectedGarbage(collected: Int) {
         owner.checkCollectedGarbage(collected)
-    }
-
-    private fun rollbackLastStep() = when (direction) {
-        Direction.UP -> y += 1
-        Direction.RIGHT -> x -= 1
-        Direction.DOWN -> y -= 1
-        Direction.LEFT -> x += 1
     }
 }
