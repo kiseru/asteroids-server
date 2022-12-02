@@ -43,15 +43,9 @@ class Game(
 
     fun incrementCollectedGarbageCount(): Int = collectedGarbageCount.getAndIncrement()
 
-    private fun generateUniqueRandomCoordinates(): Pair<Int, Int> {
-        while (true) {
-            val coordinates = generateCoordinates()
-            val (x, y) = coordinates
-            if (!isGameObjectsContainsCoordinates(x, y)) {
-                return coordinates
-            }
-        }
-    }
+    private fun generateUniqueRandomCoordinates(): Pair<Int, Int> = generateSequence { generateCoordinates() }
+        .dropWhile { isGameObjectsContainsCoordinates(it.first, it.second) }
+        .first()
 
     private fun generateCoordinates(): Pair<Int, Int> =
         Random.nextInt(screen.width) + 1 to Random.nextInt(screen.height) + 1
