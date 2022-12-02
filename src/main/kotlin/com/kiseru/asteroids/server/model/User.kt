@@ -128,7 +128,7 @@ class User(
         messageSenderService.sendUnknownCommand()
     }
 
-    private fun handleCommand(command: String) {
+    private suspend fun handleCommand(command: String) {
         val commandHandler = commandHandlerFactory.create(command)
         commandHandler.handle(this)
     }

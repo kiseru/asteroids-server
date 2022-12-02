@@ -5,7 +5,7 @@ import com.kiseru.asteroids.server.handler.CommandHandler
 
 class IsAsteroidCommandHandler : CommandHandler {
 
-    override fun handle(user: User) {
+    override suspend fun handle(user: User) {
         user.sendMessage(if (user.isAsteroidInFrontOfSpaceship) "t" else "f")
     }
 }

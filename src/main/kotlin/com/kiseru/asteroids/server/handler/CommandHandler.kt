@@ -4,5 +4,5 @@ import com.kiseru.asteroids.server.model.User
 
 interface CommandHandler {
 
-    fun handle(user: User)
+    suspend fun handle(user: User)
 }

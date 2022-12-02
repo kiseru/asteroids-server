@@ -6,5 +6,5 @@ import com.kiseru.asteroids.server.model.Direction
 
 class RightCommandHandler : DirectionCommandHandler {
 
-    override fun handle(user: User) = handleDirection(user, Direction.RIGHT)
+    override suspend fun handle(user: User) = handleDirection(user, Direction.RIGHT)
 }
