@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
 import java.io.InputStream
+import java.io.OutputStream
 import java.net.ServerSocket
 import java.net.Socket
 
@@ -22,3 +23,5 @@ suspend fun main(args: Array<String>) {
 suspend fun ServerSocket.awaitAccept(): Socket = withContext(Dispatchers.IO) { accept() }
 
 suspend fun Socket.awaitInputStream(): InputStream = withContext(Dispatchers.IO) { getInputStream() }
+
+suspend fun Socket.awaitOutputStream(): OutputStream = withContext(Dispatchers.IO) { getOutputStream() }
