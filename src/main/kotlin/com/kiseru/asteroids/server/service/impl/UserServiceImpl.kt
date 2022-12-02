@@ -3,8 +3,8 @@ package com.kiseru.asteroids.server.service.impl
 import com.kiseru.asteroids.server.factory.MessageReceiverServiceFactory
 import com.kiseru.asteroids.server.factory.MessageSenderServiceFactory
 import com.kiseru.asteroids.server.handler.CommandHandlerFactory
+import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.User
-import com.kiseru.asteroids.server.service.RoomService
 import com.kiseru.asteroids.server.service.UserService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -18,13 +18,11 @@ class UserServiceImpl(
     private val commandHandlerFactory: CommandHandlerFactory,
     private val messageReceiverServiceFactory: MessageReceiverServiceFactory,
     private val messageSenderServiceFactory: MessageSenderServiceFactory,
-    private val roomService: RoomService,
 ) : UserService {
 
-    override suspend fun authorizeUser(socket: Socket): User {
+    override suspend fun authorizeUser(socket: Socket, room: Room): User {
         val messageReceiverService = messageReceiverServiceFactory.create(socket)
         val messageSenderService = messageSenderServiceFactory.create(socket)
-        val room = roomService.getNotFullRoom()
         try {
             messageSenderService.sendWelcomeMessage()
             val username = withContext(Dispatchers.IO) { messageReceiverService.receive() }

@@ -54,7 +54,8 @@ class Server(
 
     private suspend fun handleNewConnection(newConnection: Socket) = coroutineScope {
         log.info("Started handling new connection")
-        val user = userService.authorizeUser(newConnection)
+        val room = roomService.getNotFullRoom()
+        val user = userService.authorizeUser(newConnection, room)
         launch(Dispatchers.Default) {
             launch {
                 user.init()
