@@ -6,8 +6,6 @@ import com.kiseru.asteroids.server.handler.CommandHandlerFactory
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.UserService
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.io.IOException
@@ -25,9 +23,8 @@ class UserServiceImpl(
         val messageSenderService = messageSenderServiceFactory.create(socket)
         try {
             messageSenderService.sendWelcomeMessage()
-            val username = withContext(Dispatchers.IO) { messageReceiverService.receive() }
+            val username = messageReceiverService.receive()
             log.info("{} has joined the server", username)
-            checkNotNull(username)
             val user = User(username, room, socket, messageReceiverService, messageSenderService, commandHandlerFactory)
             messageSenderService.sendInstructions(user)
             return user

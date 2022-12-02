@@ -47,7 +47,7 @@ class User(
         awaitCreatingSpaceship()
         try {
             while (!room.isGameFinished && isAlive) {
-                val command = messageReceiverService.receive() ?: break
+                val command = messageReceiverService.receive()
                 handleCommand(command)
                 incrementSteps()
                 checkIsAlive()

@@ -5,6 +5,7 @@ import kotlinx.coroutines.withContext
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
+import java.io.BufferedReader
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.PrintWriter
@@ -28,3 +29,5 @@ suspend fun Socket.awaitInputStream(): InputStream = withContext(Dispatchers.IO)
 suspend fun Socket.awaitOutputStream(): OutputStream = withContext(Dispatchers.IO) { getOutputStream() }
 
 suspend fun PrintWriter.awaitPrintln(x: String): Unit = withContext(Dispatchers.IO) { println(x) }
+
+suspend fun BufferedReader.awaitReadLine(): String = withContext(Dispatchers.IO) { readLine() }
