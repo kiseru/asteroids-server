@@ -2,8 +2,10 @@ package com.kiseru.asteroids.server.handler.impl
 
 import com.kiseru.asteroids.server.handler.CommandHandler
 import com.kiseru.asteroids.server.handler.CommandHandlerFactory
+import org.springframework.stereotype.Component
 
-object CommandHandlerFactoryImpl : CommandHandlerFactory {
+@Component
+class CommandHandlerFactoryImpl : CommandHandlerFactory {
 
     override fun create(command: String): CommandHandler = when (command) {
         "go" -> GoCommandHandler()

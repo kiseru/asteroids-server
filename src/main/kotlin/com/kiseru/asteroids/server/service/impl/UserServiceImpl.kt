@@ -2,6 +2,7 @@ package com.kiseru.asteroids.server.service.impl
 
 import com.kiseru.asteroids.server.factory.MessageReceiverServiceFactory
 import com.kiseru.asteroids.server.factory.MessageSenderServiceFactory
+import com.kiseru.asteroids.server.handler.CommandHandlerFactory
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.RoomService
 import com.kiseru.asteroids.server.service.UserService
@@ -14,9 +15,10 @@ import java.net.Socket
 
 @Service
 class UserServiceImpl(
+    private val commandHandlerFactory: CommandHandlerFactory,
     private val messageReceiverServiceFactory: MessageReceiverServiceFactory,
     private val messageSenderServiceFactory: MessageSenderServiceFactory,
-    private val roomService: RoomService
+    private val roomService: RoomService,
 ) : UserService {
 
     override suspend fun authorizeUser(socket: Socket): User {
@@ -28,7 +30,7 @@ class UserServiceImpl(
             val username = withContext(Dispatchers.IO) { messageReceiverService.receive() }
             log.info("{} has joined the server", username)
             checkNotNull(username)
-            val user = User(username, room, socket, messageReceiverService, messageSenderService)
+            val user = User(username, room, socket, messageReceiverService, messageSenderService, commandHandlerFactory)
             messageSenderService.sendInstructions(user)
             return user
         } catch (e: IOException) {

@@ -1,7 +1,7 @@
 package com.kiseru.asteroids.server.model
 
 import com.kiseru.asteroids.server.exception.GameFinishedException
-import com.kiseru.asteroids.server.handler.impl.CommandHandlerFactoryImpl
+import com.kiseru.asteroids.server.handler.CommandHandlerFactory
 import com.kiseru.asteroids.server.service.MessageReceiverService
 import com.kiseru.asteroids.server.service.MessageSenderService
 import kotlinx.coroutines.coroutineScope
@@ -15,6 +15,7 @@ class User(
     private val socket: Socket,
     private val messageReceiverService: MessageReceiverService,
     private val messageSenderService: MessageSenderService,
+    private val commandHandlerFactory: CommandHandlerFactory,
 ) {
 
     val id = nextId++
@@ -150,8 +151,6 @@ class User(
     companion object {
 
         private val log = LoggerFactory.getLogger(User::class.java)
-
-        private val commandHandlerFactory = CommandHandlerFactoryImpl
 
         private var nextId = 0
     }
