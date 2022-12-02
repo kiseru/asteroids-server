@@ -5,6 +5,9 @@ import com.kiseru.asteroids.server.service.RoomService
 import com.kiseru.asteroids.server.service.UserService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
@@ -38,18 +41,17 @@ class Server(
         }
     }
 
-    private suspend fun startAcceptingConnections() = coroutineScope {
-        log.info("Started accepting new connections")
+    private suspend fun startAcceptingConnections() = newConnections()
+        .onStart { log.info("Started accepting new connections") }
+        .collect {
+            coroutineScope {
+                launch { handleNewConnection(it) }
+            }
+        }
+
+    private suspend fun newConnections(): Flow<Socket> = flow {
         while (true) {
-            val newConnection = withContext(Dispatchers.IO) {
-                log.info("Waiting for new connection")
-                val socket = serverSocket.accept()
-                log.info("Accepted new connection")
-                socket
-            }
-            launch {
-                handleNewConnection(newConnection)
-            }
+            emit(serverSocket.awaitAccept())
         }
     }
 
