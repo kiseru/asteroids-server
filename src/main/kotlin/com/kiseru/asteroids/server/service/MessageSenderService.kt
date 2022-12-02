@@ -16,5 +16,5 @@ interface MessageSenderService {
 
     fun sendWelcomeMessage()
 
-    fun sendInstructions(user: User)
+    suspend fun sendInstructions(user: User)
 }

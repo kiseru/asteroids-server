@@ -1,6 +1,7 @@
 package com.kiseru.asteroids.server.service.impl
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.kiseru.asteroids.server.awaitPrintln
 import com.kiseru.asteroids.server.dto.ScoreDto
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.MessageSenderService
@@ -45,10 +46,9 @@ class MessageSenderServiceImpl(
         writer.flush()
     }
 
-    override fun sendInstructions(user: User) {
-        writer.println("You need to keep a space garbage.")
-        writer.println("Your ID is ${user.id}")
-        writer.println("Good luck, Commander!")
-        writer.flush()
+    override suspend fun sendInstructions(user: User) {
+        writer.awaitPrintln("You need to keep a space garbage.")
+        writer.awaitPrintln("Your ID is ${user.id}")
+        writer.awaitPrintln("Good luck, Commander!")
     }
 }
