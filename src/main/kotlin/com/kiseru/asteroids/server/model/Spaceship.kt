@@ -15,8 +15,7 @@ class Spaceship(
     override val symbolToShow: String
         get() = owner.id.toString()
 
-    override val type: Type
-        get() = Type.SPACESHIP
+    override val type: Type = Type.SPACESHIP
 
     val isAsteroidInFrontOf
         get() = courseCheckerService.isAsteroid()
