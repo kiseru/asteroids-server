@@ -3,12 +3,13 @@ package com.kiseru.asteroids.server.factory.impl
 import com.kiseru.asteroids.server.factory.GameFactory
 import com.kiseru.asteroids.server.model.*
 import com.kiseru.asteroids.server.properties.AsteroidsProperties
+import com.kiseru.asteroids.server.service.CoordinateService
 import org.springframework.stereotype.Component
-import kotlin.random.Random
 
 @Component
 class GameFactoryImpl(
     private val asteroidsProperties: AsteroidsProperties,
+    private val coordinateService: CoordinateService,
 ) : GameFactory {
 
     override fun createGame(screen: Screen): Game {
@@ -16,7 +17,7 @@ class GameFactoryImpl(
         val gameObjects = mutableListOf<Point>()
         generateAsteroids(pointsOnScreen, gameObjects)
         generateGarbage(pointsOnScreen, gameObjects)
-        return Game(screen, asteroidsProperties.numberOfGarbageCells, pointsOnScreen, gameObjects)
+        return Game(screen, asteroidsProperties.numberOfGarbageCells, pointsOnScreen, gameObjects, coordinateService)
     }
 
     private fun generateAsteroids(pointsOnScreen: MutableList<Point>, gameObjects: MutableList<Point>) {
@@ -38,13 +39,9 @@ class GameFactoryImpl(
     }
 
     private fun generateUniqueRandomCoordinates(pointsOnScreen: MutableList<Point>): Pair<Int, Int> =
-        generateSequence { generateCoordinates() }
+        coordinateService.generateCoordinateSequence()
             .dropWhile { isGameObjectsContainsCoordinates(it.first, it.second, pointsOnScreen) }
             .first()
-
-    private fun generateCoordinates(): Pair<Int, Int> =
-        Random.nextInt(asteroidsProperties.screen.width) + 1 to Random.nextInt(asteroidsProperties.screen.height) + 1
-
 
     private fun isGameObjectsContainsCoordinates(x: Int, y: Int, pointsOnScreen: MutableList<Point>): Boolean =
         pointsOnScreen.any { it.x == x && it.y == y }
