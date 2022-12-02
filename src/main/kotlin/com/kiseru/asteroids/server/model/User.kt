@@ -1,5 +1,6 @@
 package com.kiseru.asteroids.server.model
 
+import com.kiseru.asteroids.server.awaitClose
 import com.kiseru.asteroids.server.exception.GameFinishedException
 import com.kiseru.asteroids.server.handler.CommandHandlerFactory
 import com.kiseru.asteroids.server.service.MessageReceiverService
@@ -110,11 +111,11 @@ class User(
 
     fun hasSpaceship(): Boolean = spaceship != null
 
-    fun closeConnection() {
+    suspend fun closeConnection() {
         try {
             log.info("Closing connection with $username")
             messageSenderService.sendExit()
-            socket.close()
+            socket.awaitClose()
             log.info("Connection with $username has been closed")
         } catch (e: IOException) {
             log.error("Failed to close connection", e)

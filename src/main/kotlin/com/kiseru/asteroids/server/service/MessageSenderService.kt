@@ -4,7 +4,7 @@ import com.kiseru.asteroids.server.model.User
 
 interface MessageSenderService {
 
-    fun sendExit()
+    suspend fun sendExit()
 
     fun sendScore(score: Int)
 

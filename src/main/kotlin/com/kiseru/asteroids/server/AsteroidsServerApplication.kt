@@ -28,6 +28,8 @@ suspend fun Socket.awaitInputStream(): InputStream = withContext(Dispatchers.IO)
 
 suspend fun Socket.awaitOutputStream(): OutputStream = withContext(Dispatchers.IO) { getOutputStream() }
 
+suspend fun Socket.awaitClose(): Unit = withContext(Dispatchers.IO) { close() }
+
 suspend fun PrintWriter.awaitPrintln(x: String): Unit = withContext(Dispatchers.IO) { println(x) }
 
 suspend fun BufferedReader.awaitReadLine(): String = withContext(Dispatchers.IO) { readLine() }

@@ -15,8 +15,8 @@ class MessageSenderServiceImpl(
 
     private val writer = PrintWriter(outputStream)
 
-    override fun sendExit() {
-        send("exit")
+    override suspend fun sendExit() {
+        writer.awaitPrintln("exit")
     }
 
     override fun sendScore(score: Int) {
