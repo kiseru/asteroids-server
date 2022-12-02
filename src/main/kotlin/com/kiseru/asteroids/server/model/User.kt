@@ -39,16 +39,12 @@ class User(
 
     private var steps = 0
 
-    suspend fun init() {
-        room.addUserToRoom(this)
-        room.start()
-    }
-
     suspend fun awaitCreatingSpaceship() {
         room.awaitCreatingSpaceship(this)
     }
 
     suspend fun run() = coroutineScope {
+        awaitCreatingSpaceship()
         try {
             while (!room.isGameFinished && isAlive) {
                 val command = messageReceiverService.receive() ?: break

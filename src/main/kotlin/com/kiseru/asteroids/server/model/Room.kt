@@ -1,6 +1,5 @@
 package com.kiseru.asteroids.server.model
 
-import com.kiseru.asteroids.server.service.RoomService
 import kotlinx.coroutines.yield
 import org.slf4j.LoggerFactory
 
@@ -9,11 +8,13 @@ import org.slf4j.LoggerFactory
  */
 class Room(
     private val game: Game,
-    private val roomService: RoomService,
 ) {
 
     var users = emptyList<User>()
         private set
+
+    val rating: String = users.sortedBy { it.score }
+        .joinToString("\n") { "${it.username} ${it.score}" }
 
     val isFull: Boolean
         get() = users.size >= MAX_USERS
@@ -21,17 +22,7 @@ class Room(
     val isGameFinished: Boolean
         get() = status == Status.FINISHED
 
-    private var status = Status.WAITING_CONNECTIONS
-
-    suspend fun run() {
-        roomService.sendMessageToUsers(this, "start")
-        status = Status.GAMING
-        game.refresh()
-        awaitEndgame()
-        val rating = roomService.getRoomRating(this)
-        roomService.sendMessageToUsers(this, "finish\n$rating")
-        log.info("Room released! Rating table:\n$rating")
-    }
+    var status = Status.CREATED
 
     /**
      * Проверяет, собрали ли весь мусор
@@ -56,15 +47,11 @@ class Room(
         log.info("Game finished")
     }
 
-    fun addUserToRoom(user: User) {
-        addUser(user)
-        if (isFull) {
-            roomService.getNotFullRoom()
-        }
-    }
-
-    suspend fun start() {
-        roomService.startRoom(this)
+    fun addUser(user: User) {
+        check(users.size < MAX_USERS)
+        status = Status.WAITING_CONNECTIONS
+        game.registerSpaceshipForUser(user)
+        users = users + user
     }
 
     suspend fun awaitCreatingSpaceship(user: User) {
@@ -85,20 +72,14 @@ class Room(
         return game.incrementCollectedGarbageCount()
     }
 
-    /**
-     * Добавляет пользователя в комнату и рассылает уведомление об этом остальным пользователям.
-     */
-    private fun addUser(user: User) {
-        if (users.size >= MAX_USERS) {
-            roomService.getNotFullRoom().addUser(user)
+    suspend fun awaitEndgame() {
+        while (status != Status.FINISHED) {
+            yield()
         }
-        roomService.sendMessageToUsers(this, "User ${user.username} has joined the room.")
-        game.registerSpaceshipForUser(user)
-        users = users + user
     }
 
-    private suspend fun awaitEndgame() {
-        while (status != Status.FINISHED) {
+    suspend fun awaitUsers() {
+        while (users.count() < MAX_USERS) {
             yield()
         }
     }
@@ -113,7 +94,8 @@ class Room(
     /**
      * Статус комнаты.
      */
-    private enum class Status {
+    enum class Status {
+        CREATED,
         WAITING_CONNECTIONS,
         GAMING,
         FINISHED,

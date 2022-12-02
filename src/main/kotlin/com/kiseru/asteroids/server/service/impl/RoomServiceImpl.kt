@@ -5,6 +5,7 @@ import com.kiseru.asteroids.server.factory.ScreenFactory
 import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.service.RoomService
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -34,16 +35,6 @@ class RoomServiceImpl(
     }
 
     /**
-     * Возвращает рейтинг пользователей комнаты.
-     *
-     * @return рейтинг пользователей комнаты
-     */
-    override fun getRoomRating(room: Room): String {
-        return room.users.sortedBy { it.score }
-            .joinToString("\n") { "${it.username} ${it.score}" }
-    }
-
-    /**
      * Рассылает сообщение пользователям комнаты.
      *
      * @param message сообщение
@@ -56,7 +47,7 @@ class RoomServiceImpl(
 
     override fun showAllRatings() {
         for (room in rooms) {
-            println(getRoomRating(room))
+            println(room.rating)
         }
     }
 
@@ -67,10 +58,21 @@ class RoomServiceImpl(
     }
 
     override suspend fun startRoom(room: Room) {
-        room.run()
+        sendMessageToUsers(room, "start")
+        room.status = Room.Status.GAMING
+        room.refresh()
+        room.awaitEndgame()
+        val rating = room.rating
+        sendMessageToUsers(room, "finish\n$rating")
+        log.info("Room released! Rating table:\n$rating")
     }
 
-    private fun createRoom() = Room(createGame(), this)
+    private fun createRoom() = Room(createGame())
 
     private fun createGame(): Game = gameFactory.createGame(screenFactory.createScreen())
+
+    companion object {
+
+        private val log = LoggerFactory.getLogger(RoomServiceImpl::class.java)
+    }
 }

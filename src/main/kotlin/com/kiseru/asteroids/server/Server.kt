@@ -1,5 +1,6 @@
 package com.kiseru.asteroids.server
 
+import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.service.RoomService
 import com.kiseru.asteroids.server.service.UserService
 import kotlinx.coroutines.Dispatchers
@@ -56,13 +57,25 @@ class Server(
         log.info("Started handling new connection")
         val room = roomService.getNotFullRoom()
         val user = userService.authorizeUser(newConnection, room)
-        launch(Dispatchers.Default) {
-            launch {
-                user.init()
-            }
-            user.awaitCreatingSpaceship()
+        room.addUser(user)
+        roomService.sendMessageToUsers(room, "User ${user.username} has joined the room.")
+        launch {
+            startRoom(room)
+        }
+        launch {
             user.run()
         }
+    }
+
+    private suspend fun startRoom(room: Room) {
+        room.awaitUsers()
+        roomService.sendMessageToUsers(room, "start")
+        room.status = Room.Status.GAMING
+        room.refresh()
+        room.awaitEndgame()
+        val rating = room.rating
+        roomService.sendMessageToUsers(room, "finish\n$rating")
+        log.info("Room $room released! Rating table:\n$rating")
     }
 
     companion object {
