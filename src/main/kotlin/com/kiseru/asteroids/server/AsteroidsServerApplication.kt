@@ -1,6 +1,5 @@
 package com.kiseru.asteroids.server
 
-import kotlinx.coroutines.runBlocking
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
@@ -9,7 +8,7 @@ import org.springframework.boot.runApplication
 @ConfigurationPropertiesScan("com.kiseru.asteroids.server.properties")
 class AsteroidsServerApplication
 
-fun main(args: Array<String>) = runBlocking {
+suspend fun main(args: Array<String>) {
     val context = runApplication<AsteroidsServerApplication>(*args)
     val server = context.getBean(Server::class.java)
     server.startServer()
