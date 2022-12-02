@@ -37,15 +37,10 @@ class GameFactoryImpl(
         }
     }
 
-    private fun generateUniqueRandomCoordinates(pointsOnScreen: MutableList<Point>): Pair<Int, Int> {
-        while (true) {
-            val coordinates = generateCoordinates()
-            val (x, y) = coordinates
-            if (!isGameObjectsContainsCoordinates(x, y, pointsOnScreen)) {
-                return coordinates
-            }
-        }
-    }
+    private fun generateUniqueRandomCoordinates(pointsOnScreen: MutableList<Point>): Pair<Int, Int> =
+        generateSequence { generateCoordinates() }
+            .dropWhile { isGameObjectsContainsCoordinates(it.first, it.second, pointsOnScreen) }
+            .first()
 
     private fun generateCoordinates(): Pair<Int, Int> =
         Random.nextInt(asteroidsProperties.screen.width) + 1 to Random.nextInt(asteroidsProperties.screen.height) + 1
