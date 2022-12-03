@@ -59,7 +59,7 @@ class User(
         }
     }
 
-    fun sendMessage(message: String) {
+    suspend fun sendMessage(message: String) {
         messageSenderService.send(message)
     }
 
@@ -82,11 +82,6 @@ class User(
         }
     }
 
-    fun died() {
-        isAlive = false
-        messageSenderService.sendGameOver(score)
-    }
-
     fun checkCollectedGarbage(collected: Int) {
         room.checkCollectedGarbage(collected)
     }
@@ -100,7 +95,7 @@ class User(
         room.refresh()
     }
 
-    fun sendScore() {
+    suspend fun sendScore() {
         messageSenderService.sendScore(score)
     }
 
@@ -122,7 +117,7 @@ class User(
         }
     }
 
-    fun sendUnknownCommandMessage() {
+    suspend fun sendUnknownCommandMessage() {
         messageSenderService.sendUnknownCommand()
     }
 
@@ -139,10 +134,15 @@ class User(
         steps++
     }
 
-    private fun checkIsAlive() {
+    private suspend fun checkIsAlive() {
         if (steps >= 1500 || score < 0) {
             died()
         }
+    }
+
+    private suspend fun died() {
+        isAlive = false
+        messageSenderService.sendGameOver(score)
     }
 
     companion object {

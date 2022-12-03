@@ -13,37 +13,34 @@ class MessageSenderServiceImpl(
     outputStream: OutputStream,
 ) : MessageSenderService {
 
-    private val writer = PrintWriter(outputStream)
+    private val writer = PrintWriter(outputStream, true)
 
     override suspend fun sendExit() {
         writer.awaitPrintln("exit")
     }
 
-    override fun sendScore(score: Int) {
+    override suspend fun sendScore(score: Int) {
         val scoreDto = ScoreDto(score)
         val msg = objectMapper.writeValueAsString(scoreDto)
         send(msg)
     }
 
-    override fun sendUnknownCommand() {
+    override suspend fun sendUnknownCommand() {
         send("Unknown command")
     }
 
-    override fun send(message: String) {
-        writer.println(message)
-        writer.flush()
+    override suspend fun send(message: String) {
+        writer.awaitPrintln(message)
     }
 
-    override fun sendGameOver(score: Int) {
-        writer.println("died")
-        writer.println("You have collected $score score.")
-        writer.flush()
+    override suspend fun sendGameOver(score: Int) {
+        writer.awaitPrintln("died")
+        writer.awaitPrintln("You have collected $score score.")
     }
 
-    override fun sendWelcomeMessage() {
-        writer.println("Welcome To Asteroids Server")
-        writer.println("Please, introduce yourself!")
-        writer.flush()
+    override suspend fun sendWelcomeMessage() {
+        writer.awaitPrintln("Welcome to Asteroids Server")
+        writer.awaitPrintln("Please, introduce yourself!")
     }
 
     override suspend fun sendInstructions(user: User) {

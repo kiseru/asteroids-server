@@ -6,7 +6,7 @@ interface RoomService {
 
     fun getNotFullRoom(): Room
 
-    fun sendMessageToUsers(room: Room, message: String)
+    suspend fun sendMessageToUsers(room: Room, message: String)
 
     fun showAllRatings()
 

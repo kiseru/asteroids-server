@@ -6,15 +6,15 @@ interface MessageSenderService {
 
     suspend fun sendExit()
 
-    fun sendScore(score: Int)
+    suspend fun sendScore(score: Int)
 
-    fun sendUnknownCommand()
+    suspend fun sendUnknownCommand()
 
-    fun send(message: String)
+    suspend fun send(message: String)
 
-    fun sendGameOver(score: Int)
+    suspend fun sendGameOver(score: Int)
 
-    fun sendWelcomeMessage()
+    suspend fun sendWelcomeMessage()
 
     suspend fun sendInstructions(user: User)
 }

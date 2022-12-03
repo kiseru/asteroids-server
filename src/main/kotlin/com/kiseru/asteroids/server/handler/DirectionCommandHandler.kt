@@ -5,7 +5,7 @@ import com.kiseru.asteroids.server.model.Direction
 
 interface DirectionCommandHandler : CommandHandler {
 
-    fun handleDirection(user: User, direction: Direction) {
+    suspend fun handleDirection(user: User, direction: Direction) {
         user.setSpaceshipDirection(direction)
         user.refreshRoom()
         user.sendScore()

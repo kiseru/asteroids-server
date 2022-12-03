@@ -39,7 +39,7 @@ class RoomServiceImpl(
      *
      * @param message сообщение
      */
-    override fun sendMessageToUsers(room: Room, message: String) {
+    override suspend fun sendMessageToUsers(room: Room, message: String) {
         for (user in room.users) {
             user.sendMessage(message)
         }
