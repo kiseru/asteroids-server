@@ -1,11 +1,12 @@
 package com.kiseru.asteroids.server.service.impl
 
-import com.kiseru.asteroids.server.dto.UserDto
+import com.kiseru.asteroids.server.dto.TokenDto
 import com.kiseru.asteroids.server.factory.MessageReceiverServiceFactory
 import com.kiseru.asteroids.server.factory.MessageSenderServiceFactory
 import com.kiseru.asteroids.server.handler.CommandHandlerFactory
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.User
+import com.kiseru.asteroids.server.service.TokenService
 import com.kiseru.asteroids.server.service.UserService
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -20,6 +21,7 @@ class UserServiceImpl(
     private val commandHandlerFactory: CommandHandlerFactory,
     private val messageReceiverServiceFactory: MessageReceiverServiceFactory,
     private val messageSenderServiceFactory: MessageSenderServiceFactory,
+    private val tokenService: TokenService,
 ) : UserService {
 
     private val userStorage = mutableMapOf<String, User>()
@@ -33,11 +35,8 @@ class UserServiceImpl(
             log.info("{} has joined the server", username)
             val userId = generateUniqueUserId()
             val user = User(userId, username, room, socket, messageReceiverService, messageSenderService, commandHandlerFactory)
-            val userDto = UserDto(user)
-            val response = Json.encodeToString(userDto)
-            log.info("sending response $response to client")
-            messageSenderService.send(response)
-            log.info("sending instructions to client")
+            val tokenDto = TokenDto(tokenService.generateToken(user))
+            messageSenderService.send(Json.encodeToString(tokenDto))
             messageSenderService.sendInstructions(user)
             return user
         } catch (e: IOException) {
