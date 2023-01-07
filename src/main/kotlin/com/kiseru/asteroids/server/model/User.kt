@@ -11,6 +11,7 @@ import java.io.IOException
 import java.net.Socket
 
 class User(
+    val id: String,
     val username: String,
     val room: Room,
     private val socket: Socket,
@@ -18,8 +19,6 @@ class User(
     private val messageSenderService: MessageSenderService,
     private val commandHandlerFactory: CommandHandlerFactory,
 ) {
-
-    val id = nextId++
 
     val isAsteroidInFrontOfSpaceship
         get() = spaceship?.isAsteroidInFrontOf ?: false
@@ -148,7 +147,5 @@ class User(
     companion object {
 
         private val log = LoggerFactory.getLogger(User::class.java)
-
-        private var nextId = 0
     }
 }
