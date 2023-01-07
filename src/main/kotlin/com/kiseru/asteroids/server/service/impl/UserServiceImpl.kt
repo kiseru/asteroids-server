@@ -1,15 +1,19 @@
 package com.kiseru.asteroids.server.service.impl
 
+import com.kiseru.asteroids.server.dto.UserDto
 import com.kiseru.asteroids.server.factory.MessageReceiverServiceFactory
 import com.kiseru.asteroids.server.factory.MessageSenderServiceFactory
 import com.kiseru.asteroids.server.handler.CommandHandlerFactory
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.UserService
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.io.IOException
 import java.net.Socket
+import java.util.*
 
 @Service
 class UserServiceImpl(
@@ -18,6 +22,8 @@ class UserServiceImpl(
     private val messageSenderServiceFactory: MessageSenderServiceFactory,
 ) : UserService {
 
+    private val userStorage = mutableMapOf<String, User>()
+
     override suspend fun authorizeUser(socket: Socket, room: Room): User {
         val messageReceiverService = messageReceiverServiceFactory.create(socket)
         val messageSenderService = messageSenderServiceFactory.create(socket)
@@ -25,7 +31,13 @@ class UserServiceImpl(
             messageSenderService.sendWelcomeMessage()
             val username = messageReceiverService.receive()
             log.info("{} has joined the server", username)
-            val user = User(username, room, socket, messageReceiverService, messageSenderService, commandHandlerFactory)
+            val userId = generateUniqueUserId()
+            val user = User(userId, username, room, socket, messageReceiverService, messageSenderService, commandHandlerFactory)
+            val userDto = UserDto(user)
+            val response = Json.encodeToString(userDto)
+            log.info("sending response $response to client")
+            messageSenderService.send(response)
+            log.info("sending instructions to client")
             messageSenderService.sendInstructions(user)
             return user
         } catch (e: IOException) {
@@ -33,6 +45,10 @@ class UserServiceImpl(
             throw e
         }
     }
+
+    private fun generateUniqueUserId(): String = generateSequence { UUID.randomUUID().toString() }
+        .dropWhile { userStorage.containsKey(it) }
+        .first()
 
     companion object {
 
