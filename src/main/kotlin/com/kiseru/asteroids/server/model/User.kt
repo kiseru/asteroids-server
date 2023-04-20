@@ -71,9 +71,4 @@ class User(
     suspend fun sendScore() {
         messageSenderService.sendScore(score)
     }
-
-    fun setSpaceshipDirection(direction: Direction) {
-        checkNotNull(spaceship)
-        spaceship?.direction = direction
-    }
 }
