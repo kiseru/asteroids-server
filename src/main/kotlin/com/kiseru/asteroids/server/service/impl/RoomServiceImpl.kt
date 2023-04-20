@@ -5,6 +5,7 @@ import com.kiseru.asteroids.server.factory.ScreenFactory
 import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.service.RoomService
+import kotlinx.coroutines.yield
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.concurrent.locks.ReentrantLock
@@ -61,10 +62,16 @@ class RoomServiceImpl(
         sendMessageToUsers(room, "start")
         room.status = Room.Status.GAMING
         room.refresh()
-        room.awaitEndgame()
+        awaitEndgame(room)
         val rating = room.rating
         sendMessageToUsers(room, "finish\n$rating")
         log.info("Room released! Rating table:\n$rating")
+    }
+
+    override suspend fun awaitEndgame(room: Room) {
+        while (room.status != Room.Status.FINISHED) {
+            yield()
+        }
     }
 
     private fun createRoom() = Room(createGame())

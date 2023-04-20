@@ -1,13 +1,12 @@
 package com.kiseru.asteroids.server.model
 
-import kotlinx.coroutines.yield
 import org.slf4j.LoggerFactory
 
 /**
  * Комната.
  */
 class Room(
-    private val game: Game,
+    val game: Game,
 ) {
 
     var users = emptyList<User>()
@@ -54,12 +53,6 @@ class Room(
         users = users + user
     }
 
-    suspend fun awaitCreatingSpaceship(user: User) {
-        while (!user.hasSpaceship()) {
-            yield()
-        }
-    }
-
     fun refresh() {
         game.refresh()
     }
@@ -72,21 +65,9 @@ class Room(
         return game.incrementCollectedGarbageCount()
     }
 
-    suspend fun awaitEndgame() {
-        while (status != Status.FINISHED) {
-            yield()
-        }
-    }
-
-    suspend fun awaitUsers() {
-        while (users.count() < MAX_USERS) {
-            yield()
-        }
-    }
-
     companion object {
 
-        private const val MAX_USERS = 1
+        const val MAX_USERS = 1
 
         private val log = LoggerFactory.getLogger(Room::class.java)
     }

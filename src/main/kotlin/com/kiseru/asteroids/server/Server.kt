@@ -6,13 +6,10 @@ import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.RoomService
 import com.kiseru.asteroids.server.service.UserService
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.net.ServerSocket
@@ -74,7 +71,7 @@ class Server(
     }
 
     private suspend fun runUser(user: User) {
-        user.room.awaitCreatingSpaceship(user)
+        awaitCreatingSpaceship(user)
         try {
             while (!user.room.isGameFinished && user.isAlive) {
                 val command = user.messageReceiverService.receive()
@@ -85,6 +82,12 @@ class Server(
         } finally {
             user.isAlive = false
             user.room.setGameFinished()
+        }
+    }
+
+    private suspend fun awaitCreatingSpaceship(user: User) {
+        while (!user.hasSpaceship()) {
+            yield()
         }
     }
 
@@ -112,16 +115,25 @@ class Server(
         user.messageSenderService.sendGameOver(user.score)
     }
 
-
     private suspend fun startRoom(room: Room) {
-        room.awaitUsers()
+        awaitUsers(room)
         roomService.sendMessageToUsers(room, "start")
         room.status = Room.Status.GAMING
-        room.refresh()
-        room.awaitEndgame()
+        refreshRoom(room)
+        roomService.awaitEndgame(room)
         val rating = room.rating
         roomService.sendMessageToUsers(room, "finish\n$rating")
         log.info("Room $room released! Rating table:\n$rating")
+    }
+
+    private suspend fun awaitUsers(room: Room) {
+        while (room.users.count() < Room.MAX_USERS) {
+            yield()
+        }
+    }
+
+    private fun refreshRoom(room: Room) {
+        room.game.refresh()
     }
 
     companion object {

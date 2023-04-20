@@ -13,4 +13,6 @@ interface RoomService {
     fun showAllGameFields()
 
     suspend fun startRoom(room: Room)
+
+    suspend fun awaitEndgame(room: Room)
 }
