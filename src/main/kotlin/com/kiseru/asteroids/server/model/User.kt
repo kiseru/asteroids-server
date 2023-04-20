@@ -24,7 +24,6 @@ class User(
         get() = spaceship?.isWallInFrontOf ?: false
 
     var score = 100
-        private set
 
     var isAlive = true
 
@@ -42,17 +41,6 @@ class User(
         }
 
         score += 10
-    }
-
-    fun subtractScore() {
-        if (room.isGameFinished) {
-            throw GameFinishedException()
-        }
-
-        score -= 50
-        if (score < 0) {
-            isAlive = false
-        }
     }
 
     fun refreshRoom() {

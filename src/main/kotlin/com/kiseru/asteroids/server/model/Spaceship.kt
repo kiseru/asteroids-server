@@ -1,5 +1,6 @@
 package com.kiseru.asteroids.server.model
 
+import com.kiseru.asteroids.server.exception.GameFinishedException
 import com.kiseru.asteroids.server.service.CourseCheckerService
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
@@ -47,20 +48,32 @@ class Spaceship(
     fun crash(type: Type) {
         lock.withLock {
             if (type === Type.ASTEROID) {
-                owner.subtractScore()
+                subtractScore()
             } else if (type === Type.GARBAGE) {
                 owner.addScore()
                 val collected = owner.room.incrementCollectedGarbageCount()
                 checkCollectedGarbage(collected)
             } else if (type === Type.WALL) {
                 direction.rollback(this)
-                owner.subtractScore()
+                subtractScore()
             }
             if (!owner.isAlive) {
                 destroy()
             }
         }
     }
+
+    private fun subtractScore() {
+        if (owner.room.isGameFinished) {
+            throw GameFinishedException()
+        }
+
+        owner.score -= 50
+        if (owner.score < 0) {
+            owner.isAlive = false
+        }
+    }
+
 
     fun isWall(screen: Screen) = direction.isWall(this, screen)
 
