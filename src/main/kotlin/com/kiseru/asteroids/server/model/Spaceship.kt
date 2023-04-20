@@ -51,7 +51,7 @@ class Spaceship(
                 subtractScore()
             } else if (type === Type.GARBAGE) {
                 addScore()
-                val collected = owner.room.incrementCollectedGarbageCount()
+                val collected = owner.room.game.incrementCollectedGarbageCount()
                 checkCollectedGarbage(collected)
             } else if (type === Type.WALL) {
                 direction.rollback(this)

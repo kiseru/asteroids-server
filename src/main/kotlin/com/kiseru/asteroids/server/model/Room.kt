@@ -38,10 +38,6 @@ class Room(
         game.refresh()
     }
 
-    fun incrementCollectedGarbageCount(): Int {
-        return game.incrementCollectedGarbageCount()
-    }
-
     companion object {
 
         const val MAX_USERS = 1
