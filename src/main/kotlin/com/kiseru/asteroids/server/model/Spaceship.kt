@@ -87,6 +87,8 @@ class Spaceship(
     fun checkContaining(coordinates: List<Point>): Boolean = direction.checkContaining(this, coordinates)
 
     private fun checkCollectedGarbage(collected: Int) {
-        owner.room.checkCollectedGarbage(collected)
+        if (collected >= owner.room.game.garbageNumber) {
+            owner.room.setGameFinished()
+        }
     }
 }

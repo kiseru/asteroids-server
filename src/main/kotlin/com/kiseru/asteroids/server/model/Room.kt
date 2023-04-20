@@ -24,17 +24,6 @@ class Room(
     var status = Status.CREATED
 
     /**
-     * Проверяет, собрали ли весь мусор
-     *
-     * @param collected количество собранного мусора
-     */
-    fun checkCollectedGarbage(collected: Int) {
-        if (collected >= game.garbageNumber) {
-            setGameFinished()
-        }
-    }
-
-    /**
      * Переводит игру в статус завершен.
      */
     fun setGameFinished() {
