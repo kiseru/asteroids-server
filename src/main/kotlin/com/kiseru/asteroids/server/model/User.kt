@@ -1,18 +1,15 @@
 package com.kiseru.asteroids.server.model
 
-import com.kiseru.asteroids.server.awaitClose
 import com.kiseru.asteroids.server.exception.GameFinishedException
 import com.kiseru.asteroids.server.service.MessageReceiverService
 import com.kiseru.asteroids.server.service.MessageSenderService
-import org.slf4j.LoggerFactory
-import java.io.IOException
 import java.net.Socket
 
 class User(
     val id: String,
     val username: String,
     val room: Room,
-    private val socket: Socket,
+    val socket: Socket,
     val messageReceiverService: MessageReceiverService,
     val messageSenderService: MessageSenderService,
 ) {
@@ -81,20 +78,4 @@ class User(
     }
 
     fun hasSpaceship(): Boolean = spaceship != null
-
-    suspend fun closeConnection() {
-        try {
-            log.info("Closing connection with $username")
-            messageSenderService.sendExit()
-            socket.awaitClose()
-            log.info("Connection with $username has been closed")
-        } catch (e: IOException) {
-            log.error("Failed to close connection", e)
-        }
-    }
-
-    companion object {
-
-        private val log = LoggerFactory.getLogger(User::class.java)
-    }
 }
