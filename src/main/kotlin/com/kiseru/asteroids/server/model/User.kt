@@ -76,6 +76,4 @@ class User(
         checkNotNull(spaceship)
         spaceship?.direction = direction
     }
-
-    fun hasSpaceship(): Boolean = spaceship != null
 }

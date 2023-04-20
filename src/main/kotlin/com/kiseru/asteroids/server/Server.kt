@@ -86,7 +86,7 @@ class Server(
     }
 
     private suspend fun awaitCreatingSpaceship(user: User) {
-        while (!user.hasSpaceship()) {
+        while (user.spaceship == null) {
             yield()
         }
     }
