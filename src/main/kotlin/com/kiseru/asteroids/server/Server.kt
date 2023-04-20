@@ -1,9 +1,12 @@
 package com.kiseru.asteroids.server
 
 import com.kiseru.asteroids.server.exception.GameFinishedException
+import com.kiseru.asteroids.server.factory.MessageReceiverServiceFactory
+import com.kiseru.asteroids.server.factory.MessageSenderServiceFactory
 import com.kiseru.asteroids.server.handler.CommandHandlerFactory
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.User
+import com.kiseru.asteroids.server.service.MessageReceiverService
 import com.kiseru.asteroids.server.service.RoomService
 import com.kiseru.asteroids.server.service.UserService
 import kotlinx.coroutines.*
@@ -12,12 +15,15 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import java.io.IOException
 import java.net.ServerSocket
 import java.net.Socket
 import java.util.*
 
 @Component
 class Server(
+    private val messageReceiverServiceFactory: MessageReceiverServiceFactory,
+    private val messageSenderServiceFactory: MessageSenderServiceFactory,
     private val commandHandlerFactory: CommandHandlerFactory,
     private val roomService: RoomService,
     private val serverSocket: ServerSocket,
@@ -59,14 +65,23 @@ class Server(
     private suspend fun handleNewConnection(newConnection: Socket) = coroutineScope {
         log.info("Started handling new connection")
         val room = roomService.getNotFullRoom()
-        val user = userService.authorizeUser(newConnection, room)
+        val messageReceiverService = messageReceiverServiceFactory.create(newConnection)
+        val messageSenderService = messageSenderServiceFactory.create(newConnection)
+        val user = try {
+            messageSenderService.sendWelcomeMessage()
+            val username = messageReceiverService.receive()
+            userService.authorizeUser(newConnection, room, messageSenderService, username)
+        } catch (e: IOException) {
+            log.error("Failed to authorize user", e)
+            throw e
+        }
         addUser(room, user)
         roomService.sendMessageToUsers(room, "User ${user.username} has joined the room.")
         launch {
             startRoom(room)
         }
         launch {
-            runUser(user)
+            runUser(user, messageReceiverService)
         }
     }
 
@@ -77,11 +92,11 @@ class Server(
         room.users = room.users + user
     }
 
-    private suspend fun runUser(user: User) {
+    private suspend fun runUser(user: User, messageReceiverService: MessageReceiverService) {
         awaitCreatingSpaceship(user)
         try {
             while (!user.room.isGameFinished && user.isAlive) {
-                val command = user.messageReceiverService.receive()
+                val command = messageReceiverService.receive()
                 handleCommand(user, command)
                 incrementSteps(user)
                 checkIsAlive(user)

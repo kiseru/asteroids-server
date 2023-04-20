@@ -1,6 +1,5 @@
 package com.kiseru.asteroids.server.model
 
-import com.kiseru.asteroids.server.service.MessageReceiverService
 import com.kiseru.asteroids.server.service.MessageSenderService
 import java.net.Socket
 
@@ -9,7 +8,6 @@ class User(
     val username: String,
     val room: Room,
     val socket: Socket,
-    val messageReceiverService: MessageReceiverService,
     val messageSenderService: MessageSenderService,
 ) {
 

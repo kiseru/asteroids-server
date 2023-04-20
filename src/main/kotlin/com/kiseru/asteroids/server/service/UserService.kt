@@ -6,5 +6,10 @@ import java.net.Socket
 
 interface UserService {
 
-    suspend fun authorizeUser(socket: Socket, room: Room): User
+    suspend fun authorizeUser(
+        socket: Socket,
+        room: Room,
+        messageSenderService: MessageSenderService,
+        username: String,
+    ): User
 }
