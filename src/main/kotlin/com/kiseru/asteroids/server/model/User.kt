@@ -93,10 +93,6 @@ class User(
         }
     }
 
-    suspend fun sendUnknownCommandMessage() {
-        messageSenderService.sendUnknownCommand()
-    }
-
     companion object {
 
         private val log = LoggerFactory.getLogger(User::class.java)

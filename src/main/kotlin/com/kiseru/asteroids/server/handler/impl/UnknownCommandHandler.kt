@@ -6,6 +6,6 @@ import com.kiseru.asteroids.server.handler.CommandHandler
 class UnknownCommandHandler : CommandHandler {
 
     override suspend fun handle(user: User) {
-        user.sendUnknownCommandMessage()
+        user.messageSenderService.sendUnknownCommand()
     }
 }
