@@ -13,7 +13,7 @@ class Spaceship(
 ) : Point(x, y) {
 
     override val symbolToShow: String
-        get() = owner.id.toString()
+        get() = owner.id
 
     override val type: Type = Type.SPACESHIP
 
@@ -67,6 +67,6 @@ class Spaceship(
     fun checkContaining(coordinates: List<Point>): Boolean = direction.checkContaining(this, coordinates)
 
     private fun checkCollectedGarbage(collected: Int) {
-        owner.checkCollectedGarbage(collected)
+        owner.room.checkCollectedGarbage(collected)
     }
 }

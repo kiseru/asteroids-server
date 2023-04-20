@@ -55,10 +55,6 @@ class User(
         }
     }
 
-    fun checkCollectedGarbage(collected: Int) {
-        room.checkCollectedGarbage(collected)
-    }
-
     fun refreshRoom() {
         room.refresh()
     }
