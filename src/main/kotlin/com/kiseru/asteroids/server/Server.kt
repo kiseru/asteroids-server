@@ -60,7 +60,7 @@ class Server(
         log.info("Started handling new connection")
         val room = roomService.getNotFullRoom()
         val user = userService.authorizeUser(newConnection, room)
-        room.addUser(user)
+        addUser(room, user)
         roomService.sendMessageToUsers(room, "User ${user.username} has joined the room.")
         launch {
             startRoom(room)
@@ -68,6 +68,13 @@ class Server(
         launch {
             runUser(user)
         }
+    }
+
+    fun addUser(room: Room, user: User) {
+        check(room.users.size < Room.MAX_USERS)
+        room.status = Room.Status.WAITING_CONNECTIONS
+        room.game.registerSpaceshipForUser(user)
+        room.users = room.users + user
     }
 
     private suspend fun runUser(user: User) {

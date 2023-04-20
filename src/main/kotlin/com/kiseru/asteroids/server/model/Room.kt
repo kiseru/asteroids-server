@@ -10,7 +10,6 @@ class Room(
 ) {
 
     var users = emptyList<User>()
-        private set
 
     val rating: String = users.sortedBy { it.score }
         .joinToString("\n") { "${it.username} ${it.score}" }
@@ -33,13 +32,6 @@ class Room(
 
         status = Status.FINISHED
         log.info("Game finished")
-    }
-
-    fun addUser(user: User) {
-        check(users.size < MAX_USERS)
-        status = Status.WAITING_CONNECTIONS
-        game.registerSpaceshipForUser(user)
-        users = users + user
     }
 
     fun refresh() {
