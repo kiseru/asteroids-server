@@ -50,7 +50,7 @@ class Spaceship(
             if (type === Type.ASTEROID) {
                 subtractScore()
             } else if (type === Type.GARBAGE) {
-                owner.addScore()
+                addScore()
                 val collected = owner.room.incrementCollectedGarbageCount()
                 checkCollectedGarbage(collected)
             } else if (type === Type.WALL) {
@@ -74,6 +74,13 @@ class Spaceship(
         }
     }
 
+    private fun addScore() {
+        if (owner.room.isGameFinished) {
+            throw GameFinishedException()
+        }
+
+        owner.score += 10
+    }
 
     fun isWall(screen: Screen) = direction.isWall(this, screen)
 

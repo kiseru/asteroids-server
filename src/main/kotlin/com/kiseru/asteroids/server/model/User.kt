@@ -1,6 +1,5 @@
 package com.kiseru.asteroids.server.model
 
-import com.kiseru.asteroids.server.exception.GameFinishedException
 import com.kiseru.asteroids.server.service.MessageReceiverService
 import com.kiseru.asteroids.server.service.MessageSenderService
 import java.net.Socket
@@ -33,14 +32,6 @@ class User(
 
     suspend fun sendMessage(message: String) {
         messageSenderService.send(message)
-    }
-
-    fun addScore() {
-        if (room.isGameFinished) {
-            throw GameFinishedException()
-        }
-
-        score += 10
     }
 
     fun refreshRoom() {
