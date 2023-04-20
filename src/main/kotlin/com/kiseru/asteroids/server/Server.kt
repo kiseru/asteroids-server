@@ -1,6 +1,9 @@
 package com.kiseru.asteroids.server
 
+import com.kiseru.asteroids.server.exception.GameFinishedException
+import com.kiseru.asteroids.server.handler.CommandHandlerFactory
 import com.kiseru.asteroids.server.model.Room
+import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.RoomService
 import com.kiseru.asteroids.server.service.UserService
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +21,7 @@ import java.util.*
 
 @Component
 class Server(
+    private val commandHandlerFactory: CommandHandlerFactory,
     private val roomService: RoomService,
     private val serverSocket: ServerSocket,
     private val userService: UserService,
@@ -65,9 +69,49 @@ class Server(
             startRoom(room)
         }
         launch {
-            user.run()
+            runUser(user)
         }
     }
+
+    private suspend fun runUser(user: User) {
+        user.room.awaitCreatingSpaceship(user)
+        try {
+            while (!user.room.isGameFinished && user.isAlive) {
+                val command = user.messageReceiverService.receive()
+                handleCommand(user, command)
+                incrementSteps(user)
+                checkIsAlive(user)
+            }
+        } finally {
+            user.isAlive = false
+            user.room.setGameFinished()
+        }
+    }
+
+    private suspend fun handleCommand(user: User, command: String) {
+        val commandHandler = commandHandlerFactory.create(command)
+        commandHandler.handle(user)
+    }
+
+    private fun incrementSteps(user: User) {
+        if (!user.isAlive) {
+            throw GameFinishedException()
+        }
+
+        user.steps++
+    }
+
+    private suspend fun checkIsAlive(user: User) {
+        if (user.steps >= 1500 || user.score < 0) {
+            died(user)
+        }
+    }
+
+    private suspend fun died(user: User) {
+        user.isAlive = false
+        user.messageSenderService.sendGameOver(user.score)
+    }
+
 
     private suspend fun startRoom(room: Room) {
         room.awaitUsers()

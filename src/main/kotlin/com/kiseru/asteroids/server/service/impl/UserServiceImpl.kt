@@ -3,7 +3,6 @@ package com.kiseru.asteroids.server.service.impl
 import com.kiseru.asteroids.server.dto.TokenDto
 import com.kiseru.asteroids.server.factory.MessageReceiverServiceFactory
 import com.kiseru.asteroids.server.factory.MessageSenderServiceFactory
-import com.kiseru.asteroids.server.handler.CommandHandlerFactory
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.TokenService
@@ -18,7 +17,6 @@ import java.util.*
 
 @Service
 class UserServiceImpl(
-    private val commandHandlerFactory: CommandHandlerFactory,
     private val messageReceiverServiceFactory: MessageReceiverServiceFactory,
     private val messageSenderServiceFactory: MessageSenderServiceFactory,
     private val tokenService: TokenService,
@@ -34,7 +32,7 @@ class UserServiceImpl(
             val username = messageReceiverService.receive()
             log.info("{} has joined the server", username)
             val userId = generateUniqueUserId()
-            val user = User(userId, username, room, socket, messageReceiverService, messageSenderService, commandHandlerFactory)
+            val user = User(userId, username, room, socket, messageReceiverService, messageSenderService)
             val tokenDto = TokenDto(tokenService.generateToken(user))
             messageSenderService.send(Json.encodeToString(tokenDto))
             messageSenderService.sendInstructions(user)
