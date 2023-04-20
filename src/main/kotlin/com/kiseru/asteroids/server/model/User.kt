@@ -59,11 +59,6 @@ class User(
         room.checkCollectedGarbage(collected)
     }
 
-    fun moveSpaceship() {
-        checkNotNull(spaceship)
-        spaceship?.go()
-    }
-
     fun refreshRoom() {
         room.refresh()
     }

@@ -6,8 +6,13 @@ import com.kiseru.asteroids.server.handler.CommandHandler
 class GoCommandHandler : CommandHandler {
 
     override suspend fun handle(user: User) {
-        user.moveSpaceship()
+        moveSpaceship(user)
         user.refreshRoom()
         user.sendScore()
+    }
+
+    private fun moveSpaceship(user: User) {
+        checkNotNull(user.spaceship)
+        user.spaceship?.go()
     }
 }
