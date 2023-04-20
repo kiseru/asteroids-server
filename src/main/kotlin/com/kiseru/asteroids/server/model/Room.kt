@@ -38,10 +38,6 @@ class Room(
         game.refresh()
     }
 
-    fun showGameField() {
-        game.showField()
-    }
-
     fun incrementCollectedGarbageCount(): Int {
         return game.incrementCollectedGarbageCount()
     }
