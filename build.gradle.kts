@@ -20,6 +20,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 tasks.named<JavaExec>("bootRun") {
@@ -31,4 +33,8 @@ tasks.withType<KotlinCompile> {
         freeCompilerArgs = listOf("-Xjsr305=strict")
         jvmTarget = "17"
     }
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
