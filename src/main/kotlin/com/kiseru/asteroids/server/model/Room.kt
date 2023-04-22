@@ -1,5 +1,6 @@
 package com.kiseru.asteroids.server.model
 
+import com.kiseru.asteroids.server.service.MessageSenderService
 import org.slf4j.LoggerFactory
 
 /**
@@ -10,6 +11,8 @@ class Room(
 ) {
 
     var users = emptyList<User>()
+
+    var messageSenderServices = emptyList<MessageSenderService>()
 
     val rating: String = users.sortedBy { it.score }
         .joinToString("\n") { "${it.username} ${it.score}" }

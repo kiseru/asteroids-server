@@ -7,6 +7,7 @@ import com.kiseru.asteroids.server.handler.CommandHandlerFactory
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.MessageReceiverService
+import com.kiseru.asteroids.server.service.MessageSenderService
 import com.kiseru.asteroids.server.service.RoomService
 import com.kiseru.asteroids.server.service.UserService
 import kotlinx.coroutines.*
@@ -75,31 +76,36 @@ class Server(
             log.error("Failed to authorize user", e)
             throw e
         }
-        addUser(room, user)
+        addUser(room, user, messageSenderService)
         roomService.sendMessageToUsers(room, "User ${user.username} has joined the room.")
         launch {
             startRoom(room)
         }
         launch {
-            runUser(user, messageReceiverService)
+            runUser(user, messageSenderService, messageReceiverService)
         }
     }
 
-    fun addUser(room: Room, user: User) {
+    fun addUser(room: Room, user: User, messageSenderService: MessageSenderService) {
         check(room.users.size < Room.MAX_USERS)
         room.status = Room.Status.WAITING_CONNECTIONS
         room.game.registerSpaceshipForUser(user)
         room.users = room.users + user
+        room.messageSenderServices += messageSenderService
     }
 
-    private suspend fun runUser(user: User, messageReceiverService: MessageReceiverService) {
+    private suspend fun runUser(
+        user: User,
+        messageSenderService: MessageSenderService,
+        messageReceiverService: MessageReceiverService
+    ) {
         awaitCreatingSpaceship(user)
         try {
             while (!user.room.isGameFinished && user.isAlive) {
                 val command = messageReceiverService.receive()
-                handleCommand(user, command)
+                handleCommand(user, messageSenderService, command)
                 incrementSteps(user)
-                checkIsAlive(user)
+                checkIsAlive(user, messageSenderService)
             }
         } finally {
             user.isAlive = false
@@ -113,9 +119,9 @@ class Server(
         }
     }
 
-    private suspend fun handleCommand(user: User, command: String) {
+    private suspend fun handleCommand(user: User, messageSenderService: MessageSenderService, command: String) {
         val commandHandler = commandHandlerFactory.create(command)
-        commandHandler.handle(user)
+        commandHandler.handle(user, messageSenderService)
     }
 
     private fun incrementSteps(user: User) {
@@ -126,15 +132,15 @@ class Server(
         user.steps++
     }
 
-    private suspend fun checkIsAlive(user: User) {
+    private suspend fun checkIsAlive(user: User, messageSenderService: MessageSenderService) {
         if (user.steps >= 1500 || user.score < 0) {
-            died(user)
+            died(user, messageSenderService)
         }
     }
 
-    private suspend fun died(user: User) {
+    private suspend fun died(user: User, messageSenderService: MessageSenderService) {
         user.isAlive = false
-        user.messageSenderService.sendGameOver(user.score)
+        messageSenderService.sendGameOver(user.score)
     }
 
     private suspend fun startRoom(room: Room) {

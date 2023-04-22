@@ -28,7 +28,7 @@ class UserServiceImpl(
     ): User {
         log.info("{} has joined the server", username)
         val userId = generateUniqueUserId()
-        val user = User(userId, username, room, socket, messageSenderService)
+        val user = User(userId, username, room, socket)
         val tokenDto = TokenDto(tokenService.generateToken(user))
         messageSenderService.send(Json.encodeToString(tokenDto))
         messageSenderService.sendInstructions(user)
