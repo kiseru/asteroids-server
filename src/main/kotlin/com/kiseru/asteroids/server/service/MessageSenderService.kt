@@ -10,6 +10,8 @@ interface MessageSenderService {
 
     suspend fun sendUnknownCommand()
 
+    suspend fun send(boolean: Boolean)
+
     suspend fun send(message: String)
 
     suspend fun sendGameOver(score: Int)

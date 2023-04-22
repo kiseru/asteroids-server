@@ -29,6 +29,10 @@ class MessageSenderServiceImpl(
         send("Unknown command")
     }
 
+    override suspend fun send(boolean: Boolean) {
+        writer.awaitPrintln(if (boolean) "t" else "f")
+    }
+
     override suspend fun send(message: String) {
         writer.awaitPrintln(message)
     }
