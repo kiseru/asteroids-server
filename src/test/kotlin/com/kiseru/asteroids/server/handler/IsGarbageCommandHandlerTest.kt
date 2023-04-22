@@ -41,7 +41,7 @@ internal class IsGarbageCommandHandlerTest {
                 .`when`(user)
                 .isGarbageInFrontOfSpaceship
 
-            commandHandler.handle(user, messageSenderService)
+            commandHandler.handle(user, messageSenderService) {}
             val sentMessage = String(outputStream.toByteArray()).trim()
             assertEquals("t", sentMessage)
         }
@@ -54,7 +54,7 @@ internal class IsGarbageCommandHandlerTest {
                 .`when`(user)
                 .isGarbageInFrontOfSpaceship
 
-            commandHandler.handle(user, messageSenderService)
+            commandHandler.handle(user, messageSenderService) {}
             val sentMessage = String(outputStream.toByteArray()).trim()
             assertEquals("f", sentMessage)
         }

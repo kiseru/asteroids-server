@@ -1,6 +1,5 @@
 package com.kiseru.asteroids.server.handler.impl
 
-import com.kiseru.asteroids.server.awaitClose
 import com.kiseru.asteroids.server.handler.CommandHandler
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.MessageSenderService
@@ -10,10 +9,14 @@ import java.io.IOException
 
 class ExitCommandHandler : CommandHandler {
 
-    override suspend fun handle(user: User, messageSenderService: MessageSenderService) {
+    override suspend fun handle(
+        user: User,
+        messageSenderService: MessageSenderService,
+        closeSocket: suspend () -> Unit,
+    ) {
         try {
             messageSenderService.sendExit()
-            user.socket.awaitClose()
+            closeSocket()
         } catch (e: IOException) {
             log.error(e.localizedMessage, e)
         }

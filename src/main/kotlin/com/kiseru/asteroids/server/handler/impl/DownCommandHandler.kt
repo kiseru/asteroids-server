@@ -7,6 +7,9 @@ import com.kiseru.asteroids.server.service.MessageSenderService
 
 class DownCommandHandler : DirectionCommandHandler {
 
-    override suspend fun handle(user: User, messageSenderService: MessageSenderService) =
-        handleDirection(user, messageSenderService, Direction.DOWN)
+    override suspend fun handle(
+        user: User,
+        messageSenderService: MessageSenderService,
+        closeSocket: suspend () -> Unit,
+    ) = handleDirection(user, messageSenderService, Direction.DOWN)
 }

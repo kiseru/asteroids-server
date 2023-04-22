@@ -71,7 +71,7 @@ class Server(
         val user = try {
             messageSenderService.sendWelcomeMessage()
             val username = messageReceiverService.receive()
-            userService.authorizeUser(newConnection, room, messageSenderService, username)
+            userService.authorizeUser(room, messageSenderService, username)
         } catch (e: IOException) {
             log.error("Failed to authorize user", e)
             throw e
@@ -82,7 +82,7 @@ class Server(
             startRoom(room)
         }
         launch {
-            runUser(user, messageSenderService, messageReceiverService)
+            runUser(user, messageSenderService, messageReceiverService, newConnection)
         }
     }
 
@@ -97,13 +97,14 @@ class Server(
     private suspend fun runUser(
         user: User,
         messageSenderService: MessageSenderService,
-        messageReceiverService: MessageReceiverService
+        messageReceiverService: MessageReceiverService,
+        socket: Socket,
     ) {
         awaitCreatingSpaceship(user)
         try {
             while (!user.room.isGameFinished && user.isAlive) {
                 val command = messageReceiverService.receive()
-                handleCommand(user, messageSenderService, command)
+                handleCommand(user, messageSenderService, socket, command)
                 incrementSteps(user)
                 checkIsAlive(user, messageSenderService)
             }
@@ -119,9 +120,14 @@ class Server(
         }
     }
 
-    private suspend fun handleCommand(user: User, messageSenderService: MessageSenderService, command: String) {
+    private suspend fun handleCommand(
+        user: User,
+        messageSenderService: MessageSenderService,
+        socket: Socket,
+        command: String,
+    ) {
         val commandHandler = commandHandlerFactory.create(command)
-        commandHandler.handle(user, messageSenderService)
+        commandHandler.handle(user, messageSenderService) { socket.awaitClose() }
     }
 
     private fun incrementSteps(user: User) {
