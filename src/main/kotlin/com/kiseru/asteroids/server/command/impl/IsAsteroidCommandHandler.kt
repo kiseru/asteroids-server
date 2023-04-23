@@ -1,16 +1,16 @@
-package com.kiseru.asteroids.server.handler.impl
+package com.kiseru.asteroids.server.command.impl
 
-import com.kiseru.asteroids.server.handler.CommandHandler
+import com.kiseru.asteroids.server.command.CommandHandler
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.MessageSenderService
 
-class IsWallCommandHandler : CommandHandler {
+class IsAsteroidCommandHandler : CommandHandler {
 
     override suspend fun handle(
         user: User,
         messageSenderService: MessageSenderService,
         closeSocket: suspend () -> Unit,
     ) {
-        messageSenderService.send(user.isWallInFrontOfSpaceship)
+        messageSenderService.send(user.isAsteroidInFrontOfSpaceship)
     }
 }

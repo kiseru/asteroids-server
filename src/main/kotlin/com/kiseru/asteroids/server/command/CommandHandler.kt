@@ -1,4 +1,4 @@
-package com.kiseru.asteroids.server.handler
+package com.kiseru.asteroids.server.command
 
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.MessageSenderService
