@@ -4,17 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.kiseru.asteroids.server.service.impl.MessageSenderServiceImpl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 
 internal class MessageSenderServiceTest {
 
-    lateinit var outputStream: ByteArrayOutputStream
+    private lateinit var outputStream: ByteArrayOutputStream
 
-    lateinit var messageSenderService: MessageSenderService
+    private lateinit var messageSenderService: MessageSenderService
 
     @BeforeEach
     fun setUp() {
@@ -29,15 +29,21 @@ internal class MessageSenderServiceTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun testSendBool() = runTest {
+    fun `test send true`() = runTest {
         messageSenderService.send(true)
-        var sentMsg = String(outputStream.toByteArray()).trim()
-        assertEquals("t", sentMsg)
+        val actual = String(outputStream.toByteArray()).trim()
 
-        outputStream.reset()
+        val expected = "t"
+        assertThat(actual).isEqualTo(expected)
+    }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test send false`() = runTest {
         messageSenderService.send(false)
-        sentMsg = String(outputStream.toByteArray()).trim()
-        assertEquals("f", sentMsg)
+        val actual = String(outputStream.toByteArray()).trim()
+
+        val expected = "f"
+        assertThat(actual).isEqualTo(expected)
     }
 }
