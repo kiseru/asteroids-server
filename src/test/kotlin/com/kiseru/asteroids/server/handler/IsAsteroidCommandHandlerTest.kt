@@ -6,27 +6,33 @@ import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.impl.MessageSenderServiceImpl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.doReturn
-import org.mockito.Mockito.mock
+import org.mockito.BDDMockito.given
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
 import java.io.ByteArrayOutputStream
 
 internal class IsAsteroidCommandHandlerTest {
-
-    private val commandHandler = IsAsteroidCommandHandler()
 
     lateinit var outputStream: ByteArrayOutputStream
 
     lateinit var messageSenderService: MessageSenderServiceImpl
 
+    lateinit var underTest: CommandHandler
+
+    @Mock
+    lateinit var user: User
+
     @BeforeEach
     fun setUp() {
+        MockitoAnnotations.openMocks(this)
         val objectMapper = ObjectMapper()
         outputStream = ByteArrayOutputStream()
         messageSenderService = MessageSenderServiceImpl(objectMapper, outputStream)
+        underTest = IsAsteroidCommandHandler()
     }
 
     @AfterEach()
@@ -36,27 +42,25 @@ internal class IsAsteroidCommandHandlerTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun testHandleTrue() = runTest {
-        val user = mock(User::class.java)
-        doReturn(true)
-            .`when`(user)
-            .isAsteroidInFrontOfSpaceship
+    fun `test handling isAsteroid command when asteroid is on front of`() = runTest {
+        given(user.isAsteroidInFrontOfSpaceship).willReturn(true)
 
-        commandHandler.handle(user, messageSenderService) {}
-        val sentMessage = String(outputStream.toByteArray()).trim()
-        assertEquals("t", sentMessage)
+        underTest.handle(user, messageSenderService) {}
+        val actual = String(outputStream.toByteArray()).trim()
+
+        val expected = "t"
+        assertThat(actual).isEqualTo(expected)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun testHandleFalse() = runTest {
-        val user = mock(User::class.java)
-        doReturn(false)
-            .`when`(user)
-            .isAsteroidInFrontOfSpaceship
+    fun `test handling isAsteroid command when asteroid is not on front of`() = runTest {
+        given(user.isAsteroidInFrontOfSpaceship).willReturn(false)
 
-        commandHandler.handle(user, messageSenderService) {}
-        val sentMessage = String(outputStream.toByteArray()).trim()
-        assertEquals("f", sentMessage)
+        underTest.handle(user, messageSenderService) {}
+        val actual = String(outputStream.toByteArray()).trim()
+
+        val expected = "f"
+        assertThat(actual).isEqualTo(expected)
     }
 }
