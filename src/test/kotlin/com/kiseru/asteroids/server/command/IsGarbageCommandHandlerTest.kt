@@ -1,7 +1,7 @@
-package com.kiseru.asteroids.server.handler
+package com.kiseru.asteroids.server.command
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.kiseru.asteroids.server.handler.impl.IsGarbageCommandHandler
+import com.kiseru.asteroids.server.command.impl.IsGarbageCommandHandler
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.impl.MessageSenderServiceImpl
 import kotlinx.coroutines.ExperimentalCoroutinesApi

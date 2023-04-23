@@ -1,5 +1,6 @@
-package com.kiseru.asteroids.server.handler
+package com.kiseru.asteroids.server.command.direction
 
+import com.kiseru.asteroids.server.command.CommandHandler
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.model.Direction
 import com.kiseru.asteroids.server.service.MessageSenderService

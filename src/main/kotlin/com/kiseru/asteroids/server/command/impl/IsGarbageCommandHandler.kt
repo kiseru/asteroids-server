@@ -1,6 +1,6 @@
-package com.kiseru.asteroids.server.handler.impl
+package com.kiseru.asteroids.server.command.impl
 
-import com.kiseru.asteroids.server.handler.CommandHandler
+import com.kiseru.asteroids.server.command.CommandHandler
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.MessageSenderService
 

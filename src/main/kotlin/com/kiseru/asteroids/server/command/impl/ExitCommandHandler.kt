@@ -1,11 +1,10 @@
-package com.kiseru.asteroids.server.handler.impl
+package com.kiseru.asteroids.server.command.impl
 
-import com.kiseru.asteroids.server.handler.CommandHandler
+import com.kiseru.asteroids.server.command.CommandHandler
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.MessageSenderService
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.io.IOException
+import java.lang.RuntimeException
 
 class ExitCommandHandler : CommandHandler {
 
@@ -18,12 +17,7 @@ class ExitCommandHandler : CommandHandler {
             messageSenderService.sendExit()
             closeSocket()
         } catch (e: IOException) {
-            log.error(e.localizedMessage, e)
+            throw RuntimeException(e)
         }
-    }
-
-    companion object {
-
-        private val log: Logger = LoggerFactory.getLogger(ExitCommandHandler::class.java)
     }
 }
