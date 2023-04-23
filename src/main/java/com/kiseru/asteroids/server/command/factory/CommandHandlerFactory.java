@@ -1,4 +1,4 @@
-package com.kiseru.asteroids.server.factory.command.impl;
+package com.kiseru.asteroids.server.command.factory;
 
 import com.kiseru.asteroids.server.command.CommandHandler;
 
