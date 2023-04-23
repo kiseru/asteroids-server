@@ -3,7 +3,7 @@ package com.kiseru.asteroids.server
 import com.kiseru.asteroids.server.exception.GameFinishedException
 import com.kiseru.asteroids.server.factory.MessageReceiverServiceFactory
 import com.kiseru.asteroids.server.factory.MessageSenderServiceFactory
-import com.kiseru.asteroids.server.factory.command.impl.CommandHandlerFactory
+import com.kiseru.asteroids.server.command.factory.CommandHandlerFactory
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.MessageReceiverService

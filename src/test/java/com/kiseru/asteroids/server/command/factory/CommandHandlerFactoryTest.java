@@ -1,7 +1,8 @@
-package com.kiseru.asteroids.server.factory.command;
+package com.kiseru.asteroids.server.command.factory;
 
 import com.kiseru.asteroids.server.command.CommandHandler;
 import com.kiseru.asteroids.server.command.direction.impl.DownCommandHandler;
+import com.kiseru.asteroids.server.command.factory.impl.CommandHandlerFactoryImpl;
 import com.kiseru.asteroids.server.command.impl.ExitCommandHandler;
 import com.kiseru.asteroids.server.command.impl.GoCommandHandler;
 import com.kiseru.asteroids.server.command.impl.IsAsteroidCommandHandler;
@@ -11,7 +12,6 @@ import com.kiseru.asteroids.server.command.direction.impl.LeftCommandHandler;
 import com.kiseru.asteroids.server.command.direction.impl.RightCommandHandler;
 import com.kiseru.asteroids.server.command.impl.UnknownCommandHandler;
 import com.kiseru.asteroids.server.command.direction.impl.UpCommandHandler;
-import com.kiseru.asteroids.server.factory.command.impl.CommandHandlerFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
