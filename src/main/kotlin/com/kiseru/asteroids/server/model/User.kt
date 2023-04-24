@@ -6,9 +6,6 @@ class User(
     val room: Room,
 ) {
 
-    val isAsteroidInFrontOfSpaceship
-        get() = spaceship?.isAsteroidInFrontOf ?: false
-
     val isGarbageInFrontOfSpaceship
         get() = spaceship?.isGarbageInFrontOf ?: false
 
