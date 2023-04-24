@@ -11,6 +11,6 @@ class IsWallCommandHandler : CommandHandler {
         messageSenderService: MessageSenderService,
         closeSocket: suspend () -> Unit,
     ) {
-        messageSenderService.send(user.isWallInFrontOfSpaceship)
+        messageSenderService.send(user.spaceship?.isWallInFrontOf ?: false)
     }
 }

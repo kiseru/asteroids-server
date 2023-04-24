@@ -2,6 +2,7 @@ package com.kiseru.asteroids.server.command
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.kiseru.asteroids.server.command.impl.IsWallCommandHandler
+import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.impl.MessageSenderServiceImpl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,6 +16,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import java.io.ByteArrayOutputStream
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class IsWallCommandHandlerTest {
 
     private lateinit var outputStream: ByteArrayOutputStream
@@ -23,27 +25,34 @@ internal class IsWallCommandHandlerTest {
 
     private lateinit var underTest: CommandHandler
 
+    private lateinit var closeable: AutoCloseable
+
     @Mock
     private lateinit var user: User
 
+    @Mock
+    private lateinit var spaceship: Spaceship
+
     @BeforeEach
     fun setUp() {
-        MockitoAnnotations.openMocks(this)
+        closeable = MockitoAnnotations.openMocks(this)
         val objectMapper = ObjectMapper()
         outputStream = ByteArrayOutputStream()
         messageSenderService = MessageSenderServiceImpl(objectMapper, outputStream)
         underTest = IsWallCommandHandler()
+
+        given(user.spaceship).willReturn(spaceship)
     }
 
     @AfterEach()
     fun tearDown() {
         outputStream.close()
+        closeable.close()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `test handling isWall command when wall is on front of`() = runTest {
-        given(user.isWallInFrontOfSpaceship).willReturn(true)
+        given(spaceship.isWallInFrontOf).willReturn(true)
 
         underTest.handle(user, messageSenderService) {}
         val actual = String(outputStream.toByteArray()).trim()
@@ -52,10 +61,9 @@ internal class IsWallCommandHandlerTest {
         assertThat(actual).isEqualTo(expected)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `test handling isWall command when wall is not on front of`() = runTest {
-        given(user.isWallInFrontOfSpaceship).willReturn(false)
+        given(spaceship.isWallInFrontOf).willReturn(false)
 
         underTest.handle(user, messageSenderService) {}
         val actual = String(outputStream.toByteArray()).trim()
