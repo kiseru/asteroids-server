@@ -11,6 +11,6 @@ class IsGarbageCommandHandler : CommandHandler {
         messageSenderService: MessageSenderService,
         closeSocket: suspend () -> Unit,
     ) {
-        messageSenderService.send(user.isGarbageInFrontOfSpaceship)
+        messageSenderService.send(user.spaceship?.isGarbageInFrontOf ?: false)
     }
 }
