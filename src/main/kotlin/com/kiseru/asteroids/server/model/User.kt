@@ -12,9 +12,6 @@ class User(
     val isGarbageInFrontOfSpaceship
         get() = spaceship?.isGarbageInFrontOf ?: false
 
-    val isWallInFrontOfSpaceship
-        get() = spaceship?.isWallInFrontOf ?: false
-
     var score = 100
 
     var isAlive = true
