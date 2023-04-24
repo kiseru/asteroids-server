@@ -2,6 +2,7 @@ package com.kiseru.asteroids.server.command
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.kiseru.asteroids.server.command.impl.IsGarbageCommandHandler
+import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.impl.MessageSenderServiceImpl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,50 +18,58 @@ import java.io.ByteArrayOutputStream
 
 internal class IsGarbageCommandHandlerTest {
 
-        lateinit var outputStream: ByteArrayOutputStream
+    private lateinit var outputStream: ByteArrayOutputStream
 
-        lateinit var messageSenderService: MessageSenderServiceImpl
+    private lateinit var messageSenderService: MessageSenderServiceImpl
 
-        lateinit var underTest: CommandHandler
+    private lateinit var underTest: CommandHandler
 
-        @Mock
-        lateinit var user: User
+    private lateinit var closeable: AutoCloseable
 
-        @BeforeEach
-        fun setUp() {
-            MockitoAnnotations.openMocks(this)
-            val objectMapper = ObjectMapper()
-            outputStream = ByteArrayOutputStream()
-            messageSenderService = MessageSenderServiceImpl(objectMapper, outputStream)
-            underTest = IsGarbageCommandHandler()
-        }
+    @Mock
+    private lateinit var user: User
 
-        @AfterEach()
-        fun tearDown() {
-            outputStream.close()
-        }
+    @Mock
+    private lateinit var spaceship: Spaceship
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        @Test
-        fun `test handling isGarbage command when garbage is on front of`() = runTest {
-            given(user.isGarbageInFrontOfSpaceship).willReturn(true)
+    @BeforeEach
+    fun setUp() {
+        closeable = MockitoAnnotations.openMocks(this)
+        val objectMapper = ObjectMapper()
+        outputStream = ByteArrayOutputStream()
+        messageSenderService = MessageSenderServiceImpl(objectMapper, outputStream)
+        underTest = IsGarbageCommandHandler()
 
-            underTest.handle(user, messageSenderService) {}
-            val actual = String(outputStream.toByteArray()).trim()
+        given(user.spaceship).willReturn(spaceship)
+    }
 
-            val expected = "t"
-            assertThat(actual).isEqualTo(expected)
-        }
+    @AfterEach()
+    fun tearDown() {
+        outputStream.close()
+        closeable.close()
+    }
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        @Test
-        fun `test handling isGarbage command when garbage is not on front of`() = runTest {
-            given(user.isGarbageInFrontOfSpaceship).willReturn(false)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test handling isGarbage command when garbage is on front of`() = runTest {
+        given(spaceship.isGarbageInFrontOf).willReturn(true)
 
-            underTest.handle(user, messageSenderService) {}
-            val actual = String(outputStream.toByteArray()).trim()
+        underTest.handle(user, messageSenderService) {}
+        val actual = String(outputStream.toByteArray()).trim()
 
-            val expected = "f"
-            assertThat(actual).isEqualTo(expected)
-        }
+        val expected = "t"
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test handling isGarbage command when garbage is not on front of`() = runTest {
+        given(spaceship.isGarbageInFrontOf).willReturn(false)
+
+        underTest.handle(user, messageSenderService) {}
+        val actual = String(outputStream.toByteArray()).trim()
+
+        val expected = "f"
+        assertThat(actual).isEqualTo(expected)
+    }
 }

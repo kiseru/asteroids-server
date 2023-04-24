@@ -6,9 +6,6 @@ class User(
     val room: Room,
 ) {
 
-    val isGarbageInFrontOfSpaceship
-        get() = spaceship?.isGarbageInFrontOf ?: false
-
     var score = 100
 
     var isAlive = true
