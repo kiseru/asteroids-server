@@ -10,7 +10,5 @@ class User(
 
     var isAlive = true
 
-    var spaceship: Spaceship? = null
-
     var steps = 0
 }

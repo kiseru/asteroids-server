@@ -40,8 +40,6 @@ internal class IsWallCommandHandlerTest {
         outputStream = ByteArrayOutputStream()
         messageSenderService = MessageSenderServiceImpl(objectMapper, outputStream)
         underTest = IsWallCommandHandler()
-
-        given(user.spaceship).willReturn(spaceship)
     }
 
     @AfterEach()
@@ -54,7 +52,7 @@ internal class IsWallCommandHandlerTest {
     fun `test handling isWall command when wall is on front of`() = runTest {
         given(spaceship.isWallInFrontOf).willReturn(true)
 
-        underTest.handle(user, messageSenderService) {}
+        underTest.handle(user, messageSenderService, spaceship) {}
         val actual = String(outputStream.toByteArray()).trim()
 
         val expected = "t"
@@ -65,7 +63,7 @@ internal class IsWallCommandHandlerTest {
     fun `test handling isWall command when wall is not on front of`() = runTest {
         given(spaceship.isWallInFrontOf).willReturn(false)
 
-        underTest.handle(user, messageSenderService) {}
+        underTest.handle(user, messageSenderService, spaceship) {}
         val actual = String(outputStream.toByteArray()).trim()
 
         val expected = "f"

@@ -39,8 +39,6 @@ internal class IsGarbageCommandHandlerTest {
         outputStream = ByteArrayOutputStream()
         messageSenderService = MessageSenderServiceImpl(objectMapper, outputStream)
         underTest = IsGarbageCommandHandler()
-
-        given(user.spaceship).willReturn(spaceship)
     }
 
     @AfterEach()
@@ -54,7 +52,7 @@ internal class IsGarbageCommandHandlerTest {
     fun `test handling isGarbage command when garbage is on front of`() = runTest {
         given(spaceship.isGarbageInFrontOf).willReturn(true)
 
-        underTest.handle(user, messageSenderService) {}
+        underTest.handle(user, messageSenderService, spaceship) {}
         val actual = String(outputStream.toByteArray()).trim()
 
         val expected = "t"
@@ -66,7 +64,7 @@ internal class IsGarbageCommandHandlerTest {
     fun `test handling isGarbage command when garbage is not on front of`() = runTest {
         given(spaceship.isGarbageInFrontOf).willReturn(false)
 
-        underTest.handle(user, messageSenderService) {}
+        underTest.handle(user, messageSenderService, spaceship) {}
         val actual = String(outputStream.toByteArray()).trim()
 
         val expected = "f"

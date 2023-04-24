@@ -38,8 +38,6 @@ internal class IsAsteroidCommandHandlerTest {
         outputStream = ByteArrayOutputStream()
         messageSenderService = MessageSenderServiceImpl(objectMapper, outputStream)
         underTest = IsAsteroidCommandHandler()
-
-        given(user.spaceship).willReturn(spaceship)
     }
 
     @AfterEach()
@@ -51,7 +49,7 @@ internal class IsAsteroidCommandHandlerTest {
     fun `test handling isAsteroid command when asteroid is on front of`() = runTest {
         given(spaceship.isAsteroidInFrontOf).willReturn(true)
 
-        underTest.handle(user, messageSenderService) {}
+        underTest.handle(user, messageSenderService, spaceship) {}
         val actual = String(outputStream.toByteArray()).trim()
 
         val expected = "t"
@@ -62,7 +60,7 @@ internal class IsAsteroidCommandHandlerTest {
     fun `test handling isAsteroid command when asteroid is not on front of`() = runTest {
         given(spaceship.isAsteroidInFrontOf).willReturn(false)
 
-        underTest.handle(user, messageSenderService) {}
+        underTest.handle(user, messageSenderService, spaceship) {}
         val actual = String(outputStream.toByteArray()).trim()
 
         val expected = "f"

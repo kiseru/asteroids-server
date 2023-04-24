@@ -4,6 +4,7 @@ import com.kiseru.asteroids.server.handler.SpaceshipCrashHandler
 import com.kiseru.asteroids.server.handler.impl.SpaceshipCrashHandlerImpl
 import com.kiseru.asteroids.server.service.CoordinateService
 import com.kiseru.asteroids.server.service.impl.CourseCheckerServiceImpl
+import kotlinx.coroutines.channels.Channel
 import java.util.concurrent.atomic.AtomicInteger
 
 class Game(
@@ -18,7 +19,7 @@ class Game(
 
     private val collectedGarbageCount = AtomicInteger(0)
 
-    fun registerSpaceshipForUser(user: User) {
+    suspend fun registerSpaceshipForUser(user: User, spaceshipChannel: Channel<Spaceship>) {
         val courseCheckerService = CourseCheckerServiceImpl(pointsOnScreen, screen)
         val (x, y) = generateUniqueRandomCoordinates()
         val spaceship = Spaceship(user, courseCheckerService, x, y)
@@ -26,7 +27,7 @@ class Game(
         pointsOnScreen.add(spaceship)
         gameObjects.add(spaceship)
         crashHandlers.add(SpaceshipCrashHandlerImpl(this, spaceship))
-        user.spaceship = spaceship
+        spaceshipChannel.send(spaceship)
     }
 
     fun refresh() {
