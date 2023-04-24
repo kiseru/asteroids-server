@@ -12,8 +12,6 @@ import com.kiseru.asteroids.server.service.MessageSenderService
 import com.kiseru.asteroids.server.service.RoomService
 import com.kiseru.asteroids.server.service.UserService
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.flow.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -77,38 +75,31 @@ class Server(
             log.error("Failed to authorize user", e)
             throw e
         }
-        val spaceshipChannel = Channel<Spaceship>(CONFLATED)
-        addUser(room, user, messageSenderService, spaceshipChannel)
+        val spaceship = addUser(room, user, messageSenderService)
         roomService.sendMessageToUsers(room, "User ${user.username} has joined the room.")
         launch {
             startRoom(room)
         }
         launch {
-            runUser(user, messageSenderService, messageReceiverService, spaceshipChannel) { newConnection.awaitClose() }
+            runUser(user, messageSenderService, messageReceiverService, spaceship) { newConnection.awaitClose() }
         }
     }
 
-    private suspend fun addUser(
-        room: Room,
-        user: User,
-        messageSenderService: MessageSenderService,
-        spaceshipChannel: Channel<Spaceship>,
-    ) {
+    private suspend fun addUser(room: Room, user: User, messageSenderService: MessageSenderService): Spaceship {
         check(room.users.size < Room.MAX_USERS)
         room.status = Room.Status.WAITING_CONNECTIONS
-        room.game.registerSpaceshipForUser(user, spaceshipChannel)
         room.users = room.users + user
         room.messageSenderServices += messageSenderService
+        return room.game.registerSpaceshipForUser(user)
     }
 
     private suspend fun runUser(
         user: User,
         messageSenderService: MessageSenderService,
         messageReceiverService: MessageReceiverService,
-        spaceshipChannel: Channel<Spaceship>,
+        spaceship: Spaceship,
         closeSocket: suspend () -> Unit,
     ) {
-        val spaceship = spaceshipChannel.receive()
         messageReceiverService.receivingFlow()
             .onCompletion {
                 user.isAlive = false
