@@ -11,9 +11,7 @@ import com.kiseru.asteroids.server.service.MessageSenderService
 import com.kiseru.asteroids.server.service.RoomService
 import com.kiseru.asteroids.server.service.UserService
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.io.IOException
@@ -101,17 +99,17 @@ class Server(
         socket: Socket,
     ) {
         awaitCreatingSpaceship(user)
-        try {
-            while (!user.room.isGameFinished && user.isAlive) {
-                val command = messageReceiverService.receive()
+        messageReceiverService.receivingFlow()
+            .onCompletion {
+                user.isAlive = false
+                user.room.setGameFinished()
+            }
+            .takeWhile { !user.room.isGameFinished && user.isAlive }
+            .collect { command ->
                 handleCommand(user, messageSenderService, socket, command)
                 incrementSteps(user)
                 checkIsAlive(user, messageSenderService)
             }
-        } finally {
-            user.isAlive = false
-            user.room.setGameFinished()
-        }
     }
 
     private suspend fun awaitCreatingSpaceship(user: User) {
