@@ -42,7 +42,6 @@ internal class LeftCommandHandlerTest {
         outputStream = ByteArrayOutputStream()
         messageSenderService = MessageSenderServiceImpl(ObjectMapper(), outputStream)
         underTest = LeftCommandHandler()
-        BDDMockito.given(user.spaceship).willReturn(spaceship)
         BDDMockito.given(user.room).willReturn(room)
     }
 
@@ -56,7 +55,7 @@ internal class LeftCommandHandlerTest {
     fun `test handling left command`() = runTest {
         BDDMockito.given(user.score).willReturn(100)
 
-        underTest.handle(user, messageSenderService) {}
+        underTest.handle(user, messageSenderService, spaceship) {}
 
         val actual = String(outputStream.toByteArray()).trim()
 

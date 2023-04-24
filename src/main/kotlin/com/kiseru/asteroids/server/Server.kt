@@ -5,12 +5,15 @@ import com.kiseru.asteroids.server.factory.MessageReceiverServiceFactory
 import com.kiseru.asteroids.server.factory.MessageSenderServiceFactory
 import com.kiseru.asteroids.server.command.factory.CommandHandlerFactory
 import com.kiseru.asteroids.server.model.Room
+import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.MessageReceiverService
 import com.kiseru.asteroids.server.service.MessageSenderService
 import com.kiseru.asteroids.server.service.RoomService
 import com.kiseru.asteroids.server.service.UserService
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.flow.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -74,20 +77,26 @@ class Server(
             log.error("Failed to authorize user", e)
             throw e
         }
-        addUser(room, user, messageSenderService)
+        val spaceshipChannel = Channel<Spaceship>(CONFLATED)
+        addUser(room, user, messageSenderService, spaceshipChannel)
         roomService.sendMessageToUsers(room, "User ${user.username} has joined the room.")
         launch {
             startRoom(room)
         }
         launch {
-            runUser(user, messageSenderService, messageReceiverService, newConnection)
+            runUser(user, messageSenderService, messageReceiverService, spaceshipChannel) { newConnection.awaitClose() }
         }
     }
 
-    fun addUser(room: Room, user: User, messageSenderService: MessageSenderService) {
+    private suspend fun addUser(
+        room: Room,
+        user: User,
+        messageSenderService: MessageSenderService,
+        spaceshipChannel: Channel<Spaceship>,
+    ) {
         check(room.users.size < Room.MAX_USERS)
         room.status = Room.Status.WAITING_CONNECTIONS
-        room.game.registerSpaceshipForUser(user)
+        room.game.registerSpaceshipForUser(user, spaceshipChannel)
         room.users = room.users + user
         room.messageSenderServices += messageSenderService
     }
@@ -96,9 +105,10 @@ class Server(
         user: User,
         messageSenderService: MessageSenderService,
         messageReceiverService: MessageReceiverService,
-        socket: Socket,
+        spaceshipChannel: Channel<Spaceship>,
+        closeSocket: suspend () -> Unit,
     ) {
-        awaitCreatingSpaceship(user)
+        val spaceship = spaceshipChannel.receive()
         messageReceiverService.receivingFlow()
             .onCompletion {
                 user.isAlive = false
@@ -106,26 +116,21 @@ class Server(
             }
             .takeWhile { !user.room.isGameFinished && user.isAlive }
             .collect { command ->
-                handleCommand(user, messageSenderService, socket, command)
+                handleCommand(user, messageSenderService, command, spaceship, closeSocket)
                 incrementSteps(user)
                 checkIsAlive(user, messageSenderService)
             }
     }
 
-    private suspend fun awaitCreatingSpaceship(user: User) {
-        while (user.spaceship == null) {
-            yield()
-        }
-    }
-
     private suspend fun handleCommand(
         user: User,
         messageSenderService: MessageSenderService,
-        socket: Socket,
         command: String,
+        spaceship: Spaceship,
+        closeSocket: suspend () -> Unit,
     ) {
         val commandHandler = commandHandlerFactory.create(command)
-        commandHandler.handle(user, messageSenderService) { socket.awaitClose() }
+        commandHandler.handle(user, messageSenderService, spaceship, closeSocket)
     }
 
     private fun incrementSteps(user: User) {

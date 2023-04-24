@@ -43,7 +43,6 @@ internal class DownCommandHandlerTest {
         outputStream = ByteArrayOutputStream()
         messageSenderService = MessageSenderServiceImpl(ObjectMapper(), outputStream)
         underTest = DownCommandHandler()
-        given(user.spaceship).willReturn(spaceship)
         given(user.room).willReturn(room)
     }
 
@@ -57,7 +56,7 @@ internal class DownCommandHandlerTest {
     fun `test handling down command`() = runTest {
         given(user.score).willReturn(100)
 
-        underTest.handle(user, messageSenderService) {}
+        underTest.handle(user, messageSenderService, spaceship) {}
 
         val actual = String(outputStream.toByteArray()).trim()
 

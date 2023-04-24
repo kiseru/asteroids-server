@@ -15,6 +15,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
+import org.mockito.BDDMockito.*
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import java.io.ByteArrayOutputStream
@@ -42,8 +43,7 @@ internal class RightCommandHandlerTest {
         outputStream = ByteArrayOutputStream()
         messageSenderService = MessageSenderServiceImpl(ObjectMapper(), outputStream)
         underTest = RightCommandHandler()
-        BDDMockito.given(user.spaceship).willReturn(spaceship)
-        BDDMockito.given(user.room).willReturn(room)
+        given(user.room).willReturn(room)
     }
 
     @AfterEach
@@ -54,9 +54,9 @@ internal class RightCommandHandlerTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `test handling right command`() = runTest {
-        BDDMockito.given(user.score).willReturn(100)
+        given(user.score).willReturn(100)
 
-        underTest.handle(user, messageSenderService) {}
+        underTest.handle(user, messageSenderService, spaceship) {}
 
         val actual = String(outputStream.toByteArray()).trim()
 
