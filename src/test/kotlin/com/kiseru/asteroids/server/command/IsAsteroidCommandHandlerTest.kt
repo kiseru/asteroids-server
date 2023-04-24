@@ -2,6 +2,7 @@ package com.kiseru.asteroids.server.command
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.kiseru.asteroids.server.command.impl.IsAsteroidCommandHandler
+import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.impl.MessageSenderServiceImpl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,16 +16,20 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import java.io.ByteArrayOutputStream
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class IsAsteroidCommandHandlerTest {
 
-    lateinit var outputStream: ByteArrayOutputStream
+    private lateinit var outputStream: ByteArrayOutputStream
 
-    lateinit var messageSenderService: MessageSenderServiceImpl
+    private lateinit var messageSenderService: MessageSenderServiceImpl
 
-    lateinit var underTest: CommandHandler
+    private lateinit var underTest: CommandHandler
 
     @Mock
-    lateinit var user: User
+    private lateinit var user: User
+
+    @Mock
+    private lateinit var spaceship: Spaceship
 
     @BeforeEach
     fun setUp() {
@@ -33,6 +38,8 @@ internal class IsAsteroidCommandHandlerTest {
         outputStream = ByteArrayOutputStream()
         messageSenderService = MessageSenderServiceImpl(objectMapper, outputStream)
         underTest = IsAsteroidCommandHandler()
+
+        given(user.spaceship).willReturn(spaceship)
     }
 
     @AfterEach()
@@ -40,10 +47,9 @@ internal class IsAsteroidCommandHandlerTest {
         outputStream.close()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `test handling isAsteroid command when asteroid is on front of`() = runTest {
-        given(user.isAsteroidInFrontOfSpaceship).willReturn(true)
+        given(spaceship.isAsteroidInFrontOf).willReturn(true)
 
         underTest.handle(user, messageSenderService) {}
         val actual = String(outputStream.toByteArray()).trim()
@@ -52,10 +58,9 @@ internal class IsAsteroidCommandHandlerTest {
         assertThat(actual).isEqualTo(expected)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `test handling isAsteroid command when asteroid is not on front of`() = runTest {
-        given(user.isAsteroidInFrontOfSpaceship).willReturn(false)
+        given(spaceship.isAsteroidInFrontOf).willReturn(false)
 
         underTest.handle(user, messageSenderService) {}
         val actual = String(outputStream.toByteArray()).trim()

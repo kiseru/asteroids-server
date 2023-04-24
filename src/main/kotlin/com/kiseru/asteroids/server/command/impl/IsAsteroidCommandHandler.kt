@@ -11,6 +11,6 @@ class IsAsteroidCommandHandler : CommandHandler {
         messageSenderService: MessageSenderService,
         closeSocket: suspend () -> Unit,
     ) {
-        messageSenderService.send(user.isAsteroidInFrontOfSpaceship)
+        messageSenderService.send(user.spaceship?.isAsteroidInFrontOf ?: false)
     }
 }
