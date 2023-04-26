@@ -15,7 +15,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.BDDMockito
 import org.mockito.BDDMockito.*
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
@@ -44,7 +43,6 @@ internal class UpCommandHandlerTest {
         outputStream = ByteArrayOutputStream()
         messageSenderService = MessageSenderServiceImpl(ObjectMapper(), outputStream)
         underTest = UpCommandHandler()
-        given(user.room).willReturn(room)
     }
 
     @AfterEach
@@ -57,7 +55,7 @@ internal class UpCommandHandlerTest {
     fun `test handling up command`() = runTest {
         given(user.score).willReturn(100)
 
-        underTest.handle(user, messageSenderService, spaceship) {}
+        underTest.handle(user, room, messageSenderService, spaceship) {}
 
         val actual = String(outputStream.toByteArray()).trim()
 

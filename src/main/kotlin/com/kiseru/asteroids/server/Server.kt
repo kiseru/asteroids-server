@@ -70,7 +70,7 @@ class Server(
         val user = try {
             messageSenderService.sendWelcomeMessage()
             val username = messageReceiverService.receive()
-            userService.authorizeUser(room, messageSenderService, username)
+            userService.authorizeUser(messageSenderService, username)
         } catch (e: IOException) {
             log.error("Failed to authorize user", e)
             throw e
@@ -81,7 +81,9 @@ class Server(
             startRoom(room)
         }
         launch {
-            runUser(user, messageSenderService, messageReceiverService, spaceship) { newConnection.awaitClose() }
+            runUser(user, room, messageSenderService, messageReceiverService, spaceship) {
+                newConnection.awaitClose()
+            }
         }
     }
 
@@ -90,11 +92,12 @@ class Server(
         room.status = Room.Status.WAITING_CONNECTIONS
         room.users = room.users + user
         room.messageSenderServices += messageSenderService
-        return room.game.registerSpaceshipForUser(user)
+        return room.game.registerSpaceshipForUser(user, room)
     }
 
     private suspend fun runUser(
         user: User,
+        room: Room,
         messageSenderService: MessageSenderService,
         messageReceiverService: MessageReceiverService,
         spaceship: Spaceship,
@@ -103,11 +106,11 @@ class Server(
         messageReceiverService.receivingFlow()
             .onCompletion {
                 user.isAlive = false
-                user.room.setGameFinished()
+                room.setGameFinished()
             }
-            .takeWhile { !user.room.isGameFinished && user.isAlive }
+            .takeWhile { !room.isGameFinished && user.isAlive }
             .collect { command ->
-                handleCommand(user, messageSenderService, command, spaceship, closeSocket)
+                handleCommand(user, room, messageSenderService, command, spaceship, closeSocket)
                 incrementSteps(user)
                 checkIsAlive(user, messageSenderService)
             }
@@ -115,13 +118,14 @@ class Server(
 
     private suspend fun handleCommand(
         user: User,
+        room: Room,
         messageSenderService: MessageSenderService,
         command: String,
         spaceship: Spaceship,
         closeSocket: suspend () -> Unit,
     ) {
         val commandHandler = commandHandlerFactory.create(command)
-        commandHandler.handle(user, messageSenderService, spaceship, closeSocket)
+        commandHandler.handle(user, room, messageSenderService, spaceship, closeSocket)
     }
 
     private fun incrementSteps(user: User) {

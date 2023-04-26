@@ -2,6 +2,7 @@ package com.kiseru.asteroids.server.command
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.kiseru.asteroids.server.command.impl.IsGarbageCommandHandler
+import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.impl.MessageSenderServiceImpl
@@ -16,6 +17,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import java.io.ByteArrayOutputStream
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class IsGarbageCommandHandlerTest {
 
     private lateinit var outputStream: ByteArrayOutputStream
@@ -32,6 +34,9 @@ internal class IsGarbageCommandHandlerTest {
     @Mock
     private lateinit var spaceship: Spaceship
 
+    @Mock
+    private lateinit var room: Room
+
     @BeforeEach
     fun setUp() {
         closeable = MockitoAnnotations.openMocks(this)
@@ -47,24 +52,22 @@ internal class IsGarbageCommandHandlerTest {
         closeable.close()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `test handling isGarbage command when garbage is on front of`() = runTest {
         given(spaceship.isGarbageInFrontOf).willReturn(true)
 
-        underTest.handle(user, messageSenderService, spaceship) {}
+        underTest.handle(user, room, messageSenderService, spaceship) {}
         val actual = String(outputStream.toByteArray()).trim()
 
         val expected = "t"
         assertThat(actual).isEqualTo(expected)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `test handling isGarbage command when garbage is not on front of`() = runTest {
         given(spaceship.isGarbageInFrontOf).willReturn(false)
 
-        underTest.handle(user, messageSenderService, spaceship) {}
+        underTest.handle(user, room, messageSenderService, spaceship) {}
         val actual = String(outputStream.toByteArray()).trim()
 
         val expected = "f"

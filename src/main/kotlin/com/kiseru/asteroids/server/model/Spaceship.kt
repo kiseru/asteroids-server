@@ -8,6 +8,7 @@ import kotlin.concurrent.withLock
 
 class Spaceship(
     private val owner: User,
+    private val room: Room,
     private val courseCheckerService: CourseCheckerService,
     x: Int,
     y: Int,
@@ -51,7 +52,7 @@ class Spaceship(
                 subtractScore()
             } else if (type === Type.GARBAGE) {
                 addScore()
-                val collected = owner.room.game.incrementCollectedGarbageCount()
+                val collected = room.game.incrementCollectedGarbageCount()
                 checkCollectedGarbage(collected)
             } else if (type === Type.WALL) {
                 direction.rollback(this)
@@ -64,7 +65,7 @@ class Spaceship(
     }
 
     private fun subtractScore() {
-        if (owner.room.isGameFinished) {
+        if (room.isGameFinished) {
             throw GameFinishedException()
         }
 
@@ -75,7 +76,7 @@ class Spaceship(
     }
 
     private fun addScore() {
-        if (owner.room.isGameFinished) {
+        if (room.isGameFinished) {
             throw GameFinishedException()
         }
 
@@ -87,8 +88,8 @@ class Spaceship(
     fun checkContaining(coordinates: List<Point>): Boolean = direction.checkContaining(this, coordinates)
 
     private fun checkCollectedGarbage(collected: Int) {
-        if (collected >= owner.room.game.garbageNumber) {
-            owner.room.setGameFinished()
+        if (collected >= room.game.garbageNumber) {
+            room.setGameFinished()
         }
     }
 }

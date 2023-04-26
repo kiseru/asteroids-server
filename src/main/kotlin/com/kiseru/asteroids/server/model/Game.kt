@@ -18,10 +18,10 @@ class Game(
 
     private val collectedGarbageCount = AtomicInteger(0)
 
-    fun registerSpaceshipForUser(user: User): Spaceship {
+    fun registerSpaceshipForUser(user: User, room: Room): Spaceship {
         val courseCheckerService = CourseCheckerServiceImpl(pointsOnScreen, screen)
         val (x, y) = generateUniqueRandomCoordinates()
-        val spaceship = Spaceship(user, courseCheckerService, x, y)
+        val spaceship = Spaceship(user, room, courseCheckerService, x, y)
         courseCheckerService.spaceship = spaceship
         pointsOnScreen.add(spaceship)
         gameObjects.add(spaceship)

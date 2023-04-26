@@ -2,6 +2,7 @@ package com.kiseru.asteroids.server.command
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.kiseru.asteroids.server.command.impl.IsAsteroidCommandHandler
+import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.impl.MessageSenderServiceImpl
@@ -31,6 +32,9 @@ internal class IsAsteroidCommandHandlerTest {
     @Mock
     private lateinit var spaceship: Spaceship
 
+    @Mock
+    private lateinit var room: Room
+
     @BeforeEach
     fun setUp() {
         MockitoAnnotations.openMocks(this)
@@ -49,7 +53,7 @@ internal class IsAsteroidCommandHandlerTest {
     fun `test handling isAsteroid command when asteroid is on front of`() = runTest {
         given(spaceship.isAsteroidInFrontOf).willReturn(true)
 
-        underTest.handle(user, messageSenderService, spaceship) {}
+        underTest.handle(user, room, messageSenderService, spaceship) {}
         val actual = String(outputStream.toByteArray()).trim()
 
         val expected = "t"
@@ -60,7 +64,7 @@ internal class IsAsteroidCommandHandlerTest {
     fun `test handling isAsteroid command when asteroid is not on front of`() = runTest {
         given(spaceship.isAsteroidInFrontOf).willReturn(false)
 
-        underTest.handle(user, messageSenderService, spaceship) {}
+        underTest.handle(user, room, messageSenderService, spaceship) {}
         val actual = String(outputStream.toByteArray()).trim()
 
         val expected = "f"

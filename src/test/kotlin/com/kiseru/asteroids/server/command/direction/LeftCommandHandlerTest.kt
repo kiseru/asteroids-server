@@ -14,7 +14,7 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.BDDMockito
+import org.mockito.BDDMockito.*
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import java.io.ByteArrayOutputStream
@@ -42,7 +42,6 @@ internal class LeftCommandHandlerTest {
         outputStream = ByteArrayOutputStream()
         messageSenderService = MessageSenderServiceImpl(ObjectMapper(), outputStream)
         underTest = LeftCommandHandler()
-        BDDMockito.given(user.room).willReturn(room)
     }
 
     @AfterEach
@@ -53,9 +52,9 @@ internal class LeftCommandHandlerTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `test handling left command`() = runTest {
-        BDDMockito.given(user.score).willReturn(100)
+        given(user.score).willReturn(100)
 
-        underTest.handle(user, messageSenderService, spaceship) {}
+        underTest.handle(user, room, messageSenderService, spaceship) {}
 
         val actual = String(outputStream.toByteArray()).trim()
 
