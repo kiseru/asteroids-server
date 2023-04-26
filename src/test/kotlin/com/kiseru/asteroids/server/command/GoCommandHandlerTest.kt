@@ -42,7 +42,6 @@ internal class GoCommandHandlerTest {
         outputStream = ByteArrayOutputStream()
         messageSenderService = MessageSenderServiceImpl(ObjectMapper(), outputStream)
         underTest = GoCommandHandler()
-        given(user.room).willReturn(room)
     }
 
     @AfterEach
@@ -55,7 +54,7 @@ internal class GoCommandHandlerTest {
     fun `test handling go command`() = runTest {
         given(user.score).willReturn(100)
 
-        underTest.handle(user, messageSenderService, spaceship) {}
+        underTest.handle(user, room, messageSenderService, spaceship) {}
 
         val actual = String(outputStream.toByteArray()).trim()
 

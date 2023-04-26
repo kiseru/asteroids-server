@@ -2,6 +2,7 @@ package com.kiseru.asteroids.server.command
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.kiseru.asteroids.server.command.impl.IsWallCommandHandler
+import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.impl.MessageSenderServiceImpl
@@ -33,6 +34,9 @@ internal class IsWallCommandHandlerTest {
     @Mock
     private lateinit var spaceship: Spaceship
 
+    @Mock
+    private lateinit var room: Room
+
     @BeforeEach
     fun setUp() {
         closeable = MockitoAnnotations.openMocks(this)
@@ -52,7 +56,7 @@ internal class IsWallCommandHandlerTest {
     fun `test handling isWall command when wall is on front of`() = runTest {
         given(spaceship.isWallInFrontOf).willReturn(true)
 
-        underTest.handle(user, messageSenderService, spaceship) {}
+        underTest.handle(user, room, messageSenderService, spaceship) {}
         val actual = String(outputStream.toByteArray()).trim()
 
         val expected = "t"
@@ -63,7 +67,7 @@ internal class IsWallCommandHandlerTest {
     fun `test handling isWall command when wall is not on front of`() = runTest {
         given(spaceship.isWallInFrontOf).willReturn(false)
 
-        underTest.handle(user, messageSenderService, spaceship) {}
+        underTest.handle(user, room, messageSenderService, spaceship) {}
         val actual = String(outputStream.toByteArray()).trim()
 
         val expected = "f"

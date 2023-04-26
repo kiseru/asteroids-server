@@ -1,7 +1,6 @@
 package com.kiseru.asteroids.server.service.impl
 
 import com.kiseru.asteroids.server.dto.TokenDto
-import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.MessageSenderService
 import com.kiseru.asteroids.server.service.TokenService
@@ -19,14 +18,10 @@ class UserServiceImpl(
 
     private val userStorage = mutableMapOf<String, User>()
 
-    override suspend fun authorizeUser(
-        room: Room,
-        messageSenderService: MessageSenderService,
-        username: String,
-    ): User {
+    override suspend fun authorizeUser(messageSenderService: MessageSenderService, username: String): User {
         log.info("{} has joined the server", username)
         val userId = generateUniqueUserId()
-        val user = User(userId, username, room)
+        val user = User(userId, username)
         val tokenDto = TokenDto(tokenService.generateToken(user))
         messageSenderService.send(Json.encodeToString(tokenDto))
         messageSenderService.sendInstructions(user)

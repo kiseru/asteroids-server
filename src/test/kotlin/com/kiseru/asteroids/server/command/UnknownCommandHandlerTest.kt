@@ -2,6 +2,7 @@ package com.kiseru.asteroids.server.command
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.kiseru.asteroids.server.command.impl.UnknownCommandHandler
+import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.MessageSenderService
@@ -32,6 +33,9 @@ internal class UnknownCommandHandlerTest {
     @Mock
     private lateinit var spaceship: Spaceship
 
+    @Mock
+    private lateinit var room: Room
+
     @BeforeEach
     fun setUp() {
         MockitoAnnotations.openMocks(this)
@@ -50,7 +54,7 @@ internal class UnknownCommandHandlerTest {
     fun `test handling unknown command`() = runTest {
         BDDMockito.given(user.score).willReturn(100)
 
-        underTest.handle(user, messageSenderService, spaceship) {}
+        underTest.handle(user, room, messageSenderService, spaceship) {}
 
         val actual = String(outputStream.toByteArray()).trim()
 

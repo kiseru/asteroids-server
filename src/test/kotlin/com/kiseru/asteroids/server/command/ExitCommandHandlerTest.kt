@@ -2,6 +2,7 @@ package com.kiseru.asteroids.server.command
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.kiseru.asteroids.server.command.impl.ExitCommandHandler
+import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.MessageSenderService
@@ -33,6 +34,9 @@ internal class ExitCommandHandlerTest {
     @Mock
     private lateinit var spaceship: Spaceship
 
+    @Mock
+    private lateinit var room: Room
+
     @BeforeEach
     fun setUp() {
         MockitoAnnotations.openMocks(this)
@@ -49,7 +53,7 @@ internal class ExitCommandHandlerTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `test handling exit command`() = runTest {
-        underTest.handle(user, messageSenderService, spaceship) {}
+        underTest.handle(user, room, messageSenderService, spaceship) {}
 
         val actual = String(outputStream.toByteArray()).trim()
 
@@ -61,7 +65,7 @@ internal class ExitCommandHandlerTest {
     @Test
     fun `test handling exit command while io exception was thrown`() = runTest {
         try {
-            underTest.handle(user, messageSenderService, spaceship) { throw IOException("some cool exception") }
+            underTest.handle(user, room, messageSenderService, spaceship) { throw IOException("some cool exception") }
         } catch (e: RuntimeException) {
             assertThat(e.cause).isNotNull
             assertThat(e.cause?.message).isEqualTo("some cool exception")
