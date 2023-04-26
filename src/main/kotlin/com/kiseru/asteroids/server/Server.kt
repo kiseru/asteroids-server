@@ -4,15 +4,15 @@ import com.kiseru.asteroids.server.exception.GameFinishedException
 import com.kiseru.asteroids.server.factory.MessageReceiverServiceFactory
 import com.kiseru.asteroids.server.factory.MessageSenderServiceFactory
 import com.kiseru.asteroids.server.command.factory.CommandHandlerFactory
+import com.kiseru.asteroids.server.dto.TokenDto
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.User
-import com.kiseru.asteroids.server.service.MessageReceiverService
-import com.kiseru.asteroids.server.service.MessageSenderService
-import com.kiseru.asteroids.server.service.RoomService
-import com.kiseru.asteroids.server.service.UserService
+import com.kiseru.asteroids.server.service.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.io.IOException
@@ -28,6 +28,7 @@ class Server(
     private val roomService: RoomService,
     private val serverSocket: ServerSocket,
     private val userService: UserService,
+    private val tokenService: TokenService,
 ) {
 
     suspend fun startServer() = coroutineScope {
@@ -70,7 +71,11 @@ class Server(
         val user = try {
             messageSenderService.sendWelcomeMessage()
             val username = messageReceiverService.receive()
-            userService.authorizeUser(messageSenderService, username)
+            val user = userService.createUser(username)
+            val tokenDto = TokenDto(tokenService.generateToken(user))
+            messageSenderService.send(Json.encodeToString(tokenDto))
+            messageSenderService.sendInstructions(user)
+            user
         } catch (e: IOException) {
             log.error("Failed to authorize user", e)
             throw e
