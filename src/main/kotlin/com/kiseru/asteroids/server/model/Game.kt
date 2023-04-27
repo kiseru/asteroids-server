@@ -29,7 +29,7 @@ class Game(
         return spaceship
     }
 
-    fun refresh() {
+    suspend fun refresh() {
         screen.update()
         for (crashHandler in crashHandlers) {
             crashHandler.check()

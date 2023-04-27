@@ -2,9 +2,8 @@ package com.kiseru.asteroids.server.model
 
 import com.kiseru.asteroids.server.exception.GameFinishedException
 import com.kiseru.asteroids.server.service.CourseCheckerService
-import java.util.concurrent.locks.Lock
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class Spaceship(
     private val owner: User,
@@ -30,7 +29,7 @@ class Spaceship(
 
     var direction = Direction.UP
 
-    private val lock: Lock = ReentrantLock()
+    private val mutex = Mutex()
 
     override fun destroy() {
         throw UnsupportedOperationException()
@@ -46,8 +45,8 @@ class Spaceship(
      *
      * @param type: тип объекта, с которым произошло столкновение
      */
-    fun crash(type: Type) {
-        lock.withLock {
+    suspend fun crash(type: Type) {
+        mutex.withLock {
             if (type === Type.ASTEROID) {
                 subtractScore()
             } else if (type === Type.GARBAGE) {

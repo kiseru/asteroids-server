@@ -169,7 +169,7 @@ class Server(
         }
     }
 
-    private fun refreshRoom(room: Room) {
+    private suspend fun refreshRoom(room: Room) {
         room.game.refresh()
     }
 

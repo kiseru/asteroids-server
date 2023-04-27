@@ -4,7 +4,7 @@ import com.kiseru.asteroids.server.model.Room
 
 interface RoomService {
 
-    fun getNotFullRoom(): Room
+    suspend fun getNotFullRoom(): Room
 
     suspend fun sendMessageToUsers(room: Room, message: String)
 
