@@ -5,11 +5,11 @@ import com.kiseru.asteroids.server.factory.ScreenFactory
 import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.service.RoomService
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.yield
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 
 @Service
 class RoomServiceImpl(
@@ -21,10 +21,10 @@ class RoomServiceImpl(
 
     private var notFullRoom = createRoom()
 
-    private val lock = ReentrantLock()
+    private val mutex = Mutex()
 
-    override fun getNotFullRoom(): Room {
-        lock.withLock {
+    override suspend fun getNotFullRoom(): Room {
+        mutex.withLock {
             if (!notFullRoom.isFull) {
                 return notFullRoom
             }

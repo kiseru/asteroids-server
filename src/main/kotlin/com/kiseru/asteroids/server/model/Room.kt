@@ -37,7 +37,7 @@ class Room(
         log.info("Game finished")
     }
 
-    fun refresh() {
+    suspend fun refresh() {
         game.refresh()
     }
 

@@ -11,7 +11,7 @@ class SpaceshipCrashHandlerImpl(
     private val spaceship: Spaceship,
 ) : SpaceshipCrashHandler {
 
-    override fun check() {
+    override suspend fun check() {
         val pointsOnScreen = game.pointsOnScreen
         val collisionPoint = pointsOnScreen.firstOrNull {
             it.type != Type.SPACESHIP && it.isVisible && it.x == spaceship.x && it.y == spaceship.y
@@ -19,7 +19,7 @@ class SpaceshipCrashHandlerImpl(
         checkSpaceshipCrashing(collisionPoint)
     }
 
-    private fun checkSpaceshipCrashing(collisionPoint: Point?) {
+    private suspend fun checkSpaceshipCrashing(collisionPoint: Point?) {
         if (collisionPoint != null) {
             spaceship.crash(collisionPoint.type)
             collisionPoint.destroy()
