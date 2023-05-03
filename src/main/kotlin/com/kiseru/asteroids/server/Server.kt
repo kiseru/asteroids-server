@@ -49,17 +49,17 @@ class Server(
         }
     }
 
-    private suspend fun startAcceptingConnections() = newConnections()
-        .onStart { log.info("Started accepting new connections") }
-        .collect {
-            coroutineScope {
+    private suspend fun startAcceptingConnections() = coroutineScope {
+        newConnections()
+            .onStart { log.info("Started accepting new connections") }
+            .collect {
                 launch { handleNewConnection(it) }
             }
-        }
+    }
 
-    private suspend fun newConnections(): Flow<Socket> = flow {
+    private suspend fun newConnections(): Flow<Socket> = channelFlow {
         while (true) {
-            emit(serverSocket.awaitAccept())
+            send(serverSocket.awaitAccept())
         }
     }
 
@@ -81,10 +81,12 @@ class Server(
             throw e
         }
         val spaceship = addUser(room, user, messageSenderService)
-        roomService.sendMessageToUsers(room, "User ${user.username} has joined the room.")
-        launch {
-            startRoom(room)
+        if (room.users.size == Room.MAX_USERS) {
+            launch {
+                startRoom(room)
+            }
         }
+        roomService.sendMessageToUsers(room, "User ${user.username} has joined the room.")
         launch {
             runUser(user, room, messageSenderService, messageReceiverService, spaceship) {
                 newConnection.awaitClose()
@@ -153,7 +155,6 @@ class Server(
     }
 
     private suspend fun startRoom(room: Room) {
-        awaitUsers(room)
         roomService.sendMessageToUsers(room, "start")
         room.status = Room.Status.GAMING
         refreshRoom(room)
@@ -161,12 +162,6 @@ class Server(
         val rating = room.rating
         roomService.sendMessageToUsers(room, "finish\n$rating")
         log.info("Room $room released! Rating table:\n$rating")
-    }
-
-    private suspend fun awaitUsers(room: Room) {
-        while (room.users.count() < Room.MAX_USERS) {
-            yield()
-        }
     }
 
     private suspend fun refreshRoom(room: Room) {
