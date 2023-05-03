@@ -157,15 +157,11 @@ class Server(
     private suspend fun startRoom(room: Room) {
         roomService.sendMessageToUsers(room, "start")
         room.status = Room.Status.GAMING
-        refreshRoom(room)
+        room.game.refresh()
         roomService.awaitEndgame(room)
         val rating = room.rating
         roomService.sendMessageToUsers(room, "finish\n$rating")
         log.info("Room $room released! Rating table:\n$rating")
-    }
-
-    private suspend fun refreshRoom(room: Room) {
-        room.game.refresh()
     }
 
     companion object {
