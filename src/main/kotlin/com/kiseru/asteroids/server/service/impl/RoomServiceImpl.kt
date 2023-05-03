@@ -19,19 +19,18 @@ class RoomServiceImpl(
 
     private val rooms = mutableListOf<Room>()
 
-    private var notFullRoom = createRoom()
-
     private val mutex = Mutex()
 
     override suspend fun getNotFullRoom(): Room {
         mutex.withLock {
-            if (!notFullRoom.isFull) {
-                return notFullRoom
+            val room = rooms.firstOrNull { !it.isFull }
+            if (room != null) {
+                return room
             }
 
-            rooms.add(notFullRoom)
-            notFullRoom = createRoom()
-            return notFullRoom
+            val newRoom = createRoom()
+            rooms += newRoom
+            return newRoom
         }
     }
 

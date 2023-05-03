@@ -11,6 +11,7 @@ import java.io.OutputStream
 import java.io.PrintWriter
 import java.net.ServerSocket
 import java.net.Socket
+import java.util.*
 
 @SpringBootApplication
 @ConfigurationPropertiesScan("com.kiseru.asteroids.server.properties")
@@ -28,8 +29,10 @@ suspend fun Socket.awaitInputStream(): InputStream = withContext(Dispatchers.IO)
 
 suspend fun Socket.awaitOutputStream(): OutputStream = withContext(Dispatchers.IO) { getOutputStream() }
 
-suspend fun Socket.awaitClose(): Unit = withContext(Dispatchers.IO) { close() }
-
 suspend fun PrintWriter.awaitPrintln(x: String): Unit = withContext(Dispatchers.IO) { println(x) }
 
 suspend fun BufferedReader.awaitReadLine(): String = withContext(Dispatchers.IO) { readLine() }
+
+suspend fun Scanner.awaitNextLine(): String = withContext(Dispatchers.IO) { nextLine() }
+
+suspend fun AutoCloseable.awaitClose(): Unit = withContext(Dispatchers.IO) { close() }

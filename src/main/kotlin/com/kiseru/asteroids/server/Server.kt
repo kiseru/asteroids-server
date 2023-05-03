@@ -1,16 +1,17 @@
 package com.kiseru.asteroids.server
 
+import com.kiseru.asteroids.server.command.factory.CommandHandlerFactory
+import com.kiseru.asteroids.server.dto.TokenDto
 import com.kiseru.asteroids.server.exception.GameFinishedException
 import com.kiseru.asteroids.server.factory.MessageReceiverServiceFactory
 import com.kiseru.asteroids.server.factory.MessageSenderServiceFactory
-import com.kiseru.asteroids.server.command.factory.CommandHandlerFactory
-import com.kiseru.asteroids.server.dto.TokenDto
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
@@ -38,13 +39,13 @@ class Server(
 
         val scanner = Scanner(System.`in`)
         while (true) {
-            val command = withContext(Dispatchers.IO) {
-                scanner.nextLine()
-            }
-            when (command) {
+            when (scanner.awaitNextLine()) {
                 "rating" -> roomService.showAllRatings()
                 "gamefield" -> roomService.showAllGameFields()
-                "exit" -> break
+                "exit" -> {
+                    serverSocket.awaitClose()
+                    break
+                }
             }
         }
     }
@@ -52,6 +53,7 @@ class Server(
     private suspend fun startAcceptingConnections() = coroutineScope {
         newConnections()
             .onStart { log.info("Started accepting new connections") }
+            .catch { log.info("Finished accepting connections") }
             .collect {
                 launch { handleNewConnection(it) }
             }
