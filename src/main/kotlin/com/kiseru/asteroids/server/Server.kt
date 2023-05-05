@@ -112,14 +112,15 @@ class Server(
         spaceship: Spaceship,
         closeSocket: suspend () -> Unit,
     ) {
-        messageReceiverService.receivingFlow()
+        messageReceiverService.receivingMessagesFlow()
+            .onEach { println(it) }
             .onCompletion {
                 user.isAlive = false
                 room.setGameFinished()
             }
             .takeWhile { !room.isGameFinished && user.isAlive }
-            .collect { command ->
-                handleCommand(user, room, messageSenderService, command, spaceship, closeSocket)
+            .collect { message ->
+                handleCommand(user, room, messageSenderService, message.command, spaceship, closeSocket)
                 incrementSteps(user)
                 checkIsAlive(user, messageSenderService)
             }
