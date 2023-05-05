@@ -5,6 +5,7 @@ import com.kiseru.asteroids.server.dto.TokenDto
 import com.kiseru.asteroids.server.exception.GameFinishedException
 import com.kiseru.asteroids.server.factory.MessageReceiverServiceFactory
 import com.kiseru.asteroids.server.factory.MessageSenderServiceFactory
+import com.kiseru.asteroids.server.model.Message
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.User
@@ -120,10 +121,27 @@ class Server(
             }
             .takeWhile { !room.isGameFinished && user.isAlive }
             .collect { message ->
-                handleCommand(user, room, messageSenderService, message.command, spaceship, closeSocket)
+                handleMessage(message, room, messageSenderService, spaceship, closeSocket)
                 incrementSteps(user)
                 checkIsAlive(user, messageSenderService)
             }
+    }
+
+    private suspend fun handleMessage(
+        message: Message,
+        room: Room,
+        messageSenderService: MessageSenderService,
+        spaceship: Spaceship,
+        closeSocket: suspend () -> Unit,
+    ) {
+        val userId = tokenService.getUserId(message.token)
+        val user = userService.findUserById(userId)
+        if (user == null) {
+            log.warn("Failed to find user with $userId")
+            return
+        }
+
+        handleCommand(user, room, messageSenderService, message.command, spaceship, closeSocket)
     }
 
     private suspend fun handleCommand(

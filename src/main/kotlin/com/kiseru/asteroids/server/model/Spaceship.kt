@@ -14,7 +14,7 @@ class Spaceship(
 ) : Point(x, y) {
 
     override val symbolToShow: String
-        get() = owner.id
+        get() = owner.id.toString()
 
     override val type: Type = Type.SPACESHIP
 

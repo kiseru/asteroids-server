@@ -40,7 +40,7 @@ internal class MessageReceiverServiceTest {
     fun `test receiving message`() = runTest {
         val actual = underTest.receive()
 
-        val expected = "{\"token\":\"token\",\"message\":\"message #1\"}"
+        val expected = "{\"token\":\"token\",\"command\":\"message #1\"}"
         assertThat(actual).isEqualTo(expected)
     }
 

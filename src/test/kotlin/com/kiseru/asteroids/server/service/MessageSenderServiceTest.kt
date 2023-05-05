@@ -13,6 +13,7 @@ import org.mockito.BDDMockito.given
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import java.io.ByteArrayOutputStream
+import java.util.UUID
 
 internal class MessageSenderServiceTest {
 
@@ -89,13 +90,14 @@ internal class MessageSenderServiceTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `test send instructions`() = runTest {
-        given(user.id).willReturn("some cool id")
+        val userId = UUID.randomUUID()
+        given(user.id).willReturn(userId)
 
         underTest.sendInstructions(user)
         val actual = String(outputStream.toByteArray()).trim()
 
         val expected =
-            "You need to keep a space garbage.${System.lineSeparator()}Your ID is some cool id${System.lineSeparator()}Good luck, Commander!"
+            "You need to keep a space garbage.${System.lineSeparator()}Your ID is ${userId}${System.lineSeparator()}Good luck, Commander!"
         assertThat(actual).isEqualTo(expected)
     }
 }
