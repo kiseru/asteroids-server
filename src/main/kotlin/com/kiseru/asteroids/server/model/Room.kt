@@ -2,11 +2,13 @@ package com.kiseru.asteroids.server.model
 
 import com.kiseru.asteroids.server.service.MessageSenderService
 import org.slf4j.LoggerFactory
+import java.util.*
 
 /**
  * Комната.
  */
 class Room(
+    val id: UUID,
     val game: Game,
 ) {
 

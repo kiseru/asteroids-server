@@ -8,25 +8,26 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.yield
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class RoomServiceImpl(
     private val gameService: GameService,
 ) : RoomService {
 
-    private val rooms = mutableListOf<Room>()
+    private val roomStorage = mutableMapOf<UUID, Room>()
 
-    private val mutex = Mutex()
+    private val roomStorageMutex = Mutex()
 
     override suspend fun getNotFullRoom(): Room {
-        mutex.withLock {
-            val room = rooms.firstOrNull { !it.isFull }
+        roomStorageMutex.withLock {
+            val room = roomStorage.values.firstOrNull { !it.isFull }
             if (room != null) {
                 return room
             }
 
             val newRoom = createRoom()
-            rooms += newRoom
+            roomStorage[newRoom.id] = newRoom
             return newRoom
         }
     }
@@ -43,13 +44,13 @@ class RoomServiceImpl(
     }
 
     override fun showAllRatings() {
-        for (room in rooms) {
+        for (room in roomStorage.values) {
             println(room.rating)
         }
     }
 
     override fun showAllGameFields() {
-        for (room in rooms) {
+        for (room in roomStorage.values) {
             room.game.screen.display()
         }
     }
@@ -72,8 +73,13 @@ class RoomServiceImpl(
 
     private suspend fun createRoom(): Room {
         val game = gameService.createGame()
-        return Room(game)
+        val roomId = generateUniqueRoomId()
+        return Room(roomId, game)
     }
+
+    private fun generateUniqueRoomId() = generateSequence { UUID.randomUUID() }
+        .dropWhile { roomStorage.containsKey(it) }
+        .first()
 
     companion object {
 
