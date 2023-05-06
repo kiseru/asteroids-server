@@ -30,8 +30,6 @@ class Game(
         }
     }
 
-    fun showField() = screen.display()
-
     suspend fun incrementCollectedGarbageCount(): Int = collectedGarbageCountMutex.withLock {
         collectedGarbageCount++
     }

@@ -50,7 +50,7 @@ class RoomServiceImpl(
 
     override fun showAllGameFields() {
         for (room in rooms) {
-            room.game.showField()
+            room.game.screen.display()
         }
     }
 
