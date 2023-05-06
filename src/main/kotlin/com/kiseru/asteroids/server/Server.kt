@@ -5,6 +5,7 @@ import com.kiseru.asteroids.server.dto.TokenDto
 import com.kiseru.asteroids.server.exception.GameFinishedException
 import com.kiseru.asteroids.server.factory.MessageReceiverServiceFactory
 import com.kiseru.asteroids.server.factory.MessageSenderServiceFactory
+import com.kiseru.asteroids.server.game.GameService
 import com.kiseru.asteroids.server.model.Message
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.Spaceship
@@ -26,6 +27,7 @@ import java.util.*
 class Server(
     private val messageReceiverServiceFactory: MessageReceiverServiceFactory,
     private val messageSenderServiceFactory: MessageSenderServiceFactory,
+    private val gameService: GameService,
     private val commandHandlerFactory: CommandHandlerFactory,
     private val roomService: RoomService,
     private val serverSocket: ServerSocket,
@@ -102,7 +104,7 @@ class Server(
         room.status = Room.Status.WAITING_CONNECTIONS
         room.users = room.users + user
         room.messageSenderServices += messageSenderService
-        return room.game.registerSpaceshipForUser(user, room)
+        return gameService.registerSpaceshipForUser(room.game, user, room)
     }
 
     private suspend fun runUser(

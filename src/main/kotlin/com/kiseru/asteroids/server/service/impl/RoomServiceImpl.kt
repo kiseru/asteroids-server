@@ -1,8 +1,6 @@
 package com.kiseru.asteroids.server.service.impl
 
-import com.kiseru.asteroids.server.factory.GameFactory
-import com.kiseru.asteroids.server.factory.ScreenFactory
-import com.kiseru.asteroids.server.model.Game
+import com.kiseru.asteroids.server.game.GameService
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.service.RoomService
 import kotlinx.coroutines.sync.Mutex
@@ -13,8 +11,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class RoomServiceImpl(
-    private val gameFactory: GameFactory,
-    private val screenFactory: ScreenFactory,
+    private val gameService: GameService,
 ) : RoomService {
 
     private val rooms = mutableListOf<Room>()
@@ -73,9 +70,10 @@ class RoomServiceImpl(
         }
     }
 
-    private fun createRoom() = Room(createGame())
-
-    private fun createGame(): Game = gameFactory.createGame(screenFactory.createScreen())
+    private suspend fun createRoom(): Room {
+        val game = gameService.createGame()
+        return Room(game)
+    }
 
     companion object {
 
