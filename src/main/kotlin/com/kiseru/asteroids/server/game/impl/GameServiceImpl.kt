@@ -5,18 +5,17 @@ import com.kiseru.asteroids.server.game.GameService
 import com.kiseru.asteroids.server.handler.impl.SpaceshipCrashHandlerImpl
 import com.kiseru.asteroids.server.model.*
 import com.kiseru.asteroids.server.properties.AsteroidsProperties
-import com.kiseru.asteroids.server.service.CoordinateService
 import com.kiseru.asteroids.server.service.impl.CourseCheckerServiceImpl
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.springframework.stereotype.Service
 import java.util.*
+import kotlin.random.Random
 
 @Service
 class GameServiceImpl(
     private val screenFactory: ScreenFactory,
     private val asteroidsProperties: AsteroidsProperties,
-    private val coordinateService: CoordinateService,
 ) : GameService {
 
     private val gameStorage = mutableMapOf<UUID, Game>()
@@ -35,7 +34,7 @@ class GameServiceImpl(
         return spaceship
     }
 
-    fun generateUniqueRandomCoordinates(game: Game): Pair<Int, Int> = coordinateService.generateCoordinateSequence()
+    fun generateUniqueRandomCoordinates(game: Game): Pair<Int, Int> = generateCoordinateSequence()
         .dropWhile { isGameObjectsContainsCoordinates(game, it.first, it.second) }
         .first()
 
@@ -55,7 +54,7 @@ class GameServiceImpl(
             return game
         }
     }
-    
+
     private fun generateAsteroids(pointsOnScreen: MutableList<Point>, gameObjects: MutableList<Point>) {
         for (i in 0 until asteroidsProperties.numberOfAsteroidCells) {
             val (x, y) = generateUniqueRandomCoordinates(pointsOnScreen)
@@ -79,9 +78,15 @@ class GameServiceImpl(
         .first()
 
     private fun generateUniqueRandomCoordinates(pointsOnScreen: MutableList<Point>): Pair<Int, Int> =
-        coordinateService.generateCoordinateSequence()
+        generateCoordinateSequence()
             .dropWhile { isGameObjectsContainsCoordinates(it.first, it.second, pointsOnScreen) }
             .first()
+
+    private fun generateCoordinateSequence(): Sequence<Pair<Int, Int>> =
+        generateSequence { generateCoordinates(asteroidsProperties.screen.width, asteroidsProperties.screen.height) }
+
+    private fun generateCoordinates(width: Int, height: Int): Pair<Int, Int> =
+        Random.nextInt(width) + 1 to Random.nextInt(height) + 1
 
     private fun isGameObjectsContainsCoordinates(x: Int, y: Int, pointsOnScreen: MutableList<Point>): Boolean =
         pointsOnScreen.any { it.x == x && it.y == y }
