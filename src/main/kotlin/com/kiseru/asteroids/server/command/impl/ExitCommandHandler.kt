@@ -3,23 +3,35 @@ package com.kiseru.asteroids.server.command.impl
 import com.kiseru.asteroids.server.command.CommandHandler
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.Spaceship
-import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.MessageSenderService
+import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
+import org.springframework.stereotype.Component
+import org.springframework.web.server.ResponseStatusException
 import java.io.IOException
-import java.lang.RuntimeException
+import java.util.*
 
+@Component
 class ExitCommandHandler : CommandHandler {
 
     override suspend fun handle(
-        user: User,
+        userId: UUID,
         room: Room,
         messageSenderService: MessageSenderService,
         spaceship: Spaceship,
-        closeSocket: suspend () -> Unit,
-    ) = try {
-        messageSenderService.sendExit()
-        closeSocket()
-    } catch (e: IOException) {
-        throw RuntimeException(e)
+        closeSocket: suspend () -> Unit
+    ) {
+        try {
+            messageSenderService.sendExit()
+            closeSocket()
+        } catch (e: IOException) {
+            log.error(e.localizedMessage, e)
+            throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.localizedMessage, e)
+        }
+    }
+
+    companion object {
+
+        private val log = LoggerFactory.getLogger(this::class.java)
     }
 }

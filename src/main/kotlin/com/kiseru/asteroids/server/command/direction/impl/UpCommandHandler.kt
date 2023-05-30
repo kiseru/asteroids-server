@@ -1,19 +1,26 @@
 package com.kiseru.asteroids.server.command.direction.impl
 
-import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.command.direction.DirectionCommandHandler
+import com.kiseru.asteroids.server.exception.UserNotFoundException
 import com.kiseru.asteroids.server.model.Direction
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.service.MessageSenderService
+import com.kiseru.asteroids.server.service.UserService
+import org.springframework.stereotype.Component
+import java.util.*
 
-class UpCommandHandler : DirectionCommandHandler {
+@Component
+class UpCommandHandler(private val userService: UserService) : DirectionCommandHandler {
 
     override suspend fun handle(
-        user: User,
+        userId: UUID,
         room: Room,
         messageSenderService: MessageSenderService,
         spaceship: Spaceship,
-        closeSocket: suspend () -> Unit,
-    ) = handleDirection(user, room, messageSenderService, Direction.UP, spaceship)
+        closeSocket: suspend () -> Unit
+    ) {
+        val user = userService.findUserById(userId) ?: throw UserNotFoundException(userId)
+        handleDirection(user, room, messageSenderService, Direction.LEFT, spaceship)
+    }
 }

@@ -116,7 +116,6 @@ class Server(
         closeSocket: suspend () -> Unit,
     ) {
         messageReceiverService.receivingMessagesFlow()
-            .onEach { println(it) }
             .onCompletion {
                 user.isAlive = false
                 room.setGameFinished()
@@ -137,17 +136,11 @@ class Server(
         closeSocket: suspend () -> Unit,
     ) {
         val userId = tokenService.getUserId(message.token)
-        val user = userService.findUserById(userId)
-        if (user == null) {
-            log.warn("Failed to find user with $userId")
-            return
-        }
-
-        handleCommand(user, room, messageSenderService, message.command, spaceship, closeSocket)
+        handleCommand(userId, room, messageSenderService, message.command, spaceship, closeSocket)
     }
 
     private suspend fun handleCommand(
-        user: User,
+        userId: UUID,
         room: Room,
         messageSenderService: MessageSenderService,
         command: String,
@@ -155,7 +148,7 @@ class Server(
         closeSocket: suspend () -> Unit,
     ) {
         val commandHandler = commandHandlerFactory.create(command)
-        commandHandler.handle(user, room, messageSenderService, spaceship, closeSocket)
+        commandHandler.handle(userId, room, messageSenderService, spaceship, closeSocket)
     }
 
     private fun incrementSteps(user: User) {
