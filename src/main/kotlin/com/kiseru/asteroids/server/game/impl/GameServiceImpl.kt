@@ -9,7 +9,6 @@ import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.Garbage
 import com.kiseru.asteroids.server.model.Point
 import com.kiseru.asteroids.server.model.Room
-import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.properties.AsteroidsProperties
 import com.kiseru.asteroids.server.spaceship.SpaceshipService
@@ -30,13 +29,12 @@ class GameServiceImpl(
 
     private val gameStorageMutex = Mutex()
 
-    override suspend fun registerSpaceshipForUser(game: Game, user: User, room: Room): Spaceship {
+    override suspend fun registerSpaceshipForUser(game: Game, user: User, room: Room) {
         val spaceship = spaceshipService.createSpaceship(user, room, game)
         game.pointsOnScreen.add(spaceship)
         game.gameObjects.add(spaceship)
         val spaceshipCrashHandler = SpaceshipCrashHandlerImpl(game, spaceship)
         game.crashHandlers.add(spaceshipCrashHandler)
-        return spaceship
     }
 
     override suspend fun createGame(): Game {

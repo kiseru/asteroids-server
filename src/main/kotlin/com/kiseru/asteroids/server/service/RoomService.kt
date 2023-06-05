@@ -1,6 +1,7 @@
 package com.kiseru.asteroids.server.service
 
 import com.kiseru.asteroids.server.model.Room
+import java.util.*
 
 interface RoomService {
 
@@ -15,4 +16,6 @@ interface RoomService {
     suspend fun startRoom(room: Room)
 
     suspend fun awaitEndgame(room: Room)
+
+    fun findRoomById(roomId: UUID): Room?
 }
