@@ -25,7 +25,7 @@ class GameServiceImpl(
     override fun registerSpaceshipForUser(game: Game, user: User, room: Room): Spaceship {
         val courseCheckerService = CourseCheckerServiceImpl(game.pointsOnScreen, game.screen)
         val (x, y) = generateUniqueRandomCoordinates(game)
-        val spaceship = Spaceship(user, room, courseCheckerService, x, y)
+        val spaceship = Spaceship(UUID.randomUUID(), user, room, courseCheckerService, x, y)
         courseCheckerService.spaceship = spaceship
         game.pointsOnScreen.add(spaceship)
         game.gameObjects.add(spaceship)

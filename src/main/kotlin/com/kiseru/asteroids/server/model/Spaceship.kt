@@ -4,8 +4,10 @@ import com.kiseru.asteroids.server.exception.GameFinishedException
 import com.kiseru.asteroids.server.service.CourseCheckerService
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.util.UUID
 
 class Spaceship(
+    val id: UUID,
     private val owner: User,
     private val room: Room,
     private val courseCheckerService: CourseCheckerService,
