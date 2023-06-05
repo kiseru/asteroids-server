@@ -85,4 +85,7 @@ class RoomServiceImpl(
 
         private val log = LoggerFactory.getLogger(RoomServiceImpl::class.java)
     }
+
+    override fun findRoomById(roomId: UUID): Room? =
+        roomStorage[roomId]
 }

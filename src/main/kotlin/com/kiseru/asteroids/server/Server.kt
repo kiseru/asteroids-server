@@ -8,11 +8,19 @@ import com.kiseru.asteroids.server.factory.MessageSenderServiceFactory
 import com.kiseru.asteroids.server.game.GameService
 import com.kiseru.asteroids.server.model.Message
 import com.kiseru.asteroids.server.model.Room
-import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.User
-import com.kiseru.asteroids.server.service.*
+import com.kiseru.asteroids.server.service.MessageReceiverService
+import com.kiseru.asteroids.server.service.MessageSenderService
+import com.kiseru.asteroids.server.service.RoomService
+import com.kiseru.asteroids.server.service.TokenService
+import com.kiseru.asteroids.server.service.UserService
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -85,7 +93,7 @@ class Server(
             log.error("Failed to authorize user", e)
             throw e
         }
-        val spaceship = addUser(room, user, messageSenderService)
+        addUser(room, user, messageSenderService)
         if (room.users.size == Room.MAX_USERS) {
             launch {
                 startRoom(room)
@@ -93,18 +101,16 @@ class Server(
         }
         roomService.sendMessageToUsers(room, "User ${user.username} has joined the room.")
         launch {
-            runUser(user, room, messageSenderService, messageReceiverService, spaceship) {
-                newConnection.awaitClose()
-            }
+            runUser(user, room, messageSenderService, messageReceiverService) { newConnection.awaitClose() }
         }
     }
 
-    private suspend fun addUser(room: Room, user: User, messageSenderService: MessageSenderService): Spaceship {
+    private suspend fun addUser(room: Room, user: User, messageSenderService: MessageSenderService) {
         check(room.users.size < Room.MAX_USERS)
         room.status = Room.Status.WAITING_CONNECTIONS
         room.users = room.users + user
         room.messageSenderServices += messageSenderService
-        return gameService.registerSpaceshipForUser(room.game, user, room)
+        gameService.registerSpaceshipForUser(room.game, user, room)
     }
 
     private suspend fun runUser(
@@ -112,7 +118,6 @@ class Server(
         room: Room,
         messageSenderService: MessageSenderService,
         messageReceiverService: MessageReceiverService,
-        spaceship: Spaceship,
         closeSocket: suspend () -> Unit,
     ) {
         messageReceiverService.receivingMessagesFlow()
@@ -122,7 +127,7 @@ class Server(
             }
             .takeWhile { !room.isGameFinished && user.isAlive }
             .collect { message ->
-                handleMessage(message, room, messageSenderService, spaceship, closeSocket)
+                handleMessage(message, messageSenderService, closeSocket)
                 incrementSteps(user)
                 checkIsAlive(user, messageSenderService)
             }
@@ -130,25 +135,21 @@ class Server(
 
     private suspend fun handleMessage(
         message: Message,
-        room: Room,
         messageSenderService: MessageSenderService,
-        spaceship: Spaceship,
         closeSocket: suspend () -> Unit,
     ) {
         val userId = tokenService.getUserId(message.token)
-        handleCommand(userId, room, messageSenderService, message.command, spaceship, closeSocket)
+        handleCommand(userId, messageSenderService, message.command, closeSocket)
     }
 
     private suspend fun handleCommand(
         userId: UUID,
-        room: Room,
         messageSenderService: MessageSenderService,
         command: String,
-        spaceship: Spaceship,
         closeSocket: suspend () -> Unit,
     ) {
         val commandHandler = commandHandlerFactory.create(command)
-        commandHandler.handle(userId, room, messageSenderService, spaceship, closeSocket)
+        commandHandler.handle(userId, messageSenderService, closeSocket)
     }
 
     private fun incrementSteps(user: User) {

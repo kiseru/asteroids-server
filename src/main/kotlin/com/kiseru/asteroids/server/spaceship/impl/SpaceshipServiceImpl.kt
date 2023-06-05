@@ -35,4 +35,7 @@ class SpaceshipServiceImpl(private val coordinateService: CoordinateService) : S
         generateSequence { UUID.randomUUID() }
             .dropWhile { spaceshipStorage.containsKey(it) }
             .first()
+
+    override fun findSpaceshipById(spaceshipId: UUID): Spaceship? =
+        spaceshipStorage[spaceshipId]
 }

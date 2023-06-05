@@ -1,8 +1,6 @@
 package com.kiseru.asteroids.server.command.impl
 
 import com.kiseru.asteroids.server.command.CommandHandler
-import com.kiseru.asteroids.server.model.Room
-import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.service.MessageSenderService
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -16,9 +14,7 @@ class ExitCommandHandler : CommandHandler {
 
     override suspend fun handle(
         userId: UUID,
-        room: Room,
         messageSenderService: MessageSenderService,
-        spaceship: Spaceship,
         closeSocket: suspend () -> Unit
     ) {
         try {
