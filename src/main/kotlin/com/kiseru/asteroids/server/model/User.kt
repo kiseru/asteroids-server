@@ -5,6 +5,7 @@ import java.util.UUID
 class User(
     val id: UUID,
     val username: String,
+    val roomId: UUID,
 ) {
 
     var score = 100
