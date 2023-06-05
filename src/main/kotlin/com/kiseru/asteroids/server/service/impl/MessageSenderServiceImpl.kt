@@ -3,7 +3,7 @@ package com.kiseru.asteroids.server.service.impl
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.kiseru.asteroids.server.awaitPrintln
 import com.kiseru.asteroids.server.dto.ScoreDto
-import com.kiseru.asteroids.server.model.User
+import com.kiseru.asteroids.server.model.ApplicationUser
 import com.kiseru.asteroids.server.service.MessageSenderService
 import java.io.OutputStream
 import java.io.PrintWriter
@@ -47,7 +47,7 @@ class MessageSenderServiceImpl(
         writer.awaitPrintln("Please, introduce yourself!")
     }
 
-    override suspend fun sendInstructions(user: User) {
+    override suspend fun sendInstructions(user: ApplicationUser) {
         writer.awaitPrintln("You need to keep a space garbage.")
         writer.awaitPrintln("Your ID is ${user.id}")
         writer.awaitPrintln("Good luck, Commander!")

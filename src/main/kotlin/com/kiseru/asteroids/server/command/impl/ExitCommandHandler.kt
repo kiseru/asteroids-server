@@ -1,12 +1,14 @@
 package com.kiseru.asteroids.server.command.impl
 
 import com.kiseru.asteroids.server.command.CommandHandler
+import com.kiseru.asteroids.server.model.ApplicationUser
 import com.kiseru.asteroids.server.service.MessageSenderService
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ResponseStatusException
 import java.io.IOException
+import java.lang.UnsupportedOperationException
 import java.util.*
 
 @Component
@@ -25,6 +27,9 @@ class ExitCommandHandler : CommandHandler {
             throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.localizedMessage, e)
         }
     }
+
+    override suspend fun handle(user: ApplicationUser): String =
+        throw UnsupportedOperationException()
 
     companion object {
 

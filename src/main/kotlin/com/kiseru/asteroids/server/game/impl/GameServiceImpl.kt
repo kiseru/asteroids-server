@@ -4,12 +4,12 @@ import com.kiseru.asteroids.server.coordinate.CoordinateService
 import com.kiseru.asteroids.server.factory.ScreenFactory
 import com.kiseru.asteroids.server.game.GameService
 import com.kiseru.asteroids.server.handler.impl.SpaceshipCrashHandlerImpl
+import com.kiseru.asteroids.server.model.ApplicationUser
 import com.kiseru.asteroids.server.model.Asteroid
 import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.Garbage
 import com.kiseru.asteroids.server.model.Point
 import com.kiseru.asteroids.server.model.Room
-import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.properties.AsteroidsProperties
 import com.kiseru.asteroids.server.spaceship.SpaceshipService
 import kotlinx.coroutines.sync.Mutex
@@ -29,7 +29,7 @@ class GameServiceImpl(
 
     private val gameStorageMutex = Mutex()
 
-    override suspend fun registerSpaceshipForUser(game: Game, user: User, room: Room) {
+    override suspend fun registerSpaceshipForUser(game: Game, user: ApplicationUser, room: Room) {
         val spaceship = spaceshipService.createSpaceship(user, room, game)
         game.pointsOnScreen.add(spaceship)
         game.gameObjects.add(spaceship)

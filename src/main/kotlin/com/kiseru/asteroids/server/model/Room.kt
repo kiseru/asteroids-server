@@ -12,7 +12,7 @@ class Room(
     val game: Game,
 ) {
 
-    var users = emptyList<User>()
+    var users = emptyList<ApplicationUser>()
 
     var messageSenderServices = emptyList<MessageSenderService>()
 

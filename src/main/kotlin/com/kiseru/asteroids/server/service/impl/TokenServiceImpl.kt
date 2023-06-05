@@ -3,8 +3,7 @@ package com.kiseru.asteroids.server.service.impl
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
-import com.auth0.jwt.impl.JWTParser
-import com.kiseru.asteroids.server.model.User
+import com.kiseru.asteroids.server.model.ApplicationUser
 import com.kiseru.asteroids.server.service.TokenService
 import org.springframework.stereotype.Service
 import java.time.Duration
@@ -17,7 +16,7 @@ class TokenServiceImpl(
     private val verifier: JWTVerifier,
 ) : TokenService {
 
-    override fun generateToken(user: User): String = Instant.now().let {
+    override fun generateToken(user: ApplicationUser): String = Instant.now().let {
         JWT.create()
             .withSubject(user.id.toString())
             .withIssuedAt(it)

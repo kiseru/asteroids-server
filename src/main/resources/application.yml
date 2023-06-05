@@ -6,3 +6,6 @@ asteroids:
     width: 30
   server:
     port: 6501
+server:
+  error:
+    include-message: always

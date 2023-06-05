@@ -6,9 +6,9 @@ import com.kiseru.asteroids.server.exception.GameFinishedException
 import com.kiseru.asteroids.server.factory.MessageReceiverServiceFactory
 import com.kiseru.asteroids.server.factory.MessageSenderServiceFactory
 import com.kiseru.asteroids.server.game.GameService
+import com.kiseru.asteroids.server.model.ApplicationUser
 import com.kiseru.asteroids.server.model.Message
 import com.kiseru.asteroids.server.model.Room
-import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.MessageReceiverService
 import com.kiseru.asteroids.server.service.MessageSenderService
 import com.kiseru.asteroids.server.service.RoomService
@@ -105,7 +105,7 @@ class Server(
         }
     }
 
-    private suspend fun addUser(room: Room, user: User, messageSenderService: MessageSenderService) {
+    private suspend fun addUser(room: Room, user: ApplicationUser, messageSenderService: MessageSenderService) {
         check(room.users.size < Room.MAX_USERS)
         room.status = Room.Status.WAITING_CONNECTIONS
         room.users = room.users + user
@@ -114,7 +114,7 @@ class Server(
     }
 
     private suspend fun runUser(
-        user: User,
+        user: ApplicationUser,
         room: Room,
         messageSenderService: MessageSenderService,
         messageReceiverService: MessageReceiverService,
@@ -152,7 +152,7 @@ class Server(
         commandHandler.handle(userId, messageSenderService, closeSocket)
     }
 
-    private fun incrementSteps(user: User) {
+    private fun incrementSteps(user: ApplicationUser) {
         if (!user.isAlive) {
             throw GameFinishedException()
         }
@@ -160,13 +160,13 @@ class Server(
         user.steps++
     }
 
-    private suspend fun checkIsAlive(user: User, messageSenderService: MessageSenderService) {
+    private suspend fun checkIsAlive(user: ApplicationUser, messageSenderService: MessageSenderService) {
         if (user.steps >= 1500 || user.score < 0) {
             died(user, messageSenderService)
         }
     }
 
-    private suspend fun died(user: User, messageSenderService: MessageSenderService) {
+    private suspend fun died(user: ApplicationUser, messageSenderService: MessageSenderService) {
         user.isAlive = false
         messageSenderService.sendGameOver(user.score)
     }
