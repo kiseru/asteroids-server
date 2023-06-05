@@ -18,7 +18,7 @@ class UserServiceImpl : UserService {
     override suspend fun createUser(username: String, room: Room): User {
         userStorageMutex.withLock {
             val userId = generateUniqueUserId()
-            val user = User(userId, username, room.id)
+            val user = User(userId, username, room.id, )
             userStorage[userId] = user
             return user
         }

@@ -26,6 +26,7 @@ class GameServiceImpl(
         val courseCheckerService = CourseCheckerServiceImpl(game.pointsOnScreen, game.screen)
         val (x, y) = generateUniqueRandomCoordinates(game)
         val spaceship = Spaceship(UUID.randomUUID(), user, room, courseCheckerService, x, y)
+        user.spaceshipId = spaceship.id
         courseCheckerService.spaceship = spaceship
         game.pointsOnScreen.add(spaceship)
         game.gameObjects.add(spaceship)

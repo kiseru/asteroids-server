@@ -8,6 +8,8 @@ class User(
     val roomId: UUID,
 ) {
 
+    lateinit var spaceshipId: UUID
+
     var score = 100
 
     var isAlive = true
