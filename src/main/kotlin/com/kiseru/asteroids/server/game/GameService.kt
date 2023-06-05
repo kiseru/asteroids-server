@@ -4,7 +4,7 @@ import com.kiseru.asteroids.server.model.*
 
 interface GameService {
 
-    fun registerSpaceshipForUser(game: Game, user: User, room: Room): Spaceship
+    suspend fun registerSpaceshipForUser(game: Game, user: User, room: Room): Spaceship
 
     suspend fun createGame(): Game
 }
