@@ -81,11 +81,12 @@ class RoomServiceImpl(
         .dropWhile { roomStorage.containsKey(it) }
         .first()
 
+    override fun findRoomById(id: UUID): Room? {
+        return roomStorage[id]
+    }
+
     companion object {
 
         private val log = LoggerFactory.getLogger(RoomServiceImpl::class.java)
     }
-
-    override fun findRoomById(roomId: UUID): Room? =
-        roomStorage[roomId]
 }

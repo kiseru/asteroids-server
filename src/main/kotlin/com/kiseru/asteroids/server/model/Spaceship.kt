@@ -4,11 +4,11 @@ import com.kiseru.asteroids.server.exception.GameFinishedException
 import com.kiseru.asteroids.server.service.CourseCheckerService
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.util.UUID
+import java.util.*
 
 class Spaceship(
     val id: UUID,
-    private val owner: User,
+    private val owner: ApplicationUser,
     private val room: Room,
     private val courseCheckerService: CourseCheckerService,
     x: Int,
@@ -58,9 +58,6 @@ class Spaceship(
             } else if (type === Type.WALL) {
                 direction.rollback(this)
                 subtractScore()
-            }
-            if (!owner.isAlive) {
-                destroy()
             }
         }
     }

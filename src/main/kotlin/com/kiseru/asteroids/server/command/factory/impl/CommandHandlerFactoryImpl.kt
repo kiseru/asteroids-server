@@ -1,6 +1,7 @@
 package com.kiseru.asteroids.server.command.factory.impl
 
 import com.kiseru.asteroids.server.command.CommandHandler
+import com.kiseru.asteroids.server.command.CommandType
 import com.kiseru.asteroids.server.command.direction.impl.DownCommandHandler
 import com.kiseru.asteroids.server.command.direction.impl.LeftCommandHandler
 import com.kiseru.asteroids.server.command.direction.impl.RightCommandHandler
@@ -40,4 +41,17 @@ class CommandHandlerFactoryImpl(
         "exit" -> exitCommandHandler
         else -> unknownCommandHandler
     }
+
+    override fun create(commandType: CommandType): CommandHandler =
+        when (commandType) {
+            CommandType.DOWN -> downCommandHandler
+            CommandType.EXIT -> exitCommandHandler
+            CommandType.GO -> goCommandHandler
+            CommandType.IS_ASTEROID -> isAsteroidCommandHandler
+            CommandType.IS_GARBAGE -> isGarbageCommandHandler
+            CommandType.IS_WALL -> isWallCommandHandler
+            CommandType.LEFT -> leftCommandHandler
+            CommandType.RIGHT -> rightCommandHandler
+            CommandType.UP -> upCommandHandler
+        }
 }

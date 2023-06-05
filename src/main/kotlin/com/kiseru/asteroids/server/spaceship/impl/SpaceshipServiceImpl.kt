@@ -1,10 +1,10 @@
 package com.kiseru.asteroids.server.spaceship.impl
 
 import com.kiseru.asteroids.server.coordinate.CoordinateService
+import com.kiseru.asteroids.server.model.ApplicationUser
 import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.Spaceship
-import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.impl.CourseCheckerServiceImpl
 import com.kiseru.asteroids.server.spaceship.SpaceshipService
 import kotlinx.coroutines.sync.Mutex
@@ -19,7 +19,7 @@ class SpaceshipServiceImpl(private val coordinateService: CoordinateService) : S
 
     private val spaceshipStorageMutex = Mutex()
 
-    override suspend fun createSpaceship(user: User, room: Room, game: Game): Spaceship =
+    override suspend fun createSpaceship(user: ApplicationUser, room: Room, game: Game): Spaceship =
         spaceshipStorageMutex.withLock {
             val courseCheckerService = CourseCheckerServiceImpl(game.pointsOnScreen, game.screen)
             val (x, y) = coordinateService.generateUniqueRandomCoordinates(game)

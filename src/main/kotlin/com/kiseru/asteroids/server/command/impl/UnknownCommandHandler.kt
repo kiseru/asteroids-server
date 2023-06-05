@@ -1,6 +1,7 @@
 package com.kiseru.asteroids.server.command.impl
 
 import com.kiseru.asteroids.server.command.CommandHandler
+import com.kiseru.asteroids.server.model.ApplicationUser
 import com.kiseru.asteroids.server.service.MessageSenderService
 import org.springframework.stereotype.Component
 import java.util.*
@@ -15,4 +16,7 @@ class UnknownCommandHandler : CommandHandler {
     ) {
         messageSenderService.sendUnknownCommand()
     }
+
+    override suspend fun handle(user: ApplicationUser): String =
+        "Unknown command"
 }

@@ -1,6 +1,6 @@
 package com.kiseru.asteroids.server.service
 
-import com.kiseru.asteroids.server.model.User
+import com.kiseru.asteroids.server.model.ApplicationUser
 
 interface MessageSenderService {
 
@@ -18,5 +18,5 @@ interface MessageSenderService {
 
     suspend fun sendWelcomeMessage()
 
-    suspend fun sendInstructions(user: User)
+    suspend fun sendInstructions(user: ApplicationUser)
 }
