@@ -76,7 +76,7 @@ class Server(
         val user = try {
             messageSenderService.sendWelcomeMessage()
             val username = messageReceiverService.receive()
-            val user = userService.createUser(username)
+            val user = userService.createUser(username, room)
             val tokenDto = TokenDto(tokenService.generateToken(user))
             messageSenderService.send(Json.encodeToString(tokenDto))
             messageSenderService.sendInstructions(user)

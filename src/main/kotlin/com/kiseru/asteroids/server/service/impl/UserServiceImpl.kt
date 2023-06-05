@@ -1,5 +1,6 @@
 package com.kiseru.asteroids.server.service.impl
 
+import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.UserService
 import kotlinx.coroutines.sync.Mutex
@@ -14,10 +15,10 @@ class UserServiceImpl : UserService {
 
     private val userStorage = mutableMapOf<UUID, User>()
 
-    override suspend fun createUser(username: String): User {
+    override suspend fun createUser(username: String, room: Room): User {
         userStorageMutex.withLock {
             val userId = generateUniqueUserId()
-            val user = User(userId, username)
+            val user = User(userId, username, room.id)
             userStorage[userId] = user
             return user
         }
