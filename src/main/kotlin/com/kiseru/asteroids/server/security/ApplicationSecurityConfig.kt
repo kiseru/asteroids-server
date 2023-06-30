@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.ReactiveUserDetailsService
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.web.server.SecurityWebFilterChain
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher
 import reactor.core.publisher.Mono
 
 @Configuration
@@ -22,6 +23,7 @@ class ApplicationSecurityConfig {
         http {
             csrf { disable() }
             authorizeExchange {
+                authorize("/api/v1/auth", permitAll)
                 authorize(anyExchange, authenticated)
             }
             httpBasic { }
