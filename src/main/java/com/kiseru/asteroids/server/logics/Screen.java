@@ -10,14 +10,14 @@ import java.util.Arrays;
  */
 
 public class Screen {
-    private int width;
-    private int height;
-    private String[][] mainMatrix;
+    private final int width;
+    private final int height;
+    private final String[][] mainMatrix;
 
     public Screen(int width, int height) {
         this.width = width;
         this.height = height;
-        mainMatrix = new String[height + 2][width + 2];
+        this.mainMatrix = new String[height + 2][width + 2];
         generateClearScreen();
     }
 
@@ -27,11 +27,12 @@ public class Screen {
      * @param symbol - символ, которым отображается точка
      */
     public void draw(Coordinates coordinates, String symbol) {
-        if (mainMatrix[coordinates.getY()][coordinates.getX()].equals("."))
+        if (mainMatrix[coordinates.getY()][coordinates.getX()].equals(".")) {
             mainMatrix[coordinates.getY()][coordinates.getX()] = symbol;
-        else
+        } else {
             mainMatrix[coordinates.getY()][coordinates.getX()] =
                     String.format("%s|%s", mainMatrix[coordinates.getY()][coordinates.getX()], symbol);
+        }
     }
 
     /**
@@ -45,7 +46,7 @@ public class Screen {
      * отображает экран
      */
     public String display() {
-        StringBuilder result = new StringBuilder("");
+        StringBuilder result = new StringBuilder();
         for (int i = 1; i < height + 1; i++) {
             for (int j = 1; j < width + 1; j++) {
                 result.append(mainMatrix[i][j]);
