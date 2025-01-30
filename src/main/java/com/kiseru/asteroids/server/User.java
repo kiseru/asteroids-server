@@ -8,6 +8,7 @@ import com.kiseru.asteroids.server.service.RoomService;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Random;
@@ -15,6 +16,7 @@ import java.util.Random;
 public class User implements Runnable {
 
     private final BufferedReader reader;
+    private final OutputStream outputStream;
     private final PrintWriter writer;
     private final Room room;
     private final RoomService roomService;
@@ -28,7 +30,8 @@ public class User implements Runnable {
 
     public User(Socket newConnection, Room room, RoomService roomService) throws IOException {
         this.reader = new BufferedReader(new InputStreamReader(newConnection.getInputStream()));
-        this.writer = new PrintWriter(newConnection.getOutputStream(), true);
+        this.outputStream = newConnection.getOutputStream();
+        this.writer = new PrintWriter(outputStream, true);
         this.room = room;
         this.roomService = roomService;
     }
@@ -88,6 +91,8 @@ public class User implements Runnable {
                     sendMessage(spaceShip.getCourseChecker().isGarbage() ? "t" : "f");
                 } else if (userMessage.equals("isWall")) {
                     sendMessage(spaceShip.getCourseChecker().isWall() ? "t" : "f");
+                } else if (userMessage.equals("GAME_FIELD")) {
+                    handleGameFieldCommand();
                 } else {
                     sendMessage("Unknown command");
                 }
@@ -118,6 +123,10 @@ public class User implements Runnable {
 
     public String getUserName() {
         return userName;
+    }
+
+    private void handleGameFieldCommand() {
+        roomService.writeGameField(room, outputStream);
     }
 
     public void sendMessage(String message) {

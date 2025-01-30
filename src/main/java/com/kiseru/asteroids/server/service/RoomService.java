@@ -9,5 +9,7 @@ public interface RoomService {
 
     void writeGameFields(OutputStream outputStream);
 
+    void writeGameField(Room room, OutputStream outputStream);
+
     Room getNotFullRoom();
 }

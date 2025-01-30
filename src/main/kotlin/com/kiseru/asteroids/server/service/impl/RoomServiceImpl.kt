@@ -11,14 +11,14 @@ class RoomServiceImpl : RoomService {
 
     private var notFullRoom = Room(this)
 
-    override fun writeRatings(outputStream: OutputStream) =
+    override fun writeRatings(outputStream: OutputStream): Unit =
         synchronized(this) {
             for (room in rooms) {
                 writeRating(room, outputStream)
             }
         }
 
-    private fun writeRating(room: Room, outputStream: OutputStream) =
+    private fun writeRating(room: Room, outputStream: OutputStream): Unit =
         try {
             val rating = room.rating
             outputStream.write("$rating\n".toByteArray())
@@ -26,14 +26,14 @@ class RoomServiceImpl : RoomService {
             println("Failed to write the room's rating")
         }
 
-    override fun writeGameFields(outputStream: OutputStream) =
+    override fun writeGameFields(outputStream: OutputStream): Unit =
         synchronized(this) {
             for (room in rooms) {
                 writeGameField(room, outputStream)
             }
         }
 
-    private fun writeGameField(room: Room, outputStream: OutputStream) =
+    override fun writeGameField(room: Room, outputStream: OutputStream): Unit =
         try {
             val screen = room.game.screen
             val gameField = screen.display()
