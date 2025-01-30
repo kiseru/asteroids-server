@@ -9,24 +9,24 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Random;
 
-final public class User extends Thread {
+public class User implements Runnable {
 
-    private BufferedReader reader;
-    private PrintWriter writer;
-    private String userName;
-    private int score;
-    private int steps;
-    private boolean isAlive;
+    private final BufferedReader reader;
+    private final PrintWriter writer;
     private final Room room;
+    private final int id = new Random().nextInt(100);
+
+    private String userName;
+    private int score = 100;
+    private int steps = 0;
+    private boolean isAlive = true;
     private SpaceShip spaceShip;
 
-    User(Socket newConnection, Room room) throws IOException {
-        reader = new BufferedReader(new InputStreamReader(newConnection.getInputStream()));
-        writer = new PrintWriter(newConnection.getOutputStream(), true);
-        score = 100;
-        steps = 0;
-        isAlive = true;
+    public User(Socket newConnection, Room room) throws IOException {
+        this.reader = new BufferedReader(new InputStreamReader(newConnection.getInputStream()));
+        this.writer = new PrintWriter(newConnection.getOutputStream(), true);
         this.room = room;
     }
 
@@ -42,7 +42,7 @@ final public class User extends Thread {
             userName = reader.readLine();
             System.out.println(userName + " has joined the server!");
             writer.println("You need to keep a space garbage.");
-            writer.println("Your ID is " + getId());
+            writer.println("Your ID is " + id);
             writer.println("Good luck, Commander!");
             synchronized (Server.class) {
                 try {
@@ -149,5 +149,13 @@ final public class User extends Thread {
 
     public Room getRoom() {
         return room;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public boolean isAlive() {
+        return isAlive;
     }
 }
