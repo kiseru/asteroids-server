@@ -48,8 +48,8 @@ public class User implements Runnable {
                 try {
                     room.addUser(this);
                     if (room.isFull()) {
-                        Server.getNotFullRoom(); // Чтобы полная комната добавилась в список комнат
-                        room.start();
+                        Server.getNotFullRoom();// Чтобы полная комната добавилась в список комнат
+                        new Thread(room).start();
                     }
                     Server.class.wait();
                 } catch (InterruptedException e) {

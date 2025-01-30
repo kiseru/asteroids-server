@@ -10,22 +10,19 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
-final public class Room extends Thread {
+public class Room implements Runnable {
 
     private final int MAX_USERS = 1;
+    private final ArrayList<User> users = new ArrayList<>();
 
-    private ArrayList<User> users;
-    private int usersCount;
-    private RoomStatus roomStatus;
+    private int usersCount = 0;
+    private RoomStatus roomStatus = RoomStatus.WAITING_CONNECTIONS;
     private Game game;
 
     public Room() {
-        users = new ArrayList<>();
         IntStream.iterate(0, i -> i + 1)
                 .limit(MAX_USERS)
                 .forEach(i -> users.add(null));
-        usersCount = 0;
-        roomStatus = RoomStatus.WAITING_CONNECTIONS;
     }
 
     public synchronized void addUser(User user) {
