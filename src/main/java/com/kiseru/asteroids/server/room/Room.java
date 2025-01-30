@@ -2,9 +2,9 @@ package com.kiseru.asteroids.server.room;
 
 import com.kiseru.asteroids.server.logics.Game;
 import com.kiseru.asteroids.server.logics.Screen;
-import com.kiseru.asteroids.server.Server;
 import com.kiseru.asteroids.server.User;
 
+import com.kiseru.asteroids.server.service.RoomService;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Objects;
@@ -15,18 +15,24 @@ public class Room implements Runnable {
     private final int MAX_USERS = 1;
     private final ArrayList<User> users = new ArrayList<>();
 
+    private final RoomService roomService;
+
     private int usersCount = 0;
     private RoomStatus roomStatus = RoomStatus.WAITING_CONNECTIONS;
     private Game game;
 
-    public Room() {
+    public Room(RoomService roomService) {
+        this.roomService = roomService;
         IntStream.iterate(0, i -> i + 1)
                 .limit(MAX_USERS)
                 .forEach(i -> users.add(null));
     }
 
     public synchronized void addUser(User user) {
-        if (usersCount >= MAX_USERS) Server.getNotFullRoom().addUser(user);
+        if (usersCount >= MAX_USERS) {
+            var notFullRoom = roomService.getNotFullRoom();
+            notFullRoom.addUser(user);
+        }
 
         int emptyPlaceIndex = IntStream.iterate(0, index -> index + 1)
                 .limit(users.size())
@@ -94,12 +100,12 @@ public class Room implements Runnable {
 
         roomStatus = RoomStatus.GAMING;
 
-        synchronized (Server.class) {
+        synchronized (this) {
             game = new Game(new Screen(30, 30), 150, 50);
             users.stream()
                     .filter(Objects::nonNull)
                     .forEach(game::registerSpaceShipForUser);
-            Server.class.notifyAll();
+            notifyAll();
         }
 
         synchronized (this) {

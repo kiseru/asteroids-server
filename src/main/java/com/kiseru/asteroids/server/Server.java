@@ -2,6 +2,7 @@ package com.kiseru.asteroids.server;
 
 import com.kiseru.asteroids.server.room.Room;
 
+import com.kiseru.asteroids.server.service.RoomService;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.LinkedList;
@@ -10,34 +11,29 @@ import java.util.Scanner;
 
 final public class Server {
 
-    private int port;
+    @Deprecated
     private static final List<Room> rooms = new LinkedList<>();
-    private static Room notFullRoom = new Room();
 
-    public Server(int port) {
+    private final RoomService roomService;
+    private final int port;
+
+    public Server(RoomService roomService, int port) {
+        this.roomService = roomService;
         this.port = port;
     }
 
     public void up() throws IOException {
         ServerSocket server = new ServerSocket(port);
-        ConnectionReceiver connectionReceiver = new ConnectionReceiver(server);
+        ConnectionReceiver connectionReceiver = new ConnectionReceiver(server, roomService);
         new Thread(connectionReceiver).start();
         Scanner sc = new Scanner(System.in);
         while (true) {
             String command = sc.nextLine();
             if (command.equals("rating")) {
-                rooms.forEach(room -> System.out.println(room.getRating()));
+                roomService.writeRatings(System.out);
             } else if (command.equals("gamefield")) {
-                rooms.forEach(room -> System.out.println(room.getGame().getScreen().display()));
+                roomService.writeGameFields(System.out);
             }
         }
-    }
-
-    public static Room getNotFullRoom() {
-        if (!notFullRoom.isFull()) return notFullRoom;
-
-        rooms.add(notFullRoom);
-        notFullRoom = new Room();
-        return notFullRoom;
     }
 }

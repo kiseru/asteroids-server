@@ -1,4 +1,5 @@
 plugins {
+    kotlin("jvm") version "2.1.10"
     application
     java
 }
@@ -8,7 +9,7 @@ repositories {
 }
 
 application {
-    mainClass.set("com.kiseru.asteroids.server.ApplicationRunner")
+    mainClass.set("com.kiseru.asteroids.server.MainKt")
 }
 
 tasks.named<JavaExec>("run") {

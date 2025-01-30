@@ -4,6 +4,7 @@ import com.kiseru.asteroids.server.logics.auxiliary.Direction;
 import com.kiseru.asteroids.server.logics.models.SpaceShip;
 import com.kiseru.asteroids.server.room.Room;
 
+import com.kiseru.asteroids.server.service.RoomService;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,6 +17,7 @@ public class User implements Runnable {
     private final BufferedReader reader;
     private final PrintWriter writer;
     private final Room room;
+    private final RoomService roomService;
     private final int id = new Random().nextInt(100);
 
     private String userName;
@@ -24,10 +26,11 @@ public class User implements Runnable {
     private boolean isAlive = true;
     private SpaceShip spaceShip;
 
-    public User(Socket newConnection, Room room) throws IOException {
+    public User(Socket newConnection, Room room, RoomService roomService) throws IOException {
         this.reader = new BufferedReader(new InputStreamReader(newConnection.getInputStream()));
         this.writer = new PrintWriter(newConnection.getOutputStream(), true);
         this.room = room;
+        this.roomService = roomService;
     }
 
     public int getScore() {
@@ -44,14 +47,14 @@ public class User implements Runnable {
             writer.println("You need to keep a space garbage.");
             writer.println("Your ID is " + id);
             writer.println("Good luck, Commander!");
-            synchronized (Server.class) {
+            synchronized (room) {
                 try {
                     room.addUser(this);
                     if (room.isFull()) {
-                        Server.getNotFullRoom();// Чтобы полная комната добавилась в список комнат
+                        roomService.getNotFullRoom();// Чтобы полная комната добавилась в список комнат
                         new Thread(room).start();
                     }
-                    Server.class.wait();
+                    room.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
