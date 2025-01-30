@@ -21,7 +21,7 @@ final public class Server {
     public void up() throws IOException {
         ServerSocket server = new ServerSocket(port);
         ConnectionReceiver connectionReceiver = new ConnectionReceiver(server);
-        connectionReceiver.start();
+        new Thread(connectionReceiver).start();
         Scanner sc = new Scanner(System.in);
         while (true) {
             String command = sc.nextLine();

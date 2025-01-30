@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-final public class ConnectionReceiver extends Thread {
+public class ConnectionReceiver implements Runnable {
 
-    private ServerSocket connectionReceiver;
+    private final ServerSocket connectionReceiver;
 
-    ConnectionReceiver(ServerSocket connectionReceiver) {
+    public ConnectionReceiver(ServerSocket connectionReceiver) {
         this.connectionReceiver = connectionReceiver;
     }
 
