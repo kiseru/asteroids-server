@@ -20,11 +20,11 @@ public abstract class Point {
     abstract public Type getType();
 
     public int getX() {
-        return coordinates.getX();
+        return coordinates.x();
     }
 
     public int getY() {
-        return coordinates.getY();
+        return coordinates.y();
     }
 
     public Coordinates getCoordinates() {
