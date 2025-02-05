@@ -4,7 +4,6 @@ import com.kiseru.asteroids.server.logics.auxiliary.Direction;
 import com.kiseru.asteroids.server.logics.models.SpaceShip;
 import com.kiseru.asteroids.server.room.Room;
 
-import com.kiseru.asteroids.server.service.RoomService;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,6 +11,8 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Random;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 public class User implements Runnable {
 
@@ -19,7 +20,8 @@ public class User implements Runnable {
     private final OutputStream outputStream;
     private final PrintWriter writer;
     private final Room room;
-    private final RoomService roomService;
+    private final Supplier<Room> notFullRoomSupplier;
+    private final BiConsumer<Room, OutputStream> onWriteGameField;
     private final int id = new Random().nextInt(100);
 
     private String userName;
@@ -28,12 +30,18 @@ public class User implements Runnable {
     private boolean isAlive = true;
     private SpaceShip spaceShip;
 
-    public User(Socket newConnection, Room room, RoomService roomService) throws IOException {
+    public User(
+            Socket newConnection,
+            Room room,
+            Supplier<Room> notFullRoomSupplier,
+            BiConsumer<Room, OutputStream> onWriteGameField
+    ) throws IOException {
         this.reader = new BufferedReader(new InputStreamReader(newConnection.getInputStream()));
         this.outputStream = newConnection.getOutputStream();
         this.writer = new PrintWriter(outputStream, true);
         this.room = room;
-        this.roomService = roomService;
+        this.notFullRoomSupplier = notFullRoomSupplier;
+        this.onWriteGameField = onWriteGameField;
     }
 
     public int getScore() {
@@ -54,7 +62,7 @@ public class User implements Runnable {
                 try {
                     room.addUser(this);
                     if (room.isFull()) {
-                        roomService.getNotFullRoom();// Чтобы полная комната добавилась в список комнат
+                        notFullRoomSupplier.get();// Чтобы полная комната добавилась в список комнат
                         new Thread(room).start();
                     }
                     room.wait();
@@ -126,7 +134,7 @@ public class User implements Runnable {
     }
 
     private void handleGameFieldCommand() {
-        roomService.writeGameField(room, outputStream);
+        onWriteGameField.accept(room, outputStream);
     }
 
     public void sendMessage(String message) {

@@ -26,8 +26,8 @@ class ConnectionReceiverImpl(
 
     private fun handleConnection(socket: Socket): Unit =
         try {
-            val notFullRoom = roomService.notFullRoom
-            val user = User(socket, notFullRoom, roomService)
+            val notFullRoom = roomService.getNotFullRoom()
+            val user = User(socket, notFullRoom, roomService::getNotFullRoom, roomService::writeGameField)
             Thread(user).start()
         } catch (e: IOException) {
             throw RuntimeException(e)

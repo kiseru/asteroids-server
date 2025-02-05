@@ -4,10 +4,10 @@ import com.kiseru.asteroids.server.logics.Game;
 import com.kiseru.asteroids.server.logics.Screen;
 import com.kiseru.asteroids.server.User;
 
-import com.kiseru.asteroids.server.service.RoomService;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 public class Room implements Runnable {
@@ -15,14 +15,14 @@ public class Room implements Runnable {
     private final int MAX_USERS = 1;
     private final ArrayList<User> users = new ArrayList<>();
 
-    private final RoomService roomService;
+    private final Supplier<Room> notFullRoomSupplier;
 
     private int usersCount = 0;
     private RoomStatus roomStatus = RoomStatus.WAITING_CONNECTIONS;
     private Game game;
 
-    public Room(RoomService roomService) {
-        this.roomService = roomService;
+    public Room(Supplier<Room> notFullRoomSupplier) {
+        this.notFullRoomSupplier = notFullRoomSupplier;
         IntStream.iterate(0, i -> i + 1)
                 .limit(MAX_USERS)
                 .forEach(i -> users.add(null));
@@ -30,7 +30,7 @@ public class Room implements Runnable {
 
     public synchronized void addUser(User user) {
         if (usersCount >= MAX_USERS) {
-            var notFullRoom = roomService.getNotFullRoom();
+            var notFullRoom = notFullRoomSupplier.get();
             notFullRoom.addUser(user);
         }
 

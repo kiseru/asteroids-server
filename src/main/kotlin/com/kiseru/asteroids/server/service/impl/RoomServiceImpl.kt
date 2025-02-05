@@ -9,7 +9,7 @@ class RoomServiceImpl : RoomService {
 
     private val rooms = mutableListOf<Room>()
 
-    private var notFullRoom = Room(this)
+    private var notFullRoom = Room(::getNotFullRoom)
 
     override fun writeRatings(outputStream: OutputStream): Unit =
         synchronized(this) {
@@ -46,7 +46,7 @@ class RoomServiceImpl : RoomService {
         synchronized(this) {
             if (notFullRoom.isFull) {
                 rooms.add(notFullRoom)
-                notFullRoom = Room(this)
+                notFullRoom = Room(::getNotFullRoom)
             }
 
             notFullRoom
