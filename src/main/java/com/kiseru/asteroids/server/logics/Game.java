@@ -2,11 +2,11 @@ package com.kiseru.asteroids.server.logics;
 
 import com.kiseru.asteroids.server.logics.auxiliary.Coordinates;
 import com.kiseru.asteroids.server.logics.auxiliary.Type;
-import com.kiseru.asteroids.server.logics.handlers.SpaceShipCrashHandler;
 import com.kiseru.asteroids.server.logics.models.Asteroid;
+import com.kiseru.asteroids.server.logics.models.Crashable;
 import com.kiseru.asteroids.server.logics.models.Garbage;
 import com.kiseru.asteroids.server.logics.models.Point;
-import com.kiseru.asteroids.server.logics.models.SpaceShip;
+import com.kiseru.asteroids.server.logics.models.Spaceship;
 import com.kiseru.asteroids.server.User;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Game {
     private final List<Point> pointsOnScreen;
     private final Screen screen;
-    private final List<SpaceShipCrashHandler> crashHandlers;
+    private final List<Runnable> crashHandlers;
     private final AtomicInteger collectedGarbageCount = new AtomicInteger(0);
     private final int garbageNumber;
 
@@ -55,11 +55,35 @@ public class Game {
      * @param user - юзер, для которого регистриуется корабль
      */
     public void registerSpaceShipForUser(User user) {
-        SpaceShip spaceShip = new SpaceShip(generateUniqueRandomCoordinates(), user);
+        Spaceship spaceShip = new Spaceship(generateUniqueRandomCoordinates(), user);
         user.setSpaceShip(spaceShip);
-        this.pointsOnScreen.add(spaceShip);
-        crashHandlers.add(new SpaceShipCrashHandler(this, spaceShip));
+        pointsOnScreen.add(spaceShip);
+        crashHandlers.add(() -> check(this, spaceShip));
         spaceShip.setCourseChecker(new CourseChecker(spaceShip, this.pointsOnScreen, this.screen));
+    }
+
+    private void check(Game game, Spaceship spaceShip) {
+        List<Point> points = game.getPointsOnScreen();
+        Point collisionPoint = null;
+        for (Point point: points) {
+            if (point.getType() != Type.SPACESHIP &&
+                    point.isVisible() &&
+                    point.getCoordinates().equals(spaceShip.getCoordinates())) {
+                collisionPoint = point;
+                break;
+            }
+        }
+        if (collisionPoint != null) {
+            spaceShip.crash(collisionPoint.getType());
+            ((Crashable)collisionPoint).crash();
+        } else {
+            // проверка на столкновение со стеной
+            if (spaceShip.getX() == 0 || spaceShip.getY() == 0 ||
+                    spaceShip.getX() > game.getScreen().getWidth() ||
+                    spaceShip.getY() > game.getScreen().getHeight()) {
+                spaceShip.crash(Type.WALL);
+            }
+        }
     }
 
     /**
@@ -67,16 +91,8 @@ public class Game {
      */
     public void refresh() {
         screen.update();
-        crashHandlers.forEach(SpaceShipCrashHandler::check);
+        crashHandlers.forEach(Runnable::run);
         pointsOnScreen.forEach(o -> o.render(screen));
-    }
-
-    public boolean isAnyoneAlive() {
-        return pointsOnScreen.stream()
-                .filter(p -> p.getType() == Type.SPACESHIP)
-                .map(s -> ((SpaceShip)s).isOwnerAlive())
-                .reduce((b1, b2) -> b1 || b2)
-                .get();
     }
 
     private Coordinates generateUniqueRandomCoordinates() {
@@ -104,10 +120,6 @@ public class Game {
 
     public int getGarbageNumber() {
         return garbageNumber;
-    }
-
-    public List<SpaceShipCrashHandler> getCrashHandlers() {
-        return crashHandlers;
     }
 
     public int incrementCollectedGarbageCount() {

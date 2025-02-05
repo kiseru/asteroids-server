@@ -12,12 +12,12 @@ import com.kiseru.asteroids.server.User;
  * 08 Декабрь 2017
  */
 
-public class SpaceShip extends Point implements Model{
+public class Spaceship extends Point implements Model{
     private User owner;
     private Direction direction;
     private CourseChecker courseChecker;
 
-    public SpaceShip(Coordinates coordinates, User owner) {
+    public Spaceship(Coordinates coordinates, User owner) {
         super(coordinates);
         this.owner = owner;
     }

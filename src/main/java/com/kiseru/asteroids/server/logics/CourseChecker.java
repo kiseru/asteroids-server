@@ -3,7 +3,7 @@ package com.kiseru.asteroids.server.logics;
 import com.kiseru.asteroids.server.logics.models.Point;
 import com.kiseru.asteroids.server.logics.auxiliary.Coordinates;
 import com.kiseru.asteroids.server.logics.auxiliary.Type;
-import com.kiseru.asteroids.server.logics.models.SpaceShip;
+import com.kiseru.asteroids.server.logics.models.Spaceship;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,11 +14,11 @@ import java.util.stream.Collectors;
  */
 
 public class CourseChecker {
-    private SpaceShip spaceShip;
+    private Spaceship spaceShip;
     private List<Point> pointsOnMap;
     private Screen screen;
 
-    public CourseChecker(SpaceShip spaceShip, List<Point> pointsOnMap, Screen screen) {
+    public CourseChecker(Spaceship spaceShip, List<Point> pointsOnMap, Screen screen) {
         this.spaceShip = spaceShip;
         this.pointsOnMap = pointsOnMap;
         this.screen = screen;

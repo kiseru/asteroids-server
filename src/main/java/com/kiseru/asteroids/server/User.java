@@ -1,7 +1,7 @@
 package com.kiseru.asteroids.server;
 
 import com.kiseru.asteroids.server.logics.auxiliary.Direction;
-import com.kiseru.asteroids.server.logics.models.SpaceShip;
+import com.kiseru.asteroids.server.logics.models.Spaceship;
 import com.kiseru.asteroids.server.room.Room;
 
 import java.io.BufferedReader;
@@ -28,7 +28,7 @@ public class User implements Runnable {
     private int score = 100;
     private int steps = 0;
     private boolean isAlive = true;
-    private SpaceShip spaceShip;
+    private Spaceship spaceShip;
 
     public User(
             Socket newConnection,
@@ -163,7 +163,7 @@ public class User implements Runnable {
         this.sendMessage(scoreMessage);
     }
 
-    public void setSpaceShip(SpaceShip spaceShip) {
+    public void setSpaceShip(Spaceship spaceShip) {
         this.spaceShip = spaceShip;
     }
 
