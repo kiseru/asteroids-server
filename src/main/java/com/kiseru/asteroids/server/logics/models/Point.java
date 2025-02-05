@@ -8,7 +8,7 @@ import com.kiseru.asteroids.server.logics.auxiliary.Type;
  * 08 Декабрь 2017
  */
 
-public abstract class Point {
+public abstract class Point implements Model {
     protected Coordinates coordinates;
     protected boolean isVisible;
 

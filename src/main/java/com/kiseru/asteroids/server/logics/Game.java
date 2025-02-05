@@ -5,7 +5,6 @@ import com.kiseru.asteroids.server.logics.auxiliary.Type;
 import com.kiseru.asteroids.server.logics.handlers.SpaceShipCrashHandler;
 import com.kiseru.asteroids.server.logics.models.Asteroid;
 import com.kiseru.asteroids.server.logics.models.Garbage;
-import com.kiseru.asteroids.server.logics.models.Model;
 import com.kiseru.asteroids.server.logics.models.Point;
 import com.kiseru.asteroids.server.logics.models.SpaceShip;
 import com.kiseru.asteroids.server.User;
@@ -21,12 +20,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 
 public class Game {
-    private List<Model> gameObjects;
-    private List<Point> pointsOnScreen;
-    private Screen screen;
-    private List<SpaceShipCrashHandler> crashHandlers;
-    private AtomicInteger collectedGarbageCount = new AtomicInteger(0);
-    private int garbageNumber;
+    private final List<Point> pointsOnScreen;
+    private final Screen screen;
+    private final List<SpaceShipCrashHandler> crashHandlers;
+    private final AtomicInteger collectedGarbageCount = new AtomicInteger(0);
+    private final int garbageNumber;
 
     /**
      * Конструктор создания игровой сессии
@@ -38,20 +36,17 @@ public class Game {
         this.garbageNumber = garbageNumber;
         this.screen = screen;
         this.pointsOnScreen = new ArrayList<>();
-        this.gameObjects = new ArrayList<>();
         this.crashHandlers = new ArrayList<>();
 
         // генерируем мусор
         for (int i = 0; i < garbageNumber; i++) {
             Garbage garbage = new Garbage(generateUniqueRandomCoordinates());
             pointsOnScreen.add(garbage);
-            gameObjects.add(garbage);
         }
         // генерируем астероиды
         for (int i = 0; i < asteroidNumber; i++) {
             Asteroid asteroid = new Asteroid(generateUniqueRandomCoordinates());
             pointsOnScreen.add(asteroid);
-            gameObjects.add(asteroid);
         }
     }
 
@@ -63,7 +58,6 @@ public class Game {
         SpaceShip spaceShip = new SpaceShip(generateUniqueRandomCoordinates(), user);
         user.setSpaceShip(spaceShip);
         this.pointsOnScreen.add(spaceShip);
-        this.gameObjects.add(spaceShip);
         crashHandlers.add(new SpaceShipCrashHandler(this, spaceShip));
         spaceShip.setCourseChecker(new CourseChecker(spaceShip, this.pointsOnScreen, this.screen));
     }
@@ -74,8 +68,7 @@ public class Game {
     public void refresh() {
         screen.update();
         crashHandlers.forEach(SpaceShipCrashHandler::check);
-        gameObjects.forEach(o -> o.render(screen));
-        //System.out.println(screen.display());
+        pointsOnScreen.forEach(o -> o.render(screen));
     }
 
     public boolean isAnyoneAlive() {
@@ -99,10 +92,6 @@ public class Game {
     private boolean isGameObjectsContainsCoordinates(Coordinates coordinates) {
         return pointsOnScreen.stream()
                 .anyMatch(p -> p.getCoordinates().equals(coordinates));
-    }
-
-    public List<Model> getGameObjects() {
-        return gameObjects;
     }
 
     public List<Point> getPointsOnScreen() {
