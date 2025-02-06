@@ -44,25 +44,13 @@ public class Room implements Runnable {
 
         users.stream()
                 .filter(Objects::nonNull)
-                .forEach(roomUser -> roomUser.sendMessage(String.format("User %s has joined the room.", user.getUserName())));
+                .forEach(roomUser -> roomUser.sendMessage(String.format(
+                        "User %s has joined the room.",
+                        user.getUserName()
+                )));
 
         users.set(emptyPlaceIndex, user);
         usersCount++;
-    }
-
-    public synchronized void removeUser(User user) {
-        if (usersCount == 0) return;
-
-        User removingUser = users.stream()
-                .filter(user::equals)
-                .findFirst()
-                .orElse(null);
-
-        if (removingUser == null) return;
-
-        users.remove(removingUser);
-
-        usersCount--;
     }
 
     public String getRating() {
@@ -99,25 +87,8 @@ public class Room implements Runnable {
                 .forEach(user -> user.sendMessage("start"));
 
         roomStatus = RoomStatus.GAMING;
-
-        synchronized (this) {
-            game = new Game(new Screen(30, 30), 150, 50);
-            users.stream()
-                    .filter(Objects::nonNull)
-                    .forEach(game::registerSpaceShipForUser);
-            notifyAll();
-        }
-
-        synchronized (this) {
-            try {
-                game.refresh();
-                this.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            roomStatus = RoomStatus.FINISHED;
-        }
-
+        createGame();
+        waitFinish();
         users.stream()
                 .filter(Objects::nonNull)
                 .forEach(user -> user.sendMessage("finish"));
@@ -127,6 +98,50 @@ public class Room implements Runnable {
         System.out.println("Room released!");
         System.out.println(getRating());
         System.out.println();
+    }
+
+    private synchronized void createGame() {
+        game = new Game(new Screen(30, 30), 150, 50);
+        users.stream()
+                .filter(Objects::nonNull)
+                .forEach(game::registerSpaceShipForUser);
+        notifyAll();
+    }
+
+    private synchronized void waitFinish() {
+        try {
+            game.refresh();
+            this.wait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        roomStatus = RoomStatus.FINISHED;
+    }
+
+    public synchronized void waitStart(User user, Supplier<Room> notFullRoomSupplier) {
+        try {
+            addUser(user);
+            if (isFull()) {
+                notFullRoomSupplier.get();// Чтобы полная комната добавилась в список комнат
+                new Thread(this).start();
+            }
+            wait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public synchronized void checkAlive() {
+        if (aliveCount() == 0) {
+            notifyAll();
+        }
+    }
+
+    public synchronized void checkCollectedGarbage(Game game) {
+        int collected = game.incrementCollectedGarbageCount();
+        if (collected >= game.getGarbageNumber()) {
+            notifyAll();
+        }
     }
 
     public Game getGame() {

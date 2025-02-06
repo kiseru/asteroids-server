@@ -58,18 +58,7 @@ public class User implements Runnable {
             writer.println("You need to keep a space garbage.");
             writer.println("Your ID is " + id);
             writer.println("Good luck, Commander!");
-            synchronized (room) {
-                try {
-                    room.addUser(this);
-                    if (room.isFull()) {
-                        notFullRoomSupplier.get();// Чтобы полная комната добавилась в список комнат
-                        new Thread(room).start();
-                    }
-                    room.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+            room.waitStart(this, notFullRoomSupplier);
             spaceShip.setDirection(Direction.UP);
             while (!room.isGameFinished() && isAlive) {
                 String userMessage = reader.readLine();
@@ -116,11 +105,7 @@ public class User implements Runnable {
             System.out.println("Connection problems with user " + userName);
         } finally {
             isAlive = false;
-            if (room.aliveCount() == 0) {
-                synchronized (room) {
-                    room.notify();
-                }
-            }
+            room.checkAlive();
         }
     }
 

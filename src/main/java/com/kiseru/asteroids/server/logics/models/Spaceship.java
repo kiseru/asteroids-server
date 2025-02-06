@@ -13,7 +13,7 @@ import com.kiseru.asteroids.server.User;
  */
 
 public class Spaceship extends Point implements Model{
-    private User owner;
+    private final User owner;
     private Direction direction;
     private CourseChecker courseChecker;
 
@@ -53,17 +53,14 @@ public class Spaceship extends Point implements Model{
      * @param type: тип объекта, с которым произошло столкновение
      */
     public void crash(Type type) {
-        synchronized (owner.getRoom().getGame()) {
+        var room = owner.getRoom();
+        var game = room.getGame();
+        synchronized (game) {
             if (type == Type.ASTEROID) {
                 owner.substractScore();
             } else if (type == Type.GARBAGE) {
                 owner.addScore();
-                int collected = owner.getRoom().getGame().incrementCollectedGarbageCount();
-                if (collected >= owner.getRoom().getGame().getGarbageNumber()) {
-                    synchronized (owner.getRoom()) {
-                        owner.getRoom().notify();
-                    }
-                }
+                room.checkCollectedGarbage(game);
             } else if (type == Type.WALL) {
                 // возвращаемся назад, чтобы не находится на стене
                 rollbackLastStep();
@@ -117,9 +114,5 @@ public class Spaceship extends Point implements Model{
 
     public void setCourseChecker(CourseChecker courseChecker) {
         this.courseChecker = courseChecker;
-    }
-
-    public boolean isOwnerAlive() {
-        return owner.isAlive();
     }
 }
