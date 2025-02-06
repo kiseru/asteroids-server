@@ -3,13 +3,10 @@ package com.kiseru.asteroids.server;
 import com.kiseru.asteroids.server.logics.auxiliary.Direction;
 import com.kiseru.asteroids.server.logics.models.Spaceship;
 import com.kiseru.asteroids.server.room.Room;
-
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -31,14 +28,16 @@ public class User implements Runnable {
     private Spaceship spaceShip;
 
     public User(
-            Socket newConnection,
+            BufferedReader reader,
+            OutputStream outputStream,
+            PrintWriter writer,
             Room room,
             Supplier<Room> notFullRoomSupplier,
             BiConsumer<Room, OutputStream> onWriteGameField
-    ) throws IOException {
-        this.reader = new BufferedReader(new InputStreamReader(newConnection.getInputStream()));
-        this.outputStream = newConnection.getOutputStream();
-        this.writer = new PrintWriter(outputStream, true);
+    ) {
+        this.reader = reader;
+        this.outputStream = outputStream;
+        this.writer = writer;
         this.room = room;
         this.notFullRoomSupplier = notFullRoomSupplier;
         this.onWriteGameField = onWriteGameField;
