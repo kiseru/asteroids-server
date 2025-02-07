@@ -1,18 +1,22 @@
 package com.kiseru.asteroids.server;
 
 import com.kiseru.asteroids.server.logics.models.Spaceship;
-import java.util.Random;
 
 public class User {
 
-    private final int id = new Random().nextInt(100);
+    private final int id;
+    private final String username;
 
-    private String username;
     private int score = 100;
     private int steps = 0;
 
     private boolean isAlive = true;
     private Spaceship spaceship;
+
+    public User(int id, String username) {
+        this.id = id;
+        this.username = username;
+    }
 
     public int getScore() {
         return score;
@@ -25,10 +29,6 @@ public class User {
 
     public String getUsername() {
         return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public void addScore() {

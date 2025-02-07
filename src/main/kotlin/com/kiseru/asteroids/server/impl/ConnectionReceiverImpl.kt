@@ -12,6 +12,7 @@ import java.io.OutputStream
 import java.io.PrintWriter
 import java.net.ServerSocket
 import java.net.Socket
+import java.util.Random
 import java.util.concurrent.locks.Condition
 import java.util.concurrent.locks.Lock
 import kotlin.concurrent.thread
@@ -44,8 +45,7 @@ class ConnectionReceiverImpl(
             val printWriter = PrintWriter(outputStream, true)
             val reader = inputStream.bufferedReader()
             val onMessageSend: (String) -> Unit = printWriter::println
-            val user = User()
-            thread { handleUser(printWriter, reader, user, onMessageSend, notFullRoom, outputStream, notFullRoomLock, notFullRoomCondition) }
+            thread { handleUser(printWriter, reader, onMessageSend, notFullRoom, outputStream, notFullRoomLock, notFullRoomCondition) }
         } catch (e: IOException) {
             throw RuntimeException(e)
         }
@@ -54,7 +54,6 @@ class ConnectionReceiverImpl(
     private fun handleUser(
         writer: PrintWriter,
         reader: BufferedReader,
-        user: User,
         onMessageSend: (String) -> Unit,
         room: Room,
         outputStream: OutputStream,
@@ -65,7 +64,7 @@ class ConnectionReceiverImpl(
             writer.println("Welcome To Asteroids Server")
             writer.println("Please, introduce yourself!")
             val username = reader.readLine()
-            user.username = username
+            val user = User(Random().nextInt(100), username)
             println("$username has joined the server!")
             writer.println("You need to keep a space garbage.")
             writer.println("Your ID is " + user.id)

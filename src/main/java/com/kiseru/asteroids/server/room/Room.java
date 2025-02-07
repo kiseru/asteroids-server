@@ -119,10 +119,6 @@ public class Room {
         this.status = status;
     }
 
-    public List<User> getUsers() {
-        return Collections.unmodifiableList(users);
-    }
-
     public List<Consumer<String>> getOnMessageSendHandlers() {
         return Collections.unmodifiableList(onMessageSendHandlers);
     }
