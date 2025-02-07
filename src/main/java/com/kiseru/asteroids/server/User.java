@@ -1,15 +1,12 @@
 package com.kiseru.asteroids.server;
 
-import com.kiseru.asteroids.server.logics.auxiliary.Direction;
 import com.kiseru.asteroids.server.logics.models.Spaceship;
 import com.kiseru.asteroids.server.room.Room;
+import com.kiseru.asteroids.server.room.RoomStatus;
 import java.util.Random;
-import java.util.function.Consumer;
 
 public class User {
 
-    private final Room room;
-    private final Consumer<String> onSendMessage;
     private final int id = new Random().nextInt(100);
 
     private String username;
@@ -18,21 +15,6 @@ public class User {
 
     private boolean isAlive = true;
     private Spaceship spaceship;
-
-    public User(Room room, Consumer<String> onSendMessage) {
-        this.room = room;
-        this.onSendMessage = onSendMessage;
-    }
-
-    public void moveSpaceshipForward() {
-        spaceship.go();
-        room.getGame().refresh();
-    }
-
-    public void updateSpaceshipDirection(Direction direction) {
-        spaceship.setDirection(direction);
-        room.getGame().refresh();
-    }
 
     public int getScore() {
         return score;
@@ -51,16 +33,14 @@ public class User {
         this.username = username;
     }
 
-    public void sendMessage(String message) {
-        onSendMessage.accept(message);
+    public void addScore(Room room) {
+        if (room.getStatus() == RoomStatus.GAMING) {
+            score += 10;
+        }
     }
 
-    public void addScore() {
-        if (room.isGameStarted()) score += 10;
-    }
-
-    public void substractScore() {
-        if (room.isGameStarted()) {
+    public void subtractScore(Room room) {
+        if (room.getStatus() == RoomStatus.GAMING) {
             score -= 50;
             if (score < 0) isAlive = false;
         }
@@ -72,10 +52,6 @@ public class User {
 
     public void setSpaceship(Spaceship spaceship) {
         this.spaceship = spaceship;
-    }
-
-    public Room getRoom() {
-        return room;
     }
 
     public int getId() {

@@ -4,6 +4,7 @@ import com.kiseru.asteroids.server.ConnectionReceiver
 import com.kiseru.asteroids.server.User
 import com.kiseru.asteroids.server.logics.auxiliary.Direction
 import com.kiseru.asteroids.server.room.Room
+import com.kiseru.asteroids.server.room.RoomStatus
 import com.kiseru.asteroids.server.service.RoomService
 import java.io.BufferedReader
 import java.io.IOException
@@ -11,7 +12,10 @@ import java.io.OutputStream
 import java.io.PrintWriter
 import java.net.ServerSocket
 import java.net.Socket
+import java.util.concurrent.locks.Condition
+import java.util.concurrent.locks.Lock
 import kotlin.concurrent.thread
+import kotlin.concurrent.withLock
 
 class ConnectionReceiverImpl(
     private val serverSocket: ServerSocket,
@@ -33,12 +37,15 @@ class ConnectionReceiverImpl(
     private fun handleConnection(socket: Socket) {
         try {
             val notFullRoom = roomService.getNotFullRoom()
+            val notFullRoomLock = roomService.notFullRoomLock
+            val notFullRoomCondition = roomService.notFullRoomCondition
             val inputStream = socket.getInputStream()
             val outputStream = socket.getOutputStream()
             val printWriter = PrintWriter(outputStream, true)
             val reader = inputStream.bufferedReader()
-            val user = User(notFullRoom, printWriter::println)
-            thread { handleUser(printWriter, reader, user, notFullRoom, outputStream) }
+            val onMessageSend: (String) -> Unit = printWriter::println
+            val user = User()
+            thread { handleUser(printWriter, reader, user, onMessageSend, notFullRoom, outputStream, notFullRoomLock, notFullRoomCondition) }
         } catch (e: IOException) {
             throw RuntimeException(e)
         }
@@ -48,8 +55,11 @@ class ConnectionReceiverImpl(
         writer: PrintWriter,
         reader: BufferedReader,
         user: User,
+        onMessageSend: (String) -> Unit,
         room: Room,
         outputStream: OutputStream,
+        lock: Lock,
+        condition: Condition,
     ) {
         try {
             writer.println("Welcome To Asteroids Server")
@@ -60,29 +70,36 @@ class ConnectionReceiverImpl(
             writer.println("You need to keep a space garbage.")
             writer.println("Your ID is " + user.id)
             writer.println("Good luck, Commander!")
-            user.room.waitStart(user, roomService::getNotFullRoom)
+            lock.withLock {
+                room.waitStart(user, onMessageSend, roomService::getNotFullRoom, lock, condition)
+            }
             user.spaceship.direction = Direction.UP
-            while (!user.room.isGameFinished && user.isAlive) {
+            while (room.status != RoomStatus.FINISHED && user.isAlive) {
                 val userMessage = reader.readLine()
                 when (userMessage) {
                     "go" -> {
-                        user.moveSpaceshipForward()
+                        user.spaceship.go()
+                        room.game.refresh()
                         writer.println(user.score.toString())
                     }
                     "left" -> {
-                        user.updateSpaceshipDirection(Direction.LEFT)
+                        user.spaceship.direction = Direction.LEFT
+                        room.game.refresh()
                         writer.println("success")
                     }
                     "right" -> {
-                        user.updateSpaceshipDirection(Direction.RIGHT)
+                        user.spaceship.direction = Direction.RIGHT
+                        room.game.refresh()
                         writer.println("success")
                     }
                     "up" -> {
-                        user.updateSpaceshipDirection(Direction.UP)
+                        user.spaceship.direction = Direction.UP
+                        room.game.refresh()
                         writer.println("success")
                     }
                     "down" -> {
-                        user.updateSpaceshipDirection(Direction.DOWN)
+                        user.spaceship.direction = Direction.DOWN
+                        room.game.refresh()
                         writer.println("success")
                     }
                     "isAsteroid" -> {
@@ -107,7 +124,12 @@ class ConnectionReceiverImpl(
             println("Connection problems with user " + user.username)
         } finally {
             user.setIsAlive(false)
-            room.checkAlive()
+            lock.withLock {
+                if (room.aliveCount() == 0L) {
+                    room.status = RoomStatus.FINISHED
+                }
+                condition.signalAll()
+            }
         }
     }
 

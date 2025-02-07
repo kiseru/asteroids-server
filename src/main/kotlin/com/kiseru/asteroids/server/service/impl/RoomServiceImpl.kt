@@ -1,17 +1,27 @@
 package com.kiseru.asteroids.server.service.impl
 
-import com.kiseru.asteroids.server.User
 import com.kiseru.asteroids.server.room.Room
 import com.kiseru.asteroids.server.room.RoomStatus
 import com.kiseru.asteroids.server.service.RoomService
 import java.io.IOException
 import java.io.OutputStream
+import java.util.concurrent.locks.Condition
+import java.util.concurrent.locks.Lock
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 class RoomServiceImpl : RoomService {
 
     private val rooms = mutableListOf<Room>()
 
-    private var notFullRoom = Room(::getNotFullRoom, ::handleRoom)
+    override var notFullRoomLock: Lock = ReentrantLock()
+        private set
+    override var notFullRoomCondition: Condition = notFullRoomLock.newCondition()
+        private set
+    private var notFullRoom = Room(
+        ::getNotFullRoom,
+        createRoomHandler(notFullRoomLock, notFullRoomCondition)
+    )
 
     override fun writeRatings(outputStream: OutputStream): Unit =
         synchronized(this) {
@@ -48,32 +58,39 @@ class RoomServiceImpl : RoomService {
         synchronized(this) {
             if (notFullRoom.isFull) {
                 rooms.add(notFullRoom)
-                notFullRoom = Room(::getNotFullRoom, ::handleRoom)
+                notFullRoomLock = ReentrantLock()
+                notFullRoomCondition = notFullRoomLock.newCondition()
+                val roomHandler = createRoomHandler(notFullRoomLock, notFullRoomCondition)
+                val room = Room(::getNotFullRoom, roomHandler)
+                notFullRoom = room
             }
 
             notFullRoom
         }
 
-    private fun handleRoom(room: Room, users: List<User?>) {
-        for (user in users) {
-            user?.sendMessage("start")
+    private fun createRoomHandler(lock: Lock, condition: Condition): (Room) -> Unit {
+        return { room -> handleRoom(lock, condition, room) }
+    }
+
+    private fun handleRoom(lock: Lock, condition: Condition, room: Room) {
+        lock.withLock {
+            while (room.status != RoomStatus.FINISHED) {
+                condition.await()
+            }
         }
 
-        room.setStatus(RoomStatus.GAMING)
-        room.createGame()
-        room.waitFinish()
-
-        for (user in users) {
-            user?.sendMessage("finish")
+        for (handler in room.onMessageSendHandlers) {
+            handler.accept("finish")
         }
 
         val rating = room.rating
-        for (user in users) {
-            user?.sendMessage(rating)
+        for (handler in room.onMessageSendHandlers) {
+            handler.accept(rating)
         }
 
         println("Room released!")
         println(rating)
         println()
     }
+
 }

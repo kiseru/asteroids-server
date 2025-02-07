@@ -9,10 +9,13 @@ import com.kiseru.asteroids.server.logics.models.Point;
 import com.kiseru.asteroids.server.logics.models.Spaceship;
 import com.kiseru.asteroids.server.User;
 
+import com.kiseru.asteroids.server.room.Room;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 
 /**
  * @author Bulat Giniyatullin
@@ -54,34 +57,35 @@ public class Game {
      * создает и регистрирует новый корабль
      * @param user - юзер, для которого регистриуется корабль
      */
-    public void registerSpaceShipForUser(User user) {
-        Spaceship spaceShip = new Spaceship(generateUniqueRandomCoordinates(), user);
-        user.setSpaceship(spaceShip);
-        pointsOnScreen.add(spaceShip);
-        crashHandlers.add(() -> check(this, spaceShip));
-        spaceShip.setCourseChecker(new CourseChecker(spaceShip, this.pointsOnScreen, this.screen));
+    public void registerSpaceShipForUser(User user, Lock lock, Condition condition, Room room) {
+        Spaceship spaceship = new Spaceship(generateUniqueRandomCoordinates(), user, lock, condition);
+        user.setSpaceship(spaceship);
+        pointsOnScreen.add(spaceship);
+        crashHandlers.add(() -> check(this, spaceship, room));
+        spaceship.setCourseChecker(new CourseChecker(spaceship, this.pointsOnScreen, this.screen));
     }
 
-    private void check(Game game, Spaceship spaceShip) {
+    private void check(Game game, Spaceship spaceship, Room room) {
         List<Point> points = game.getPointsOnScreen();
         Point collisionPoint = null;
         for (Point point: points) {
             if (point.getType() != Type.SPACESHIP &&
                     point.isVisible() &&
-                    point.getCoordinates().equals(spaceShip.getCoordinates())) {
+                    point.getCoordinates().equals(spaceship.getCoordinates())) {
                 collisionPoint = point;
                 break;
             }
         }
+
         if (collisionPoint != null) {
-            spaceShip.crash(collisionPoint.getType());
+            spaceship.crash(room, collisionPoint.getType());
             ((Crashable)collisionPoint).crash();
         } else {
             // проверка на столкновение со стеной
-            if (spaceShip.getX() == 0 || spaceShip.getY() == 0 ||
-                    spaceShip.getX() > game.getScreen().getWidth() ||
-                    spaceShip.getY() > game.getScreen().getHeight()) {
-                spaceShip.crash(Type.WALL);
+            if (spaceship.getX() == 0 || spaceship.getY() == 0 ||
+                    spaceship.getX() > game.getScreen().getWidth() ||
+                    spaceship.getY() > game.getScreen().getHeight()) {
+                spaceship.crash(room, Type.WALL);
             }
         }
     }
