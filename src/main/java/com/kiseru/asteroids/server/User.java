@@ -3,44 +3,35 @@ package com.kiseru.asteroids.server;
 import com.kiseru.asteroids.server.logics.auxiliary.Direction;
 import com.kiseru.asteroids.server.logics.models.Spaceship;
 import com.kiseru.asteroids.server.room.Room;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.util.Random;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
+import java.util.function.Consumer;
 
-public class User implements Runnable {
+public class User {
 
-    private final BufferedReader reader;
-    private final OutputStream outputStream;
-    private final PrintWriter writer;
     private final Room room;
-    private final Supplier<Room> notFullRoomSupplier;
-    private final BiConsumer<Room, OutputStream> onWriteGameField;
+    private final Consumer<String> onSendMessage;
     private final int id = new Random().nextInt(100);
 
-    private String userName;
+    private String username;
     private int score = 100;
     private int steps = 0;
-    private boolean isAlive = true;
-    private Spaceship spaceShip;
 
-    public User(
-            BufferedReader reader,
-            OutputStream outputStream,
-            PrintWriter writer,
-            Room room,
-            Supplier<Room> notFullRoomSupplier,
-            BiConsumer<Room, OutputStream> onWriteGameField
-    ) {
-        this.reader = reader;
-        this.outputStream = outputStream;
-        this.writer = writer;
+    private boolean isAlive = true;
+    private Spaceship spaceship;
+
+    public User(Room room, Consumer<String> onSendMessage) {
         this.room = room;
-        this.notFullRoomSupplier = notFullRoomSupplier;
-        this.onWriteGameField = onWriteGameField;
+        this.onSendMessage = onSendMessage;
+    }
+
+    public void moveSpaceshipForward() {
+        spaceship.go();
+        room.getGame().refresh();
+    }
+
+    public void updateSpaceshipDirection(Direction direction) {
+        spaceship.setDirection(direction);
+        room.getGame().refresh();
     }
 
     public int getScore() {
@@ -48,81 +39,20 @@ public class User implements Runnable {
     }
 
     @Override
-    public void run() {
-        try {
-            writer.println("Welcome To Asteroids Server");
-            writer.println("Please, introduce yourself!");
-            userName = reader.readLine();
-            System.out.println(userName + " has joined the server!");
-            writer.println("You need to keep a space garbage.");
-            writer.println("Your ID is " + id);
-            writer.println("Good luck, Commander!");
-            room.waitStart(this, notFullRoomSupplier);
-            spaceShip.setDirection(Direction.UP);
-            while (!room.isGameFinished() && isAlive) {
-                String userMessage = reader.readLine();
-                if (userMessage.equals("go")) {
-                    spaceShip.go();
-                    room.getGame().refresh();
-                    sendMessage(Integer.toString(score));
-                } else if (userMessage.equals("left")) {
-                    spaceShip.setDirection(Direction.LEFT);
-                    room.getGame().refresh();
-                    sendMessage("success");
-                } else if (userMessage.equals("right")) {
-                    spaceShip.setDirection(Direction.RIGHT);
-                    room.getGame().refresh();
-                    sendMessage("success");
-                } else if (userMessage.equals("up")) {
-                    spaceShip.setDirection(Direction.UP);
-                    room.getGame().refresh();
-                    sendMessage("success");
-                } else if (userMessage.equals("down")) {
-                    spaceShip.setDirection(Direction.DOWN);
-                    room.getGame().refresh();
-                    sendMessage("success");
-                } else if (userMessage.equals("isAsteroid")) {
-                    sendMessage(spaceShip.getCourseChecker().isAsteroid() ? "t" : "f");
-                } else if (userMessage.equals("isGarbage")) {
-                    sendMessage(spaceShip.getCourseChecker().isGarbage() ? "t" : "f");
-                } else if (userMessage.equals("isWall")) {
-                    sendMessage(spaceShip.getCourseChecker().isWall() ? "t" : "f");
-                } else if (userMessage.equals("GAME_FIELD")) {
-                    handleGameFieldCommand();
-                } else {
-                    sendMessage("Unknown command");
-                }
-                steps++;
-                if (steps >= 1500) {
-                    died();
-                }
-                if (score < 0) {
-                    died();
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Connection problems with user " + userName);
-        } finally {
-            isAlive = false;
-            room.checkAlive();
-        }
-    }
-
-    @Override
     public String toString() {
-        return String.format("%s %d", userName, score);
+        return String.format("%s %d", username, score);
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    private void handleGameFieldCommand() {
-        onWriteGameField.accept(room, outputStream);
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public void sendMessage(String message) {
-        writer.println(message);
+        onSendMessage.accept(message);
     }
 
     public void addScore() {
@@ -136,19 +66,12 @@ public class User implements Runnable {
         }
     }
 
-    public boolean getIsAlive() {
-        return isAlive;
+    public Spaceship getSpaceship() {
+        return spaceship;
     }
 
-    public void died() {
-        isAlive = false;
-        this.sendMessage("died");
-        String scoreMessage = String.format("You have collected %d score", this.score);
-        this.sendMessage(scoreMessage);
-    }
-
-    public void setSpaceShip(Spaceship spaceShip) {
-        this.spaceShip = spaceShip;
+    public void setSpaceship(Spaceship spaceship) {
+        this.spaceship = spaceship;
     }
 
     public Room getRoom() {
@@ -161,5 +84,17 @@ public class User implements Runnable {
 
     public boolean isAlive() {
         return isAlive;
+    }
+
+    public void setIsAlive(boolean isAlive) {
+        this.isAlive = isAlive;
+    }
+
+    public int getSteps() {
+        return steps;
+    }
+
+    public void setSteps(int steps) {
+        this.steps = steps;
     }
 }

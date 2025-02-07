@@ -46,7 +46,7 @@ public class Room implements Runnable {
                 .filter(Objects::nonNull)
                 .forEach(roomUser -> roomUser.sendMessage(String.format(
                         "User %s has joined the room.",
-                        user.getUserName()
+                        user.getUsername()
                 )));
 
         users.set(emptyPlaceIndex, user);
@@ -64,7 +64,7 @@ public class Room implements Runnable {
     public long aliveCount() {
         return users.stream()
                 .filter(Objects::nonNull)
-                .filter(User::getIsAlive)
+                .filter(User::isAlive)
                 .count();
     }
 

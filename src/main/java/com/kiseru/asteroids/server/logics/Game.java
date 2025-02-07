@@ -56,7 +56,7 @@ public class Game {
      */
     public void registerSpaceShipForUser(User user) {
         Spaceship spaceShip = new Spaceship(generateUniqueRandomCoordinates(), user);
-        user.setSpaceShip(spaceShip);
+        user.setSpaceship(spaceShip);
         pointsOnScreen.add(spaceShip);
         crashHandlers.add(() -> check(this, spaceShip));
         spaceShip.setCourseChecker(new CourseChecker(spaceShip, this.pointsOnScreen, this.screen));
