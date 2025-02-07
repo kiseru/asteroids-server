@@ -65,9 +65,13 @@ public class Spaceship extends Point implements Model{
         var game = room.getGame();
         synchronized (game) {
             if (type == Type.ASTEROID) {
-                owner.subtractScore(room);
+                if (room.getStatus() == RoomStatus.GAMING) {
+                    owner.subtractScore();
+                }
             } else if (type == Type.GARBAGE) {
-                owner.addScore(room);
+                if (room.getStatus() == RoomStatus.GAMING) {
+                    owner.addScore();
+                }
                 lock.lock();
                 checkCollectedGarbage(room, game);
                 condition.signalAll();
@@ -75,7 +79,9 @@ public class Spaceship extends Point implements Model{
             } else if (type == Type.WALL) {
                 // возвращаемся назад, чтобы не находится на стене
                 rollbackLastStep();
-                owner.subtractScore(room);
+                if (room.getStatus() == RoomStatus.GAMING) {
+                    owner.subtractScore();
+                }
             }
             if (!owner.isAlive()) {
                 this.destroy();

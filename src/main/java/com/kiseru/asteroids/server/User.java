@@ -1,8 +1,6 @@
 package com.kiseru.asteroids.server;
 
 import com.kiseru.asteroids.server.logics.models.Spaceship;
-import com.kiseru.asteroids.server.room.Room;
-import com.kiseru.asteroids.server.room.RoomStatus;
 import java.util.Random;
 
 public class User {
@@ -33,17 +31,13 @@ public class User {
         this.username = username;
     }
 
-    public void addScore(Room room) {
-        if (room.getStatus() == RoomStatus.GAMING) {
-            score += 10;
-        }
+    public void addScore() {
+        score += 10;
     }
 
-    public void subtractScore(Room room) {
-        if (room.getStatus() == RoomStatus.GAMING) {
-            score -= 50;
-            if (score < 0) isAlive = false;
-        }
+    public void subtractScore() {
+        score -= 50;
+        isAlive = score >= 0;
     }
 
     public Spaceship getSpaceship() {
