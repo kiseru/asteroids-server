@@ -1,6 +1,8 @@
 package com.kiseru.asteroids.server.service.impl
 
+import com.kiseru.asteroids.server.User
 import com.kiseru.asteroids.server.room.Room
+import com.kiseru.asteroids.server.room.RoomStatus
 import com.kiseru.asteroids.server.service.RoomService
 import java.io.IOException
 import java.io.OutputStream
@@ -9,7 +11,7 @@ class RoomServiceImpl : RoomService {
 
     private val rooms = mutableListOf<Room>()
 
-    private var notFullRoom = Room(::getNotFullRoom)
+    private var notFullRoom = Room(::getNotFullRoom, ::handleRoom)
 
     override fun writeRatings(outputStream: OutputStream): Unit =
         synchronized(this) {
@@ -46,9 +48,32 @@ class RoomServiceImpl : RoomService {
         synchronized(this) {
             if (notFullRoom.isFull) {
                 rooms.add(notFullRoom)
-                notFullRoom = Room(::getNotFullRoom)
+                notFullRoom = Room(::getNotFullRoom, ::handleRoom)
             }
 
             notFullRoom
         }
+
+    private fun handleRoom(room: Room, users: List<User?>) {
+        for (user in users) {
+            user?.sendMessage("start")
+        }
+
+        room.setStatus(RoomStatus.GAMING)
+        room.createGame()
+        room.waitFinish()
+
+        for (user in users) {
+            user?.sendMessage("finish")
+        }
+
+        val rating = room.rating
+        for (user in users) {
+            user?.sendMessage(rating)
+        }
+
+        println("Room released!")
+        println(rating)
+        println()
+    }
 }

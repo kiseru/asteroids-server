@@ -6,23 +6,27 @@ import com.kiseru.asteroids.server.User;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
-public class Room implements Runnable {
+public class Room {
 
     private final int MAX_USERS = 1;
     private final ArrayList<User> users = new ArrayList<>();
 
     private final Supplier<Room> notFullRoomSupplier;
+    private final BiConsumer<Room, List<User>> onRoomRun;
 
     private int usersCount = 0;
-    private RoomStatus roomStatus = RoomStatus.WAITING_CONNECTIONS;
+    private RoomStatus status = RoomStatus.WAITING_CONNECTIONS;
     private Game game;
 
-    public Room(Supplier<Room> notFullRoomSupplier) {
+    public Room(Supplier<Room> notFullRoomSupplier, BiConsumer<Room, List<User>> onRoomRun) {
         this.notFullRoomSupplier = notFullRoomSupplier;
+        this.onRoomRun = onRoomRun;
         IntStream.iterate(0, i -> i + 1)
                 .limit(MAX_USERS)
                 .forEach(i -> users.add(null));
@@ -73,34 +77,14 @@ public class Room implements Runnable {
     }
 
     public boolean isGameStarted() {
-        return roomStatus == RoomStatus.GAMING;
+        return status == RoomStatus.GAMING;
     }
 
     public boolean isGameFinished() {
-        return roomStatus == RoomStatus.FINISHED;
+        return status == RoomStatus.FINISHED;
     }
 
-    @Override
-    public void run() {
-        users.stream()
-                .filter(Objects::nonNull)
-                .forEach(user -> user.sendMessage("start"));
-
-        roomStatus = RoomStatus.GAMING;
-        createGame();
-        waitFinish();
-        users.stream()
-                .filter(Objects::nonNull)
-                .forEach(user -> user.sendMessage("finish"));
-        users.stream()
-                .filter(Objects::nonNull)
-                .forEach(user -> user.sendMessage(this.getRating()));
-        System.out.println("Room released!");
-        System.out.println(getRating());
-        System.out.println();
-    }
-
-    private synchronized void createGame() {
+    public synchronized void createGame() {
         game = new Game(new Screen(30, 30), 150, 50);
         users.stream()
                 .filter(Objects::nonNull)
@@ -108,14 +92,14 @@ public class Room implements Runnable {
         notifyAll();
     }
 
-    private synchronized void waitFinish() {
+    public synchronized void waitFinish() {
         try {
             game.refresh();
             this.wait();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        roomStatus = RoomStatus.FINISHED;
+        status = RoomStatus.FINISHED;
     }
 
     public synchronized void waitStart(User user, Supplier<Room> notFullRoomSupplier) {
@@ -123,7 +107,8 @@ public class Room implements Runnable {
             addUser(user);
             if (isFull()) {
                 notFullRoomSupplier.get();// Чтобы полная комната добавилась в список комнат
-                new Thread(this).start();
+                Runnable runnable = () -> onRoomRun.accept(this, users);
+                new Thread(runnable).start();
             }
             wait();
         } catch (InterruptedException e) {
@@ -146,5 +131,9 @@ public class Room implements Runnable {
 
     public Game getGame() {
         return game;
+    }
+
+    public void setStatus(RoomStatus status) {
+        this.status = status;
     }
 }
