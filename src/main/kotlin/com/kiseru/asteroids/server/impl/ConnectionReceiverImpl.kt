@@ -60,12 +60,9 @@ class ConnectionReceiverImpl(
         lock: Lock,
         condition: Condition,
     ) {
+        val user = createUser(writer, reader)
         try {
-            writer.println("Welcome To Asteroids Server")
-            writer.println("Please, introduce yourself!")
-            val username = reader.readLine()
-            val user = User(Random().nextInt(100), username)
-            println("$username has joined the server!")
+            println("${user.username} has joined the server!")
             writer.println("You need to keep a space garbage.")
             writer.println("Your ID is " + user.id)
             writer.println("Good luck, Commander!")
@@ -130,6 +127,13 @@ class ConnectionReceiverImpl(
                 condition.signalAll()
             }
         }
+    }
+
+    private fun createUser(writer: PrintWriter, reader: BufferedReader): User {
+        writer.println("Welcome To Asteroids Server")
+        writer.println("Please, introduce yourself!")
+        val username = reader.readLine()
+        return User(Random().nextInt(100), username)
     }
 
     private fun incrementSteps(user: User, writer: PrintWriter) {
