@@ -75,6 +75,7 @@ class ConnectionReceiverImpl(
         val user = createUser(writer, reader)
         try {
             println("${user.username} has joined the server!")
+            writer.println("You joined the room \"${room.name}\"")
             writer.println("You need to keep a space garbage.")
             writer.println("Your ID is " + user.id)
             writer.println("Good luck, Commander!")
@@ -191,4 +192,5 @@ class ConnectionReceiverImpl(
         val scoreMessage = String.format("You have collected %d score", user.score)
         writer.println(scoreMessage)
     }
+
 }

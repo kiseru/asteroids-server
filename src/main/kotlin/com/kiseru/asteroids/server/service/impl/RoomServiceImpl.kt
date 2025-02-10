@@ -5,6 +5,7 @@ import com.kiseru.asteroids.server.room.RoomStatus
 import com.kiseru.asteroids.server.service.RoomService
 import java.io.IOException
 import java.io.OutputStream
+import java.util.UUID
 import java.util.concurrent.locks.Condition
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
@@ -18,7 +19,7 @@ class RoomServiceImpl : RoomService {
         private set
     override var notFullRoomCondition: Condition = notFullRoomLock.newCondition()
         private set
-    private var notFullRoom = Room(createRoomHandler(notFullRoomLock, notFullRoomCondition))
+    private var notFullRoom = createRoom(createRoomHandler(notFullRoomLock, notFullRoomCondition))
 
     override fun writeRatings(outputStream: OutputStream): Unit =
         synchronized(this) {
@@ -58,7 +59,7 @@ class RoomServiceImpl : RoomService {
                 notFullRoomLock = ReentrantLock()
                 notFullRoomCondition = notFullRoomLock.newCondition()
                 val roomHandler = createRoomHandler(notFullRoomLock, notFullRoomCondition)
-                val room = Room(roomHandler)
+                val room = createRoom(roomHandler)
                 notFullRoom = room
             }
 
@@ -88,6 +89,11 @@ class RoomServiceImpl : RoomService {
         println("Room released!")
         println(rating)
         println()
+    }
+
+    private fun createRoom(roomHandler: (Room) -> Unit): Room {
+        val roomId = UUID.randomUUID()
+        return Room(roomId, roomId.toString(), roomHandler)
     }
 
     private fun getRoomRating(room: Room): String =

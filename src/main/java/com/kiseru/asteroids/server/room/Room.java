@@ -6,6 +6,7 @@ import com.kiseru.asteroids.server.User;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class Room {
@@ -14,13 +15,17 @@ public class Room {
     private final List<User> users = new ArrayList<>();
     private final List<Consumer<String>> onMessageSendHandlers = new ArrayList<>();
 
+    private final UUID id;
+    private final String name;
     private final Consumer<Room> onRoomRun;
 
     private int usersCount = 0;
     private RoomStatus status = RoomStatus.WAITING_CONNECTIONS;
     private Game game;
 
-    public Room(Consumer<Room> onRoomRun) {
+    public Room(UUID id, String name, Consumer<Room> onRoomRun) {
+        this.id = id;
+        this.name = name;
         this.onRoomRun = onRoomRun;
     }
 
@@ -69,5 +74,9 @@ public class Room {
 
     public Consumer<Room> getOnRoomRun() {
         return onRoomRun;
+    }
+
+    public String getName() {
+        return name;
     }
 }
