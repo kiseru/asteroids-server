@@ -18,10 +18,7 @@ class RoomServiceImpl : RoomService {
         private set
     override var notFullRoomCondition: Condition = notFullRoomLock.newCondition()
         private set
-    private var notFullRoom = Room(
-        ::getNotFullRoom,
-        createRoomHandler(notFullRoomLock, notFullRoomCondition)
-    )
+    private var notFullRoom = Room(createRoomHandler(notFullRoomLock, notFullRoomCondition))
 
     override fun writeRatings(outputStream: OutputStream): Unit =
         synchronized(this) {
@@ -32,7 +29,7 @@ class RoomServiceImpl : RoomService {
 
     private fun writeRating(room: Room, outputStream: OutputStream): Unit =
         try {
-            val rating = room.rating
+            val rating = getRoomRating(room)
             outputStream.write("$rating\n".toByteArray())
         } catch (_: IOException) {
             println("Failed to write the room's rating")
@@ -61,7 +58,7 @@ class RoomServiceImpl : RoomService {
                 notFullRoomLock = ReentrantLock()
                 notFullRoomCondition = notFullRoomLock.newCondition()
                 val roomHandler = createRoomHandler(notFullRoomLock, notFullRoomCondition)
-                val room = Room(::getNotFullRoom, roomHandler)
+                val room = Room(roomHandler)
                 notFullRoom = room
             }
 
@@ -83,7 +80,7 @@ class RoomServiceImpl : RoomService {
             handler.accept("finish")
         }
 
-        val rating = room.rating
+        val rating = getRoomRating(room)
         for (handler in room.onMessageSendHandlers) {
             handler.accept(rating)
         }
@@ -93,4 +90,7 @@ class RoomServiceImpl : RoomService {
         println()
     }
 
+    private fun getRoomRating(room: Room): String =
+        room.users.sortedByDescending { it.score }
+            .joinToString("\n") { it.toString() }
 }

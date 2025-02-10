@@ -2,6 +2,8 @@ package com.kiseru.asteroids.server.impl
 
 import com.kiseru.asteroids.server.ConnectionReceiver
 import com.kiseru.asteroids.server.User
+import com.kiseru.asteroids.server.logics.Game
+import com.kiseru.asteroids.server.logics.Screen
 import com.kiseru.asteroids.server.logics.auxiliary.Direction
 import com.kiseru.asteroids.server.room.Room
 import com.kiseru.asteroids.server.room.RoomStatus
@@ -45,7 +47,17 @@ class ConnectionReceiverImpl(
             val printWriter = PrintWriter(outputStream, true)
             val reader = inputStream.bufferedReader()
             val onMessageSend: (String) -> Unit = printWriter::println
-            thread { handleUser(printWriter, reader, onMessageSend, notFullRoom, outputStream, notFullRoomLock, notFullRoomCondition) }
+            thread {
+                handleUser(
+                    printWriter,
+                    reader,
+                    onMessageSend,
+                    notFullRoom,
+                    outputStream,
+                    notFullRoomLock,
+                    notFullRoomCondition,
+                )
+            }
         } catch (e: IOException) {
             throw RuntimeException(e)
         }
@@ -67,7 +79,24 @@ class ConnectionReceiverImpl(
             writer.println("Your ID is " + user.id)
             writer.println("Good luck, Commander!")
             lock.withLock {
-                room.waitStart(user, onMessageSend, roomService::getNotFullRoom, lock, condition)
+                room.addUser(user, onMessageSend)
+                if (room.isFull) {
+                    roomService.getNotFullRoom()
+                    for (handler in room.onMessageSendHandlers) {
+                        handler.accept("start")
+                    }
+                    room.status = RoomStatus.GAMING
+                    val game = Game(Screen(30, 30), 150, 150)
+                    room.game = game
+                    for (roomUser in room.users) {
+                        game.registerSpaceShipForUser(roomUser, lock, condition, room)
+                    }
+                    game.refresh()
+                    val runnable = room.onRoomRun
+                    thread {
+                        runnable.accept(room)
+                    }
+                }
             }
             user.spaceship.direction = Direction.UP
             while (room.status != RoomStatus.FINISHED && user.isAlive) {
@@ -78,38 +107,47 @@ class ConnectionReceiverImpl(
                         room.game.refresh()
                         writer.println(user.score.toString())
                     }
+
                     "left" -> {
                         user.spaceship.direction = Direction.LEFT
                         room.game.refresh()
                         writer.println("success")
                     }
+
                     "right" -> {
                         user.spaceship.direction = Direction.RIGHT
                         room.game.refresh()
                         writer.println("success")
                     }
+
                     "up" -> {
                         user.spaceship.direction = Direction.UP
                         room.game.refresh()
                         writer.println("success")
                     }
+
                     "down" -> {
                         user.spaceship.direction = Direction.DOWN
                         room.game.refresh()
                         writer.println("success")
                     }
+
                     "isAsteroid" -> {
                         writer.println(if (user.spaceship.courseChecker.isAsteroid) "t" else "f")
                     }
+
                     "isGarbage" -> {
                         writer.println(if (user.spaceship.courseChecker.isGarbage) "t" else "f")
                     }
+
                     "isWall" -> {
                         writer.println(if (user.spaceship.courseChecker.isWall) "t" else "f")
                     }
+
                     "GAME_FIELD" -> {
                         roomService.writeGameField(room, outputStream)
                     }
+
                     else -> {
                         writer.println("Unknown command")
                     }
@@ -121,7 +159,8 @@ class ConnectionReceiverImpl(
         } finally {
             user.setIsAlive(false)
             lock.withLock {
-                if (room.aliveCount() == 0L) {
+                val aliveUsersCount = room.users.count { it.isAlive }
+                if (aliveUsersCount == 0) {
                     room.status = RoomStatus.FINISHED
                 }
                 condition.signalAll()
