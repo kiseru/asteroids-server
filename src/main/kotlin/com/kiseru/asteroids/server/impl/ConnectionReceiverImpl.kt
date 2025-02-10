@@ -15,8 +15,8 @@ import java.io.PrintWriter
 import java.net.ServerSocket
 import java.net.Socket
 import java.util.Random
-import java.util.concurrent.locks.Condition
-import java.util.concurrent.locks.Lock
+import java.util.UUID
+import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.thread
 import kotlin.concurrent.withLock
 
@@ -39,9 +39,6 @@ class ConnectionReceiverImpl(
 
     private fun handleConnection(socket: Socket) {
         try {
-            val notFullRoom = roomService.getNotFullRoom()
-            val notFullRoomLock = roomService.notFullRoomLock
-            val notFullRoomCondition = roomService.notFullRoomCondition
             val inputStream = socket.getInputStream()
             val outputStream = socket.getOutputStream()
             val printWriter = PrintWriter(outputStream, true)
@@ -52,10 +49,7 @@ class ConnectionReceiverImpl(
                     printWriter,
                     reader,
                     onMessageSend,
-                    notFullRoom,
                     outputStream,
-                    notFullRoomLock,
-                    notFullRoomCondition,
                 )
             }
         } catch (e: IOException) {
@@ -67,36 +61,34 @@ class ConnectionReceiverImpl(
         writer: PrintWriter,
         reader: BufferedReader,
         onMessageSend: (String) -> Unit,
-        room: Room,
         outputStream: OutputStream,
-        lock: Lock,
-        condition: Condition,
     ) {
         val user = createUser(writer, reader)
+        val lock = ReentrantLock()
+        val condition = lock.newCondition()
+        println("${user.username} has joined the server!")
+        val roomId = UUID.randomUUID()
+        val room = Room(roomId, roomId.toString(), user, onMessageSend)
         try {
-            println("${user.username} has joined the server!")
+
             writer.println("You joined the room \"${room.name}\"")
             writer.println("You need to keep a space garbage.")
             writer.println("Your ID is " + user.id)
             writer.println("Good luck, Commander!")
             lock.withLock {
-                room.addUser(user, onMessageSend)
-                if (room.isFull) {
-                    roomService.getNotFullRoom()
-                    for (handler in room.onMessageSendHandlers) {
-                        handler.accept("start")
-                    }
-                    room.status = RoomStatus.GAMING
-                    val game = Game(Screen(30, 30), 150, 150)
-                    room.game = game
-                    for (roomUser in room.users) {
-                        game.registerSpaceShipForUser(roomUser, lock, condition, room)
-                    }
-                    game.refresh()
-                    val runnable = room.onRoomRun
-                    thread {
-                        runnable.accept(room)
-                    }
+                for (handler in room.onMessageSendHandlers) {
+                    handler.accept("start")
+                }
+                room.status = RoomStatus.GAMING
+                val game = Game(Screen(30, 30), 150, 150)
+                room.game = game
+                for (roomUser in room.users) {
+                    game.registerSpaceShipForUser(roomUser, lock, condition, room)
+                }
+                game.refresh()
+                val runnable = roomService.createRoomHandler(lock, condition)
+                thread {
+                    runnable(room)
                 }
             }
             user.spaceship.direction = Direction.UP

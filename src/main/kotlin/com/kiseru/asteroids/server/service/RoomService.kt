@@ -7,15 +7,11 @@ import java.util.concurrent.locks.Lock
 
 interface RoomService {
 
-    val notFullRoomLock: Lock
-
-    val notFullRoomCondition: Condition
-
     fun writeRatings(outputStream: OutputStream)
 
     fun writeGameFields(outputStream: OutputStream)
 
     fun writeGameField(room: Room, outputStream: OutputStream)
 
-    fun getNotFullRoom(): Room
+    fun createRoomHandler(lock: Lock, condition: Condition): (Room) -> Unit
 }

@@ -3,7 +3,6 @@ package com.kiseru.asteroids.server.room;
 import com.kiseru.asteroids.server.logics.Game;
 import com.kiseru.asteroids.server.User;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -11,41 +10,20 @@ import java.util.function.Consumer;
 
 public class Room {
 
-    private final int MAX_USERS = 1;
-    private final List<User> users = new ArrayList<>();
-    private final List<Consumer<String>> onMessageSendHandlers = new ArrayList<>();
+    private final User user;
+    private final Consumer<String> onMessageSendHandler;
 
     private final UUID id;
     private final String name;
-    private final Consumer<Room> onRoomRun;
 
-    private int usersCount = 0;
     private RoomStatus status = RoomStatus.WAITING_CONNECTIONS;
     private Game game;
 
-    public Room(UUID id, String name, Consumer<Room> onRoomRun) {
+    public Room(UUID id, String name, User user, Consumer<String> onMessageSendHandler) {
         this.id = id;
         this.name = name;
-        this.onRoomRun = onRoomRun;
-    }
-
-    public void addUser(User user, Consumer<String> onMessageSend) {
-        if (usersCount >= MAX_USERS) {
-            return;
-        }
-
-        var message = String.format("User %s has joined the room.", user.getUsername());
-        for (var handler : onMessageSendHandlers) {
-            handler.accept(message);
-        }
-
-        users.add(user);
-        onMessageSendHandlers.add(onMessageSend);
-        usersCount++;
-    }
-
-    public boolean isFull() {
-        return usersCount == MAX_USERS;
+        this.user = user;
+        this.onMessageSendHandler = onMessageSendHandler;
     }
 
     public Game getGame() {
@@ -65,15 +43,11 @@ public class Room {
     }
 
     public List<User> getUsers() {
-        return Collections.unmodifiableList(users);
+        return Collections.singletonList(user);
     }
 
     public List<Consumer<String>> getOnMessageSendHandlers() {
-        return Collections.unmodifiableList(onMessageSendHandlers);
-    }
-
-    public Consumer<Room> getOnRoomRun() {
-        return onRoomRun;
+        return Collections.singletonList(onMessageSendHandler);
     }
 
     public String getName() {
