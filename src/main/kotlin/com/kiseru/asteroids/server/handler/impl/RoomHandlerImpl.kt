@@ -20,6 +20,8 @@ class RoomHandlerImpl(
         for (roomUser in room.users) {
             room.game.registerSpaceShipForUser(roomUser, lock, condition, room)
         }
+        room.status = RoomStatus.GAMING
+        lock.withLock { condition.signalAll() }
         room.game.refresh()
         sendMessage("start")
         awaitFinish()
@@ -33,7 +35,7 @@ class RoomHandlerImpl(
 
     override fun awaitStart() {
         lock.withLock {
-            while (room.status != RoomStatus.GAMING) {
+            while (room.users.size < room.size) {
                 condition.await()
             }
         }
@@ -48,7 +50,7 @@ class RoomHandlerImpl(
     }
 
     override fun sendMessage(message: String) {
-        for (handler in room.onMessageSendHandlers) {
+        for (handler in room.sendMessageHandlers) {
             handler.accept(message)
         }
     }

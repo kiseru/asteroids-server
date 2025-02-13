@@ -70,10 +70,10 @@ class ConnectionReceiverImpl(
             userHandler.onSendInstructions()
             val roomHandler = RoomHandlerImpl(room, lock, condition, roomService)
             thread { roomHandler.handle() }
-
             lock.withLock {
-                room.status = RoomStatus.GAMING
-                condition.signalAll()
+                while (room.status != RoomStatus.GAMING) {
+                    condition.await()
+                }
             }
 
             userHandler.onSpaceshipChangeDirection(Direction.UP)
@@ -145,6 +145,8 @@ class ConnectionReceiverImpl(
     private fun createRoom(user: User, onMessageSend: (String) -> Unit): Room {
         val roomId = UUID.randomUUID()
         val game = Game(Screen(30, 30), 150, 150)
-        return Room(roomId, roomId.toString(), user, game, onMessageSend)
+        val room = Room(roomId, roomId.toString(), game, 1)
+        room.addUser(user, onMessageSend)
+        return room
     }
 }

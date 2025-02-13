@@ -64,12 +64,12 @@ class RoomServiceImpl : RoomService {
             }
         }
 
-        for (handler in room.onMessageSendHandlers) {
+        for (handler in room.sendMessageHandlers) {
             handler.accept("finish")
         }
 
         val rating = getRoomRating(room)
-        for (handler in room.onMessageSendHandlers) {
+        for (handler in room.sendMessageHandlers) {
             handler.accept(rating)
         }
 
