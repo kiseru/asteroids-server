@@ -1,6 +1,6 @@
 package com.kiseru.asteroids.server.service
 
-import com.kiseru.asteroids.server.room.Room
+import com.kiseru.asteroids.server.model.Room
 import java.io.OutputStream
 import java.util.concurrent.locks.Condition
 import java.util.concurrent.locks.Lock

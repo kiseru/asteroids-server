@@ -1,7 +1,7 @@
 package com.kiseru.asteroids.server.handler.impl
 
 import com.kiseru.asteroids.server.handler.RoomHandler
-import com.kiseru.asteroids.server.room.Room
+import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.room.RoomStatus
 import com.kiseru.asteroids.server.service.RoomService
 import java.util.concurrent.locks.Condition
@@ -17,8 +17,10 @@ class RoomHandlerImpl(
 
     override fun handle() {
         awaitStart()
-        for (roomUser in room.users) {
-            room.game.registerSpaceShipForUser(roomUser, lock, condition, room)
+        for (roomUser in room.getUsers()) {
+            room.game.registerSpaceshipForUser(roomUser, lock, condition) {
+                room.game.check(room.game, it, room.status) { roomStatus -> room.status = roomStatus }
+            }
         }
         room.status = RoomStatus.GAMING
         lock.withLock { condition.signalAll() }
@@ -35,7 +37,7 @@ class RoomHandlerImpl(
 
     override fun awaitStart() {
         lock.withLock {
-            while (room.users.size < room.size) {
+            while (room.getUsers().size < room.size) {
                 condition.await()
             }
         }
@@ -50,8 +52,8 @@ class RoomHandlerImpl(
     }
 
     override fun sendMessage(message: String) {
-        for (handler in room.sendMessageHandlers) {
-            handler.accept(message)
+        for (handler in room.getSendMessageHandlers()) {
+            handler(message)
         }
     }
 }

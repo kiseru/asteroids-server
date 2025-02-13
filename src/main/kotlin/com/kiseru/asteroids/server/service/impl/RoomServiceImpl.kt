@@ -1,6 +1,6 @@
 package com.kiseru.asteroids.server.service.impl
 
-import com.kiseru.asteroids.server.room.Room
+import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.room.RoomStatus
 import com.kiseru.asteroids.server.service.RoomService
 import java.io.IOException
@@ -64,13 +64,13 @@ class RoomServiceImpl : RoomService {
             }
         }
 
-        for (handler in room.sendMessageHandlers) {
-            handler.accept("finish")
+        for (handler in room.getSendMessageHandlers()) {
+            handler("finish")
         }
 
         val rating = getRoomRating(room)
-        for (handler in room.sendMessageHandlers) {
-            handler.accept(rating)
+        for (handler in room.getSendMessageHandlers()) {
+            handler(rating)
         }
 
         println("Room released!")
@@ -79,6 +79,7 @@ class RoomServiceImpl : RoomService {
     }
 
     override fun getRoomRating(room: Room): String =
-        room.users.sortedByDescending { it.score }
+        room.getUsers()
+            .sortedByDescending { it.score }
             .joinToString("\n") { it.toString() }
 }

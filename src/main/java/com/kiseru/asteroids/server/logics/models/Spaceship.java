@@ -7,10 +7,10 @@ import com.kiseru.asteroids.server.logics.auxiliary.Coordinates;
 import com.kiseru.asteroids.server.logics.auxiliary.Direction;
 import com.kiseru.asteroids.server.logics.auxiliary.Type;
 import com.kiseru.asteroids.server.User;
-import com.kiseru.asteroids.server.room.Room;
 import com.kiseru.asteroids.server.room.RoomStatus;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
+import java.util.function.Consumer;
 
 /**
  * @author Bulat Giniyatullin
@@ -57,29 +57,24 @@ public class Spaceship extends Point implements Model{
         }
     }
 
-    /**
-     * Вызывается при выявлении столкновения корабля с чем-либо
-     * @param type: тип объекта, с которым произошло столкновение
-     */
-    public void crash(Room room, Type type) {
-        var game = room.getGame();
+    public void crash(Game game, Type type, RoomStatus roomStatus, Consumer<RoomStatus> onRoomStatusUpdate) {
         synchronized (game) {
             if (type == Type.ASTEROID) {
-                if (room.getStatus() == RoomStatus.GAMING) {
+                if (roomStatus == RoomStatus.GAMING) {
                     owner.subtractScore();
                 }
             } else if (type == Type.GARBAGE) {
-                if (room.getStatus() == RoomStatus.GAMING) {
+                if (roomStatus == RoomStatus.GAMING) {
                     owner.addScore();
                 }
                 lock.lock();
-                checkCollectedGarbage(room, game);
+                checkCollectedGarbage(game, onRoomStatusUpdate);
                 condition.signalAll();
                 lock.unlock();
             } else if (type == Type.WALL) {
                 // возвращаемся назад, чтобы не находится на стене
                 rollbackLastStep();
-                if (room.getStatus() == RoomStatus.GAMING) {
+                if (roomStatus == RoomStatus.GAMING) {
                     owner.subtractScore();
                 }
             }
@@ -89,10 +84,10 @@ public class Spaceship extends Point implements Model{
         }
     }
 
-    private static void checkCollectedGarbage(Room room, Game game) {
+    private static void checkCollectedGarbage(Game game, Consumer<RoomStatus> onRoomStatusUpdate) {
         int collected = game.incrementCollectedGarbageCount();
         if (collected >= game.getGarbageNumber()) {
-            room.setStatus(RoomStatus.FINISHED);
+            onRoomStatusUpdate.accept(RoomStatus.FINISHED);
         }
     }
 

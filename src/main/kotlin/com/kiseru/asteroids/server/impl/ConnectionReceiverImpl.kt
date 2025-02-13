@@ -7,7 +7,7 @@ import com.kiseru.asteroids.server.handler.impl.UserHandlerImpl
 import com.kiseru.asteroids.server.logics.Game
 import com.kiseru.asteroids.server.logics.Screen
 import com.kiseru.asteroids.server.logics.auxiliary.Direction
-import com.kiseru.asteroids.server.room.Room
+import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.room.RoomStatus
 import com.kiseru.asteroids.server.service.RoomService
 import java.io.IOException
@@ -127,7 +127,7 @@ class ConnectionReceiverImpl(
         } finally {
             user.setIsAlive(false)
             lock.withLock {
-                val aliveUsersCount = room.users.count { it.isAlive }
+                val aliveUsersCount = room.getUsers().count { it.isAlive }
                 if (aliveUsersCount == 0) {
                     room.status = RoomStatus.FINISHED
                 }
