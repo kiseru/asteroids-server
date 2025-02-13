@@ -67,7 +67,7 @@ class ConnectionReceiverImpl(
         try {
             sendInstructions(writer, user)
             val roomHandler = RoomHandlerImpl(room, lock, condition, roomService)
-            thread { roomHandler.handle(room) }
+            thread { roomHandler.handle() }
 
             lock.withLock {
                 room.status = RoomStatus.GAMING

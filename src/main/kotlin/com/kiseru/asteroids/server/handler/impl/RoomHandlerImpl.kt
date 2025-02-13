@@ -15,7 +15,7 @@ class RoomHandlerImpl(
     private val roomService: RoomService,
 ) : RoomHandler {
 
-    override fun handle(room: Room) {
+    override fun handle() {
         awaitStart()
         for (roomUser in room.users) {
             room.game.registerSpaceShipForUser(roomUser, lock, condition, room)

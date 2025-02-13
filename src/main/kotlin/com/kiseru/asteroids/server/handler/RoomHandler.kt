@@ -1,7 +1,5 @@
 package com.kiseru.asteroids.server.handler
 
-import com.kiseru.asteroids.server.room.Room
-
 interface RoomHandler {
 
     fun awaitStart()
@@ -10,5 +8,5 @@ interface RoomHandler {
 
     fun sendMessage(message: String)
 
-    fun handle(room: Room)
+    fun handle()
 }
