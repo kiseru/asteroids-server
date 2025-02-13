@@ -44,6 +44,15 @@ class RoomServiceImpl : RoomService {
             println("Failed to write the room's game field")
         }
 
+    override fun writeGameField(room: Room, onMessageSend: (String) -> Unit): Unit =
+        try {
+            val screen = room.game.screen
+            val gameField = screen.display()
+            onMessageSend("$gameField\n")
+        } catch (_: IOException) {
+            println("Failed to write the room's game field")
+        }
+
     override fun createRoomHandler(lock: Lock, condition: Condition): (Room) -> Unit {
         return { room -> handleRoom(lock, condition, room) }
     }

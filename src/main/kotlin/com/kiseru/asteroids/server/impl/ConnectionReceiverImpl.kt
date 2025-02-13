@@ -9,9 +9,7 @@ import com.kiseru.asteroids.server.logics.auxiliary.Direction
 import com.kiseru.asteroids.server.room.Room
 import com.kiseru.asteroids.server.room.RoomStatus
 import com.kiseru.asteroids.server.service.RoomService
-import java.io.BufferedReader
 import java.io.IOException
-import java.io.OutputStream
 import java.io.PrintWriter
 import java.net.ServerSocket
 import java.net.Socket
@@ -44,28 +42,22 @@ class ConnectionReceiverImpl(
             val outputStream = socket.getOutputStream()
             val printWriter = PrintWriter(outputStream, true)
             val reader = inputStream.bufferedReader()
-            val onMessageSend: (String) -> Unit = printWriter::println
-            thread { handleUser(printWriter, reader, onMessageSend, outputStream) }
+            thread { handleUser(reader::readLine, printWriter::println) }
         } catch (e: IOException) {
             throw RuntimeException(e)
         }
     }
 
-    private fun handleUser(
-        writer: PrintWriter,
-        reader: BufferedReader,
-        onMessageSend: (String) -> Unit,
-        outputStream: OutputStream,
-    ) {
-        val username = promptUsername(reader, writer)
+    private fun handleUser(onMessageReceive: () -> String, onMessageSend: (String) -> Unit) {
+        val username = promptUsername(onMessageReceive, onMessageSend)
         val user = User(Random().nextInt(100), username)
         val lock = ReentrantLock()
         val condition = lock.newCondition()
         println("$username has joined the server!")
         val room = createRoom(user, onMessageSend)
-        writer.println("You joined the room \"${room.name}\"")
+        onMessageSend("You joined the room \"${room.name}\"")
         try {
-            sendInstructions(writer, user)
+            sendInstructions(user, onMessageSend)
             val roomHandler = RoomHandlerImpl(room, lock, condition, roomService)
             thread { roomHandler.handle() }
 
@@ -76,59 +68,59 @@ class ConnectionReceiverImpl(
 
             user.spaceship.direction = Direction.UP
             while (room.status != RoomStatus.FINISHED && user.isAlive) {
-                val userMessage = reader.readLine()
+                val userMessage = onMessageReceive()
                 when (userMessage) {
                     "go" -> {
                         user.spaceship.go()
                         room.game.refresh()
-                        writer.println(user.score.toString())
+                        onMessageSend(user.score.toString())
                     }
 
                     "left" -> {
                         user.spaceship.direction = Direction.LEFT
                         room.game.refresh()
-                        writer.println("success")
+                        onMessageSend("success")
                     }
 
                     "right" -> {
                         user.spaceship.direction = Direction.RIGHT
                         room.game.refresh()
-                        writer.println("success")
+                        onMessageSend("success")
                     }
 
                     "up" -> {
                         user.spaceship.direction = Direction.UP
                         room.game.refresh()
-                        writer.println("success")
+                        onMessageSend("success")
                     }
 
                     "down" -> {
                         user.spaceship.direction = Direction.DOWN
                         room.game.refresh()
-                        writer.println("success")
+                        onMessageSend("success")
                     }
 
                     "isAsteroid" -> {
-                        writer.println(if (user.spaceship.courseChecker.isAsteroid) "t" else "f")
+                        onMessageSend(if (user.spaceship.courseChecker.isAsteroid) "t" else "f")
                     }
 
                     "isGarbage" -> {
-                        writer.println(if (user.spaceship.courseChecker.isGarbage) "t" else "f")
+                        onMessageSend(if (user.spaceship.courseChecker.isGarbage) "t" else "f")
                     }
 
                     "isWall" -> {
-                        writer.println(if (user.spaceship.courseChecker.isWall) "t" else "f")
+                        onMessageSend(if (user.spaceship.courseChecker.isWall) "t" else "f")
                     }
 
                     "GAME_FIELD" -> {
-                        roomService.writeGameField(room, outputStream)
+                        roomService.writeGameField(room, onMessageSend)
                     }
 
                     else -> {
-                        writer.println("Unknown command")
+                        onMessageSend("Unknown command")
                     }
                 }
-                incrementSteps(user, writer)
+                incrementSteps(user, onMessageSend)
             }
         } catch (e: IOException) {
             println("Connection problems with user " + user.username)
@@ -144,10 +136,10 @@ class ConnectionReceiverImpl(
         }
     }
 
-    private fun promptUsername(reader: BufferedReader, writer: PrintWriter): String {
-        writer.println("Welcome To Asteroids Server")
-        writer.println("Please, introduce yourself!")
-        return reader.readLine()
+    private fun promptUsername(onReceiveMessage: () -> String, onMessageSend: (String) -> Unit): String {
+        onMessageSend("Welcome To Asteroids Server")
+        onMessageSend("Please, introduce yourself!")
+        return onReceiveMessage()
     }
 
     private fun createRoom(user: User, onMessageSend: (String) -> Unit): Room {
@@ -156,26 +148,26 @@ class ConnectionReceiverImpl(
         return Room(roomId, roomId.toString(), user, game, onMessageSend)
     }
 
-    private fun sendInstructions(writer: PrintWriter, user: User) {
-        writer.println("You need to keep a space garbage.")
-        writer.println("Your ID is " + user.id)
-        writer.println("Good luck, Commander!")
+    private fun sendInstructions(user: User, onMessageSend: (String) -> Unit) {
+        onMessageSend("You need to keep a space garbage.")
+        onMessageSend("Your ID is " + user.id)
+        onMessageSend("Good luck, Commander!")
     }
 
-    private fun incrementSteps(user: User, writer: PrintWriter) {
+    private fun incrementSteps(user: User, onMessageSend: (String) -> Unit) {
         user.steps += 1
         if (user.steps >= 1500) {
-            died(user, writer)
+            died(user, onMessageSend)
         }
         if (user.score < 0) {
-            died(user, writer)
+            died(user, onMessageSend)
         }
     }
 
-    private fun died(user: User, writer: PrintWriter) {
+    private fun died(user: User, onMessageSend: (String) -> Unit) {
         user.setIsAlive(false)
-        writer.println("died")
+        onMessageSend("died")
         val scoreMessage = String.format("You have collected %d score", user.score)
-        writer.println(scoreMessage)
+        onMessageSend(scoreMessage)
     }
 }
