@@ -2,6 +2,7 @@ package com.kiseru.asteroids.server.impl
 
 import com.kiseru.asteroids.server.ConnectionReceiver
 import com.kiseru.asteroids.server.User
+import com.kiseru.asteroids.server.handler.impl.RoomHandlerImpl
 import com.kiseru.asteroids.server.logics.Game
 import com.kiseru.asteroids.server.logics.Screen
 import com.kiseru.asteroids.server.logics.auxiliary.Direction
@@ -44,14 +45,7 @@ class ConnectionReceiverImpl(
             val printWriter = PrintWriter(outputStream, true)
             val reader = inputStream.bufferedReader()
             val onMessageSend: (String) -> Unit = printWriter::println
-            thread {
-                handleUser(
-                    printWriter,
-                    reader,
-                    onMessageSend,
-                    outputStream,
-                )
-            }
+            thread { handleUser(printWriter, reader, onMessageSend, outputStream) }
         } catch (e: IOException) {
             throw RuntimeException(e)
         }
@@ -63,34 +57,23 @@ class ConnectionReceiverImpl(
         onMessageSend: (String) -> Unit,
         outputStream: OutputStream,
     ) {
-        val user = createUser(writer, reader)
+        val username = promptUsername(reader, writer)
+        val user = User(Random().nextInt(100), username)
         val lock = ReentrantLock()
         val condition = lock.newCondition()
-        println("${user.username} has joined the server!")
-        val roomId = UUID.randomUUID()
-        val room = Room(roomId, roomId.toString(), user, onMessageSend)
+        println("$username has joined the server!")
+        val room = createRoom(user, onMessageSend)
+        writer.println("You joined the room \"${room.name}\"")
         try {
+            sendInstructions(writer, user)
+            val roomHandler = RoomHandlerImpl(room, lock, condition, roomService)
+            thread { roomHandler.handle(room) }
 
-            writer.println("You joined the room \"${room.name}\"")
-            writer.println("You need to keep a space garbage.")
-            writer.println("Your ID is " + user.id)
-            writer.println("Good luck, Commander!")
             lock.withLock {
-                for (handler in room.onMessageSendHandlers) {
-                    handler.accept("start")
-                }
                 room.status = RoomStatus.GAMING
-                val game = Game(Screen(30, 30), 150, 150)
-                room.game = game
-                for (roomUser in room.users) {
-                    game.registerSpaceShipForUser(roomUser, lock, condition, room)
-                }
-                game.refresh()
-                val runnable = roomService.createRoomHandler(lock, condition)
-                thread {
-                    runnable(room)
-                }
+                condition.signalAll()
             }
+
             user.spaceship.direction = Direction.UP
             while (room.status != RoomStatus.FINISHED && user.isAlive) {
                 val userMessage = reader.readLine()
@@ -161,11 +144,22 @@ class ConnectionReceiverImpl(
         }
     }
 
-    private fun createUser(writer: PrintWriter, reader: BufferedReader): User {
+    private fun promptUsername(reader: BufferedReader, writer: PrintWriter): String {
         writer.println("Welcome To Asteroids Server")
         writer.println("Please, introduce yourself!")
-        val username = reader.readLine()
-        return User(Random().nextInt(100), username)
+        return reader.readLine()
+    }
+
+    private fun createRoom(user: User, onMessageSend: (String) -> Unit): Room {
+        val roomId = UUID.randomUUID()
+        val game = Game(Screen(30, 30), 150, 150)
+        return Room(roomId, roomId.toString(), user, game, onMessageSend)
+    }
+
+    private fun sendInstructions(writer: PrintWriter, user: User) {
+        writer.println("You need to keep a space garbage.")
+        writer.println("Your ID is " + user.id)
+        writer.println("Good luck, Commander!")
     }
 
     private fun incrementSteps(user: User, writer: PrintWriter) {
@@ -184,5 +178,4 @@ class ConnectionReceiverImpl(
         val scoreMessage = String.format("You have collected %d score", user.score)
         writer.println(scoreMessage)
     }
-
 }

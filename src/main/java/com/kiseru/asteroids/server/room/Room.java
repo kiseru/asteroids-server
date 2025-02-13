@@ -19,10 +19,11 @@ public class Room {
     private RoomStatus status = RoomStatus.WAITING_CONNECTIONS;
     private Game game;
 
-    public Room(UUID id, String name, User user, Consumer<String> onMessageSendHandler) {
+    public Room(UUID id, String name, User user, Game game, Consumer<String> onMessageSendHandler) {
         this.id = id;
         this.name = name;
         this.user = user;
+        this.game = game;
         this.onMessageSendHandler = onMessageSendHandler;
     }
 

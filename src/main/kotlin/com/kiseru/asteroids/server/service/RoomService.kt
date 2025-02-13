@@ -14,4 +14,5 @@ interface RoomService {
     fun writeGameField(room: Room, outputStream: OutputStream)
 
     fun createRoomHandler(lock: Lock, condition: Condition): (Room) -> Unit
+    fun getRoomRating(room: Room): String
 }
