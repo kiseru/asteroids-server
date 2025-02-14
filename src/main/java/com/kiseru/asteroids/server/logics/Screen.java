@@ -1,7 +1,7 @@
 package com.kiseru.asteroids.server.logics;
 
 import com.kiseru.asteroids.server.logics.auxiliary.Coordinates;
-
+import com.kiseru.asteroids.server.logics.models.Point;
 import java.util.Arrays;
 
 /**
@@ -21,12 +21,22 @@ public class Screen {
         generateClearScreen();
     }
 
+    public void render(Point point) {
+        if (point.isVisible()) {
+            draw(point.getCoordinates(), point.view());
+        }
+    }
+
     /**
      * рисует на экране точку
      * @param coordinates - по какой координате
      * @param symbol - символ, которым отображается точка
      */
-    public void draw(Coordinates coordinates, String symbol) {
+    private void draw(Coordinates coordinates, String symbol) {
+        if (symbol == null || symbol.isBlank()) {
+            mainMatrix[coordinates.y()][coordinates.x()] = ".";
+        }
+
         if (mainMatrix[coordinates.y()][coordinates.x()].equals(".")) {
             mainMatrix[coordinates.y()][coordinates.x()] = symbol;
         } else {

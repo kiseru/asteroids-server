@@ -9,7 +9,7 @@ import com.kiseru.asteroids.server.logics.auxiliary.Type;
  * 08 Декабрь 2017
  */
 
-public class Asteroid extends Point implements Model, Crashable{
+public class Asteroid extends Point implements Crashable{
     public Asteroid(Coordinates coordinates) {
         super(coordinates);
     }
@@ -19,14 +19,12 @@ public class Asteroid extends Point implements Model, Crashable{
     }
 
     @Override
-    public void render(Screen screen) {
-        if (isVisible) {
-            screen.draw(coordinates, "A");
-        }
+    public Type getType() {
+        return Type.ASTEROID;
     }
 
     @Override
-    public Type getType() {
-        return Type.ASTEROID;
+    public String view() {
+        return "A";
     }
 }

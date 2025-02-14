@@ -9,7 +9,7 @@ import com.kiseru.asteroids.server.logics.auxiliary.Type;
  * 08 Декабрь 2017
  */
 
-public class Garbage extends Point implements Model, Crashable{
+public class Garbage extends Point implements Crashable {
     public Garbage(Coordinates coordinates) {
         super(coordinates);
     }
@@ -19,10 +19,8 @@ public class Garbage extends Point implements Model, Crashable{
     }
 
     @Override
-    public void render(Screen screen) {
-        if (isVisible) {
-            screen.draw(coordinates, "G");
-        }
+    public String view() {
+        return "G";
     }
 
     @Override

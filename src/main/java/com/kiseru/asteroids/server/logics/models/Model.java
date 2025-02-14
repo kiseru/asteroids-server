@@ -8,5 +8,4 @@ import com.kiseru.asteroids.server.logics.Screen;
  */
 
 public interface Model {
-    void render(Screen screen);
 }

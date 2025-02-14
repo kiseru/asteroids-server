@@ -17,7 +17,7 @@ import java.util.function.Consumer;
  * 08 Декабрь 2017
  */
 
-public class Spaceship extends Point implements Model{
+public class Spaceship extends Point {
     private final User owner;
     private final Lock lock;
     private final Condition condition;
@@ -32,10 +32,12 @@ public class Spaceship extends Point implements Model{
     }
 
     @Override
-    public void render(Screen screen) {
-        if (isVisible) {
-            screen.draw(coordinates, String.valueOf(owner.getId()));
+    public String view() {
+        if (owner == null) {
+            return "";
         }
+
+        return String.valueOf(owner.getId());
     }
 
     /**

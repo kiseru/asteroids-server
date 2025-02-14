@@ -98,7 +98,7 @@ public class Game {
     public void refresh() {
         screen.update();
         crashHandlers.forEach(Runnable::run);
-        pointsOnScreen.forEach(o -> o.render(screen));
+        pointsOnScreen.forEach(screen::render);
     }
 
     private Coordinates generateUniqueRandomCoordinates() {
