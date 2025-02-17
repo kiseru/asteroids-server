@@ -10,16 +10,19 @@ import com.kiseru.asteroids.server.logics.auxiliary.Type;
 
 public abstract class Point {
     protected Coordinates coordinates;
-    protected boolean isVisible;
+    protected boolean isVisible = true;
 
     public Point(Coordinates coordinates) {
         this.coordinates = coordinates;
-        isVisible = true;
     }
 
     abstract public String view();
 
     abstract public Type getType();
+
+    public void destroy() {
+        this.isVisible = false;
+    }
 
     public int getX() {
         return coordinates.x();

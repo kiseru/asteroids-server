@@ -109,13 +109,6 @@ public class Spaceship extends Point {
         }
     }
 
-    /**
-     * разрушение корабля - прекращение его отображения
-     */
-    private void destroy() {
-        this.isVisible = false;
-    }
-
     public Direction getDirection() {
         return direction;
     }

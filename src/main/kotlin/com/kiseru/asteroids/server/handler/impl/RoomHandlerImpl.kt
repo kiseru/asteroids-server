@@ -4,7 +4,6 @@ import com.kiseru.asteroids.server.User
 import com.kiseru.asteroids.server.handler.RoomHandler
 import com.kiseru.asteroids.server.logics.CourseChecker
 import com.kiseru.asteroids.server.logics.auxiliary.Type
-import com.kiseru.asteroids.server.logics.models.Crashable
 import com.kiseru.asteroids.server.logics.models.Spaceship
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.room.RoomStatus
@@ -62,7 +61,7 @@ class RoomHandlerImpl(
 
         if (collisionPoint != null) {
             spaceship.crash(room.game, collisionPoint.type, room.status) { room.status = it }
-            (collisionPoint as Crashable).crash()
+            collisionPoint.destroy()
         } else if (spaceship.x == 0
             || spaceship.y == 0
             || spaceship.x > room.game.screen.width
