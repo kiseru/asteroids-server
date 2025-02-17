@@ -14,66 +14,49 @@ import java.util.stream.Collectors;
  */
 
 public class CourseChecker {
-    private Spaceship spaceShip;
-    private List<Point> pointsOnMap;
-    private Screen screen;
+    private final List<Point> pointsOnMap;
+    private final Screen screen;
 
-    public CourseChecker(Spaceship spaceShip, List<Point> pointsOnMap, Screen screen) {
-        this.spaceShip = spaceShip;
+    public CourseChecker(List<Point> pointsOnMap, Screen screen) {
         this.pointsOnMap = pointsOnMap;
         this.screen = screen;
     }
 
-    public boolean isAsteroid() {
+    public boolean isAsteroid(Spaceship spaceship) {
         List<Coordinates> asteroidsCoordinates = pointsOnMap.stream()
                 .filter(p -> p.getType() == Type.ASTEROID)
                 .map(Point::getCoordinates)
                 .collect(Collectors.toList());
-        return checkContaining(asteroidsCoordinates);
+        return checkContaining(spaceship, asteroidsCoordinates);
     }
 
-    public boolean isGarbage() {
+    public boolean isGarbage(Spaceship spaceship) {
         List<Coordinates> garbageCoordinates = pointsOnMap.stream()
                 .filter(p -> p.getType() == Type.GARBAGE)
                 .map(Point::getCoordinates)
                 .collect(Collectors.toList());
-        return checkContaining(garbageCoordinates);
+        return checkContaining(spaceship, garbageCoordinates);
     }
 
-    public boolean isWall() {
-        switch (spaceShip.getDirection()) {
-            case UP:
-                return spaceShip.getY() == 1;
-            case RIGHT:
-                return spaceShip.getX() == screen.getWidth();
-            case DOWN:
-                return spaceShip.getY() == screen.getHeight();
-            case LEFT:
-                return spaceShip.getX() == 1;
-        }
-        return false;
+    public boolean isWall(Spaceship spaceship) {
+        return switch (spaceship.getDirection()) {
+            case UP -> spaceship.getY() == 1;
+            case RIGHT -> spaceship.getX() == screen.getWidth();
+            case DOWN -> spaceship.getY() == screen.getHeight();
+            case LEFT -> spaceship.getX() == 1;
+        };
     }
 
-    private boolean checkContaining(List<Coordinates> container) {
-        boolean contains = false;
-        switch (spaceShip.getDirection()) {
-            case UP:
-                contains =  container
-                        .contains(new Coordinates(spaceShip.getX(), spaceShip.getY() - 1));
-                break;
-            case RIGHT:
-                contains =  container
-                        .contains(new Coordinates(spaceShip.getX() + 1, spaceShip.getY()));
-                break;
-            case DOWN:
-                contains =  container
-                        .contains(new Coordinates(spaceShip.getX(), spaceShip.getY() + 1));
-                break;
-            case LEFT:
-                contains =  container
-                        .contains(new Coordinates(spaceShip.getX() - 1, spaceShip.getY()));
-                break;
-        }
-        return contains;
+    private boolean checkContaining(Spaceship spaceship, List<Coordinates> container) {
+        return switch (spaceship.getDirection()) {
+            case UP -> container
+                    .contains(new Coordinates(spaceship.getX(), spaceship.getY() - 1));
+            case RIGHT -> container
+                    .contains(new Coordinates(spaceship.getX() + 1, spaceship.getY()));
+            case DOWN -> container
+                    .contains(new Coordinates(spaceship.getX(), spaceship.getY() + 1));
+            case LEFT -> container
+                    .contains(new Coordinates(spaceship.getX() - 1, spaceship.getY()));
+        };
     }
 }

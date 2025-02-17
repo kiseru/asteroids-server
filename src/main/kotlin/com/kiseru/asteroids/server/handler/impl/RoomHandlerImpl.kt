@@ -46,9 +46,8 @@ class RoomHandlerImpl(
 
     private fun registerSpaceshipForUser(user: User) {
         val coordinates = room.game.generateUniqueRandomCoordinates()
-        val spaceship = Spaceship(coordinates, user, lock, condition)
-        val courseChecker = CourseChecker(spaceship, room.game.pointsOnScreen, room.game.screen)
-        spaceship.courseChecker = courseChecker
+        val courseChecker = CourseChecker(room.game.pointsOnScreen, room.game.screen)
+        val spaceship = Spaceship(coordinates, user, courseChecker, lock, condition)
         user.spaceship = spaceship
         room.game.addPoint(spaceship)
         room.game.addCrashHandler {

@@ -20,12 +20,13 @@ public class Spaceship extends Point {
     private final User owner;
     private final Lock lock;
     private final Condition condition;
+    private final CourseChecker courseChecker;
     private Direction direction;
-    private CourseChecker courseChecker;
 
-    public Spaceship(Coordinates coordinates, User owner, Lock lock, Condition condition) {
+    public Spaceship(Coordinates coordinates, User owner, CourseChecker courseChecker, Lock lock, Condition condition) {
         super(coordinates);
         this.owner = owner;
+        this.courseChecker = courseChecker;
         this.lock = lock;
         this.condition = condition;
     }
@@ -130,10 +131,6 @@ public class Spaceship extends Point {
 
     public CourseChecker getCourseChecker() {
         return courseChecker;
-    }
-
-    public void setCourseChecker(CourseChecker courseChecker) {
-        this.courseChecker = courseChecker;
     }
 
     public User getOwner() {
