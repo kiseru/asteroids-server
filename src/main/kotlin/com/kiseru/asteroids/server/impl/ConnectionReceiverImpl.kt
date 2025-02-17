@@ -8,7 +8,7 @@ import com.kiseru.asteroids.server.logics.Game
 import com.kiseru.asteroids.server.logics.Screen
 import com.kiseru.asteroids.server.logics.auxiliary.Coordinates
 import com.kiseru.asteroids.server.logics.auxiliary.Direction
-import com.kiseru.asteroids.server.logics.models.Asteroid
+import com.kiseru.asteroids.server.model.Asteroid
 import com.kiseru.asteroids.server.logics.models.Garbage
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.room.RoomStatus
