@@ -2,12 +2,9 @@ package com.kiseru.asteroids.server.logics;
 
 import com.kiseru.asteroids.server.logics.auxiliary.Coordinates;
 import com.kiseru.asteroids.server.logics.auxiliary.Type;
-import com.kiseru.asteroids.server.logics.models.Asteroid;
 import com.kiseru.asteroids.server.logics.models.Crashable;
-import com.kiseru.asteroids.server.logics.models.Garbage;
 import com.kiseru.asteroids.server.logics.models.Point;
 import com.kiseru.asteroids.server.logics.models.Spaceship;
-
 import com.kiseru.asteroids.server.room.RoomStatus;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,24 +28,12 @@ public class Game {
      * Конструктор создания игровой сессии
      * @param screen - экран
      * @param garbageNumber - количество мусора для первоначальной генерации
-     * @param asteroidNumber - количество астероидов для первоначальной генерации
      */
-    public Game(Screen screen, int garbageNumber, int asteroidNumber) {
+    public Game(Screen screen, int garbageNumber) {
         this.garbageNumber = garbageNumber;
         this.screen = screen;
         this.pointsOnScreen = new ArrayList<>();
         this.crashHandlers = new ArrayList<>();
-
-        // генерируем мусор
-        for (int i = 0; i < garbageNumber; i++) {
-            Garbage garbage = new Garbage(generateUniqueRandomCoordinates());
-            pointsOnScreen.add(garbage);
-        }
-        // генерируем астероиды
-        for (int i = 0; i < asteroidNumber; i++) {
-            Asteroid asteroid = new Asteroid(generateUniqueRandomCoordinates());
-            pointsOnScreen.add(asteroid);
-        }
     }
 
     public void check(Game game, Spaceship spaceship, RoomStatus roomStatus, Consumer<RoomStatus> onRoomStatusUpdate) {

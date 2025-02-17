@@ -6,7 +6,10 @@ import com.kiseru.asteroids.server.handler.impl.RoomHandlerImpl
 import com.kiseru.asteroids.server.handler.impl.UserHandlerImpl
 import com.kiseru.asteroids.server.logics.Game
 import com.kiseru.asteroids.server.logics.Screen
+import com.kiseru.asteroids.server.logics.auxiliary.Coordinates
 import com.kiseru.asteroids.server.logics.auxiliary.Direction
+import com.kiseru.asteroids.server.logics.models.Asteroid
+import com.kiseru.asteroids.server.logics.models.Garbage
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.room.RoomStatus
 import com.kiseru.asteroids.server.service.RoomService
@@ -19,6 +22,11 @@ import java.util.UUID
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.thread
 import kotlin.concurrent.withLock
+
+private const val GARBAGE_AMOUNT = 150
+private const val ASTEROIDS_AMOUNT = 150
+private const val GAME_FIELD_HEIGHT = 30
+private const val GAME_FIELD_WIDTH = 30
 
 class ConnectionReceiverImpl(
     private val serverSocket: ServerSocket,
@@ -144,9 +152,35 @@ class ConnectionReceiverImpl(
 
     private fun createRoom(user: User, onMessageSend: (String) -> Unit): Room {
         val roomId = UUID.randomUUID()
-        val game = Game(Screen(30, 30), 150, 150)
+        val game = Game(Screen(GAME_FIELD_WIDTH, GAME_FIELD_HEIGHT), GARBAGE_AMOUNT)
+        generateGarbage(game)
+        generateAsteroids(game)
         val room = Room(roomId, roomId.toString(), game, 1)
         room.addUser(user, onMessageSend)
         return room
     }
+
+    private fun generateGarbage(game: Game) {
+        freeCoordinates(game)
+            .take(GARBAGE_AMOUNT)
+            .forEach {
+                val garbage = Garbage(it)
+                game.addPoint(garbage)
+            }
+    }
+
+    private fun generateAsteroids(game: Game) {
+        freeCoordinates(game)
+            .take(ASTEROIDS_AMOUNT)
+            .forEach {
+                val asteroid = Asteroid(it)
+                game.addPoint(asteroid)
+            }
+    }
+
+    private fun freeCoordinates(game: Game): Sequence<Coordinates> =
+        sequence {
+            val coordinates = game.generateUniqueRandomCoordinates()
+            yield(coordinates)
+        }
 }
