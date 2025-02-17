@@ -7,8 +7,6 @@ import com.kiseru.asteroids.server.logics.auxiliary.Direction;
 import com.kiseru.asteroids.server.logics.auxiliary.Type;
 import com.kiseru.asteroids.server.User;
 import com.kiseru.asteroids.server.room.RoomStatus;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
 import java.util.function.Consumer;
 
 /**
@@ -18,17 +16,13 @@ import java.util.function.Consumer;
 
 public class Spaceship extends Point {
     private final User owner;
-    private final Lock lock;
-    private final Condition condition;
     private final CourseChecker courseChecker;
     private Direction direction;
 
-    public Spaceship(Coordinates coordinates, User owner, CourseChecker courseChecker, Lock lock, Condition condition) {
+    public Spaceship(Coordinates coordinates, User owner, CourseChecker courseChecker) {
         super(coordinates);
         this.owner = owner;
         this.courseChecker = courseChecker;
-        this.lock = lock;
-        this.condition = condition;
     }
 
     @Override
@@ -60,29 +54,24 @@ public class Spaceship extends Point {
     }
 
     public void crash(Game game, Type type, RoomStatus roomStatus, Consumer<RoomStatus> onRoomStatusUpdate) {
-        synchronized (game) {
-            if (type == Type.ASTEROID) {
-                if (roomStatus == RoomStatus.GAMING) {
-                    owner.subtractScore();
-                }
-            } else if (type == Type.GARBAGE) {
-                if (roomStatus == RoomStatus.GAMING) {
-                    owner.addScore();
-                }
-                lock.lock();
-                checkCollectedGarbage(game, onRoomStatusUpdate);
-                condition.signalAll();
-                lock.unlock();
-            } else if (type == Type.WALL) {
-                // возвращаемся назад, чтобы не находится на стене
-                rollbackLastStep();
-                if (roomStatus == RoomStatus.GAMING) {
-                    owner.subtractScore();
-                }
+        if (type == Type.ASTEROID) {
+            if (roomStatus == RoomStatus.GAMING) {
+                owner.subtractScore();
             }
-            if (!owner.isAlive()) {
-                this.destroy();
+        } else if (type == Type.GARBAGE) {
+            if (roomStatus == RoomStatus.GAMING) {
+                owner.addScore();
             }
+            checkCollectedGarbage(game, onRoomStatusUpdate);
+        } else if (type == Type.WALL) {
+            // возвращаемся назад, чтобы не находится на стене
+            rollbackLastStep();
+            if (roomStatus == RoomStatus.GAMING) {
+                owner.subtractScore();
+            }
+        }
+        if (!owner.isAlive()) {
+            this.destroy();
         }
     }
 
