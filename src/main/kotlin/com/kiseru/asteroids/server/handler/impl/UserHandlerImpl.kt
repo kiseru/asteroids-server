@@ -42,15 +42,15 @@ class UserHandlerImpl(
     }
 
     override fun onIsAsteroid() {
-        onBooleanSend(user.spaceship.courseChecker.isAsteroid)
+        onBooleanSend(user.spaceship.courseChecker.isAsteroid(user.spaceship))
     }
 
     override fun onIsGarbage() {
-        onBooleanSend(user.spaceship.courseChecker.isGarbage)
+        onBooleanSend(user.spaceship.courseChecker.isGarbage(user.spaceship))
     }
 
     override fun onIsWall() {
-        onBooleanSend(user.spaceship.courseChecker.isWall)
+        onBooleanSend(user.spaceship.courseChecker.isWall(user.spaceship))
     }
 
     private fun onBooleanSend(value: Boolean) {

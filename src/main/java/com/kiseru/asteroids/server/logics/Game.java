@@ -7,15 +7,12 @@ import com.kiseru.asteroids.server.logics.models.Crashable;
 import com.kiseru.asteroids.server.logics.models.Garbage;
 import com.kiseru.asteroids.server.logics.models.Point;
 import com.kiseru.asteroids.server.logics.models.Spaceship;
-import com.kiseru.asteroids.server.User;
 
 import com.kiseru.asteroids.server.room.RoomStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
 import java.util.function.Consumer;
 
 /**
@@ -54,19 +51,6 @@ public class Game {
         }
     }
 
-    public void registerSpaceshipForUser(
-            User user,
-            Lock lock,
-            Condition condition,
-            Consumer<Spaceship> onSpaceshipCrash
-    ) {
-        Spaceship spaceship = new Spaceship(generateUniqueRandomCoordinates(), user, lock, condition);
-        user.setSpaceship(spaceship);
-        pointsOnScreen.add(spaceship);
-        crashHandlers.add(() -> onSpaceshipCrash.accept(spaceship));
-        spaceship.setCourseChecker(new CourseChecker(spaceship, this.pointsOnScreen, this.screen));
-    }
-
     public void check(Game game, Spaceship spaceship, RoomStatus roomStatus, Consumer<RoomStatus> onRoomStatusUpdate) {
         List<Point> points = game.getPointsOnScreen();
         Point collisionPoint = null;
@@ -101,7 +85,7 @@ public class Game {
         pointsOnScreen.forEach(screen::render);
     }
 
-    private Coordinates generateUniqueRandomCoordinates() {
+    public Coordinates generateUniqueRandomCoordinates() {
         Random random = new Random();
         Coordinates randomCoordinates = null;
         // если по случайно сгенерованным координатам уже что-то находится(или они ещё не сгенерированы)
@@ -114,6 +98,14 @@ public class Game {
     private boolean isGameObjectsContainsCoordinates(Coordinates coordinates) {
         return pointsOnScreen.stream()
                 .anyMatch(p -> p.getCoordinates().equals(coordinates));
+    }
+
+    public void addPoint(Point point) {
+        pointsOnScreen.add(point);
+    }
+
+    public void addCrashHandler(Runnable onSpaceshipCrash) {
+        crashHandlers.add(onSpaceshipCrash);
     }
 
     public List<Point> getPointsOnScreen() {

@@ -1,6 +1,9 @@
 package com.kiseru.asteroids.server.handler.impl
 
+import com.kiseru.asteroids.server.User
 import com.kiseru.asteroids.server.handler.RoomHandler
+import com.kiseru.asteroids.server.logics.CourseChecker
+import com.kiseru.asteroids.server.logics.models.Spaceship
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.room.RoomStatus
 import com.kiseru.asteroids.server.service.RoomService
@@ -18,9 +21,7 @@ class RoomHandlerImpl(
     override fun handle() {
         awaitStart()
         for (roomUser in room.getUsers()) {
-            room.game.registerSpaceshipForUser(roomUser, lock, condition) {
-                room.game.check(room.game, it, room.status) { roomStatus -> room.status = roomStatus }
-            }
+            registerSpaceshipForUser(roomUser)
         }
         room.status = RoomStatus.GAMING
         lock.withLock { condition.signalAll() }
@@ -40,6 +41,18 @@ class RoomHandlerImpl(
             while (room.getUsers().size < room.size) {
                 condition.await()
             }
+        }
+    }
+
+    private fun registerSpaceshipForUser(user: User) {
+        val coordinates = room.game.generateUniqueRandomCoordinates()
+        val spaceship = Spaceship(coordinates, user, lock, condition)
+        val courseChecker = CourseChecker(spaceship, room.game.pointsOnScreen, room.game.screen)
+        spaceship.courseChecker = courseChecker
+        user.spaceship = spaceship
+        room.game.addPoint(spaceship)
+        room.game.addCrashHandler {
+            room.game.check(room.game, spaceship, room.status) { roomStatus -> room.status = roomStatus }
         }
     }
 
