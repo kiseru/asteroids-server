@@ -36,6 +36,10 @@ public abstract class Point {
         return coordinates;
     }
 
+    public void setCoordinates(Coordinates coordinates) {
+        this.coordinates = coordinates;
+    }
+
     public boolean isVisible() {
         return isVisible;
     }
