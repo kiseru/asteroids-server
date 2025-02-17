@@ -1,16 +1,11 @@
 package com.kiseru.asteroids.server.logics;
 
 import com.kiseru.asteroids.server.logics.auxiliary.Coordinates;
-import com.kiseru.asteroids.server.logics.auxiliary.Type;
-import com.kiseru.asteroids.server.logics.models.Crashable;
 import com.kiseru.asteroids.server.logics.models.Point;
-import com.kiseru.asteroids.server.logics.models.Spaceship;
-import com.kiseru.asteroids.server.room.RoomStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 /**
  * @author Bulat Giniyatullin
@@ -34,31 +29,6 @@ public class Game {
         this.screen = screen;
         this.pointsOnScreen = new ArrayList<>();
         this.crashHandlers = new ArrayList<>();
-    }
-
-    public void check(Game game, Spaceship spaceship, RoomStatus roomStatus, Consumer<RoomStatus> onRoomStatusUpdate) {
-        List<Point> points = game.getPointsOnScreen();
-        Point collisionPoint = null;
-        for (Point point: points) {
-            if (point.getType() != Type.SPACESHIP &&
-                    point.isVisible() &&
-                    point.getCoordinates().equals(spaceship.getCoordinates())) {
-                collisionPoint = point;
-                break;
-            }
-        }
-
-        if (collisionPoint != null) {
-            spaceship.crash(game, collisionPoint.getType(), roomStatus, onRoomStatusUpdate);
-            ((Crashable)collisionPoint).crash();
-        } else {
-            // проверка на столкновение со стеной
-            if (spaceship.getX() == 0 || spaceship.getY() == 0 ||
-                    spaceship.getX() > game.getScreen().getWidth() ||
-                    spaceship.getY() > game.getScreen().getHeight()) {
-                spaceship.crash(game, Type.WALL, roomStatus, onRoomStatusUpdate);
-            }
-        }
     }
 
     /**

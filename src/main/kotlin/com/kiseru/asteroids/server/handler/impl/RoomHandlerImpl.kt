@@ -3,6 +3,8 @@ package com.kiseru.asteroids.server.handler.impl
 import com.kiseru.asteroids.server.User
 import com.kiseru.asteroids.server.handler.RoomHandler
 import com.kiseru.asteroids.server.logics.CourseChecker
+import com.kiseru.asteroids.server.logics.auxiliary.Type
+import com.kiseru.asteroids.server.logics.models.Crashable
 import com.kiseru.asteroids.server.logics.models.Spaceship
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.room.RoomStatus
@@ -50,8 +52,22 @@ class RoomHandlerImpl(
         val spaceship = Spaceship(coordinates, user, courseChecker, lock, condition)
         user.spaceship = spaceship
         room.game.addPoint(spaceship)
-        room.game.addCrashHandler {
-            room.game.check(room.game, spaceship, room.status) { roomStatus -> room.status = roomStatus }
+        room.game.addCrashHandler { checkSpaceship(spaceship) }
+    }
+
+    private fun checkSpaceship(spaceship: Spaceship) {
+        val collisionPoint = room.game.pointsOnScreen.firstOrNull {
+            it.type != Type.SPACESHIP && it.isVisible && it.coordinates == spaceship.coordinates
+        }
+
+        if (collisionPoint != null) {
+            spaceship.crash(room.game, collisionPoint.type, room.status) { room.status = it }
+            (collisionPoint as Crashable).crash()
+        } else if (spaceship.x == 0
+            || spaceship.y == 0
+            || spaceship.x > room.game.screen.width
+            || spaceship.y > room.game.screen.height) {
+            spaceship.crash(room.game, Type.WALL, room.status) { room.status = it }
         }
     }
 
