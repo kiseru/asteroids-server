@@ -9,7 +9,7 @@ import com.kiseru.asteroids.server.logics.auxiliary.Direction
 import com.kiseru.asteroids.server.logics.auxiliary.Type
 import com.kiseru.asteroids.server.logics.models.Spaceship
 import com.kiseru.asteroids.server.model.Room
-import com.kiseru.asteroids.server.room.RoomStatus
+import com.kiseru.asteroids.server.model.RoomStatus
 import com.kiseru.asteroids.server.service.RoomService
 import java.util.concurrent.locks.Condition
 import java.util.concurrent.locks.Lock

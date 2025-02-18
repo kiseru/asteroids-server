@@ -11,7 +11,7 @@ import com.kiseru.asteroids.server.logics.auxiliary.Direction
 import com.kiseru.asteroids.server.model.Asteroid
 import com.kiseru.asteroids.server.model.Garbage
 import com.kiseru.asteroids.server.model.Room
-import com.kiseru.asteroids.server.room.RoomStatus
+import com.kiseru.asteroids.server.model.RoomStatus
 import com.kiseru.asteroids.server.service.RoomService
 import java.io.IOException
 import java.io.PrintWriter

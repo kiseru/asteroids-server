@@ -2,7 +2,6 @@ package com.kiseru.asteroids.server.model
 
 import com.kiseru.asteroids.server.User
 import com.kiseru.asteroids.server.logics.Game
-import com.kiseru.asteroids.server.room.RoomStatus
 import java.util.UUID
 
 class Room(
