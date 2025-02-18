@@ -2,6 +2,7 @@ package com.kiseru.asteroids.server.handler.impl
 
 import com.kiseru.asteroids.server.User
 import com.kiseru.asteroids.server.handler.UserHandler
+import com.kiseru.asteroids.server.logics.auxiliary.Coordinates
 import com.kiseru.asteroids.server.logics.auxiliary.Direction
 
 class UserHandlerImpl(
@@ -63,7 +64,13 @@ class UserHandlerImpl(
     }
 
     override fun onSpaceshipMove() {
-        user.spaceship.go()
+        val direction = user.spaceship.direction ?: return
+        user.spaceship.coordinates = when (direction) {
+            Direction.UP -> Coordinates(user.spaceship.x, user.spaceship.y - 1)
+            Direction.RIGHT -> Coordinates(user.spaceship.x + 1, user.spaceship.y)
+            Direction.DOWN -> Coordinates(user.spaceship.x, user.spaceship.y + 1)
+            Direction.LEFT -> Coordinates(user.spaceship.x - 1, user.spaceship.y)
+        }
     }
 
     override fun onSpaceshipChangeDirection(direction: Direction) {

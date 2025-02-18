@@ -31,25 +31,6 @@ public class Spaceship extends Point {
         return String.valueOf(owner.getId());
     }
 
-    /**
-     * делает шаг в текущем направлении
-     */
-    public void go() {
-        switch (direction) {
-            case UP:
-                coordinates = new Coordinates(this.getX(), this.getY() - 1);
-                break;
-            case RIGHT:
-                coordinates = new Coordinates(this.getX() + 1, this.getY());
-                break;
-            case DOWN:
-                coordinates = new Coordinates(this.getX(), this.getY() + 1);
-                break;
-            case LEFT:
-                coordinates = new Coordinates(this.getX() - 1, this.getY());
-        }
-    }
-
     public Direction getDirection() {
         return direction;
     }
