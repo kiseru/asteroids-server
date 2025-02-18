@@ -1,7 +1,7 @@
 package com.kiseru.asteroids.server.impl
 
 import com.kiseru.asteroids.server.ConnectionReceiver
-import com.kiseru.asteroids.server.User
+import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.handler.impl.RoomHandlerImpl
 import com.kiseru.asteroids.server.handler.impl.UserHandlerImpl
 import com.kiseru.asteroids.server.logics.Game

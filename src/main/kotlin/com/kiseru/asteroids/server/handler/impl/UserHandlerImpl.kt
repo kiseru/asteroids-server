@@ -1,6 +1,6 @@
 package com.kiseru.asteroids.server.handler.impl
 
-import com.kiseru.asteroids.server.User
+import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.handler.UserHandler
 import com.kiseru.asteroids.server.logics.auxiliary.Coordinates
 import com.kiseru.asteroids.server.logics.auxiliary.Direction

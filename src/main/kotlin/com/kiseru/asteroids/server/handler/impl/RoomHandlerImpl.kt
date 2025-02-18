@@ -1,6 +1,6 @@
 package com.kiseru.asteroids.server.handler.impl
 
-import com.kiseru.asteroids.server.User
+import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.handler.RoomHandler
 import com.kiseru.asteroids.server.logics.CourseChecker
 import com.kiseru.asteroids.server.logics.Game

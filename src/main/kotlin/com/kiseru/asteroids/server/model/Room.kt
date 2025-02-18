@@ -1,6 +1,5 @@
 package com.kiseru.asteroids.server.model
 
-import com.kiseru.asteroids.server.User
 import com.kiseru.asteroids.server.logics.Game
 import java.util.UUID
 
