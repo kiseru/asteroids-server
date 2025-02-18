@@ -11,16 +11,16 @@ class UserHandlerImpl(
 ) : UserHandler {
 
     override fun onIncrementSteps() {
-        user.steps += 1
-        if (user.steps >= 1500 || user.score < 0) {
+        user.spaceship.steps += 1
+        if (user.spaceship.steps >= 1500 || user.spaceship.score < 0) {
             handleDeath()
         }
     }
 
     private fun handleDeath() {
-        user.setIsAlive(false)
+        user.spaceship.isAlive = false
         onMessageSend("died")
-        val scoreMessage = String.format("You have collected %d score", user.score)
+        val scoreMessage = String.format("You have collected %d score", user.spaceship.score)
         onMessageSend(scoreMessage)
     }
 
@@ -35,7 +35,7 @@ class UserHandlerImpl(
     }
 
     override fun onSendScore() {
-        onMessageSend(user.score.toString())
+        onMessageSend(user.spaceship.score.toString())
     }
 
     override fun onSuccess() {

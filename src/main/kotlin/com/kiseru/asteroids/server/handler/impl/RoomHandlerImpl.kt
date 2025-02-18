@@ -51,7 +51,7 @@ class RoomHandlerImpl(
     private fun registerSpaceshipForUser(user: User) {
         val coordinates = room.game.generateUniqueRandomCoordinates()
         val courseChecker = CourseChecker(room.game.pointsOnScreen, room.game.screen)
-        val spaceship = Spaceship(coordinates, user, courseChecker)
+        val spaceship = Spaceship(coordinates, user.id, courseChecker)
         user.spaceship = spaceship
         room.game.addPoint(spaceship)
         room.game.addCrashHandler { checkSpaceship(spaceship) }
@@ -83,21 +83,21 @@ class RoomHandlerImpl(
     private fun onSpaceshipDestroy(spaceship: Spaceship, type: Type) {
         if (type == Type.ASTEROID) {
             if (room.status == RoomStatus.GAMING) {
-                spaceship.owner.subtractScore()
+                spaceship.subtractScore()
             }
         } else if (type == Type.GARBAGE) {
             if (room.status == RoomStatus.GAMING) {
-                spaceship.owner.addScore()
+                spaceship.addScore()
             }
             checkCollectedGarbage(room.game)
         } else if (type == Type.WALL) {
             // возвращаемся назад, чтобы не находится на стене
             rollbackLastStep(spaceship.direction, spaceship)
             if (room.status == RoomStatus.GAMING) {
-                spaceship.owner.subtractScore()
+                spaceship.subtractScore()
             }
         }
-        if (!spaceship.owner.isAlive) {
+        if (!spaceship.isAlive) {
             spaceship.destroy()
         }
     }

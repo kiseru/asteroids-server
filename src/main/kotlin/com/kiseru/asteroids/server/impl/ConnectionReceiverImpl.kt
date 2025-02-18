@@ -85,7 +85,7 @@ class ConnectionReceiverImpl(
             }
 
             userHandler.onSpaceshipChangeDirection(Direction.UP)
-            while (room.status != RoomStatus.FINISHED && user.isAlive) {
+            while (room.status != RoomStatus.FINISHED && user.spaceship.isAlive) {
                 val userMessage = onMessageReceive()
                 when (userMessage) {
                     "go" -> {
@@ -133,9 +133,9 @@ class ConnectionReceiverImpl(
         } catch (e: IOException) {
             println("Connection problems with user " + user.username)
         } finally {
-            user.setIsAlive(false)
+            user.spaceship.isAlive = false
             lock.withLock {
-                val aliveUsersCount = room.getUsers().count { it.isAlive }
+                val aliveUsersCount = room.getUsers().count { it.spaceship.isAlive }
                 if (aliveUsersCount == 0) {
                     room.status = RoomStatus.FINISHED
                 }

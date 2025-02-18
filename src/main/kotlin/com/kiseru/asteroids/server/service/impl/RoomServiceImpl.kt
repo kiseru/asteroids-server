@@ -80,6 +80,6 @@ class RoomServiceImpl : RoomService {
 
     override fun getRoomRating(room: Room): String =
         room.getUsers()
-            .sortedByDescending { it.score }
+            .sortedByDescending { it.spaceship.score }
             .joinToString("\n") { it.toString() }
 }
