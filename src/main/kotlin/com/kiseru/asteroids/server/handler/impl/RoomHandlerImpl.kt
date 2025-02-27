@@ -2,12 +2,11 @@ package com.kiseru.asteroids.server.handler.impl
 
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.handler.RoomHandler
-import com.kiseru.asteroids.server.logics.CourseChecker
 import com.kiseru.asteroids.server.logics.Game
 import com.kiseru.asteroids.server.logics.auxiliary.Coordinates
 import com.kiseru.asteroids.server.logics.auxiliary.Direction
 import com.kiseru.asteroids.server.logics.auxiliary.Type
-import com.kiseru.asteroids.server.logics.models.Spaceship
+import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.RoomStatus
 import com.kiseru.asteroids.server.service.RoomService
@@ -50,8 +49,7 @@ class RoomHandlerImpl(
 
     private fun registerSpaceshipForUser(user: User) {
         val coordinates = room.game.generateUniqueRandomCoordinates()
-        val courseChecker = CourseChecker(room.game.pointsOnScreen, room.game.screen)
-        val spaceship = Spaceship(coordinates, user.id, courseChecker)
+        val spaceship = Spaceship(coordinates, user.id, room.game.pointsOnScreen, room.game.screen)
         user.spaceship = spaceship
         room.game.addPoint(spaceship)
         room.game.addCrashHandler { checkSpaceship(spaceship) }

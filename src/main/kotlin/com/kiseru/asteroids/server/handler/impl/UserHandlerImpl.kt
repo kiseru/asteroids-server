@@ -43,15 +43,15 @@ class UserHandlerImpl(
     }
 
     override fun onIsAsteroid() {
-        onBooleanSend(user.spaceship.courseChecker.isAsteroid(user.spaceship))
+        onBooleanSend(user.spaceship.isAsteroidAhead())
     }
 
     override fun onIsGarbage() {
-        onBooleanSend(user.spaceship.courseChecker.isGarbage(user.spaceship))
+        onBooleanSend(user.spaceship.isGarbageAhead())
     }
 
     override fun onIsWall() {
-        onBooleanSend(user.spaceship.courseChecker.isWall(user.spaceship))
+        onBooleanSend(user.spaceship.isWallAhead())
     }
 
     private fun onBooleanSend(value: Boolean) {
@@ -64,8 +64,7 @@ class UserHandlerImpl(
     }
 
     override fun onSpaceshipMove() {
-        val direction = user.spaceship.direction ?: return
-        user.spaceship.coordinates = when (direction) {
+        user.spaceship.coordinates = when (user.spaceship.direction) {
             Direction.UP -> Coordinates(user.spaceship.x, user.spaceship.y - 1)
             Direction.RIGHT -> Coordinates(user.spaceship.x + 1, user.spaceship.y)
             Direction.DOWN -> Coordinates(user.spaceship.x, user.spaceship.y + 1)
