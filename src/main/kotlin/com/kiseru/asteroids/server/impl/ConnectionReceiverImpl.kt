@@ -180,7 +180,9 @@ class ConnectionReceiverImpl(
 
     private fun freeCoordinates(game: Game): Sequence<Coordinates> =
         sequence {
-            val coordinates = game.generateUniqueRandomCoordinates()
-            yield(coordinates)
+            while (true) {
+                val coordinates = game.generateUniqueRandomCoordinates()
+                yield(coordinates)
+            }
         }
 }
