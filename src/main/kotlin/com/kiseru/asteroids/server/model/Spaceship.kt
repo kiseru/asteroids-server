@@ -33,28 +33,18 @@ class Spaceship(
         isAlive = score >= 0
     }
 
-    fun isAsteroidAhead(): Boolean {
-        val coordinates = pointsOnMap.asSequence()
-            .filter { it.type == Type.ASTEROID }
-            .map(Point::getCoordinates)
-            .toList()
-        return checkContaining(coordinates)
-    }
+    fun isAsteroidAhead(): Boolean =
+        pointsOnMap.any { it.type == Type.ASTEROID && isPointAhead(it) }
 
-    fun isGarbageAhead(): Boolean {
-        val coordinates = pointsOnMap.asSequence()
-            .filter { it.type == Type.GARBAGE }
-            .map(Point::getCoordinates)
-            .toList()
-        return checkContaining(coordinates)
-    }
+    fun isGarbageAhead(): Boolean =
+        pointsOnMap.any { it.type == Type.GARBAGE && isPointAhead(it) }
 
-    private fun checkContaining(coordinates: List<Coordinates>): Boolean =
+    private fun isPointAhead(point: Point): Boolean =
         when (direction) {
-            Direction.UP -> coordinates.contains(Coordinates(x, y - 1))
-            Direction.RIGHT -> coordinates.contains(Coordinates(x + 1, y))
-            Direction.DOWN -> coordinates.contains(Coordinates(x, y + 1))
-            Direction.LEFT -> coordinates.contains(Coordinates(x - 1, y))
+            Direction.UP -> x == point.x && y == point.y + 1
+            Direction.DOWN -> x == point.x && y == point.y - 1
+            Direction.LEFT -> x == point.x + 1 && y == point.y
+            Direction.RIGHT -> x == point.x - 1 && y == point.y
         }
 
     fun isWallAhead(): Boolean =

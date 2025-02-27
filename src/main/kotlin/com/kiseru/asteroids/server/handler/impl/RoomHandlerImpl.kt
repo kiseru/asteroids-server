@@ -66,6 +66,7 @@ class RoomHandlerImpl(
                 condition.signalAll()
             }
             collisionPoint.destroy()
+            room.game.pointsOnScreen.remove(collisionPoint)
         } else if (spaceship.x == 0
             || spaceship.y == 0
             || spaceship.x > room.game.screen.width
