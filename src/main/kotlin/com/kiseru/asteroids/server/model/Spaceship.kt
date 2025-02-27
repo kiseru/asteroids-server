@@ -15,7 +15,7 @@ class Spaceship(
 
     var direction = Direction.UP
     var steps = 0
-    var score = 0
+    var score = 100
     var isAlive = true
 
     override fun view(): String =
