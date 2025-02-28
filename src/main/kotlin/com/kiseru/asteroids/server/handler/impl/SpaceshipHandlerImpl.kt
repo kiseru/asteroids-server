@@ -73,5 +73,6 @@ class SpaceshipHandlerImpl(
 
     override fun onSpaceshipChangeDirection(direction: Direction) {
         spaceship.direction = direction
+        onSuccess()
     }
 }

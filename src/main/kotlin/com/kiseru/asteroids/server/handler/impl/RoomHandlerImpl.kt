@@ -24,7 +24,6 @@ class RoomHandlerImpl(
         awaitStart()
         room.status = RoomStatus.GAMING
         lock.withLock { condition.signalAll() }
-        room.game.refresh()
         sendMessage("start")
         awaitFinish()
         sendMessage("finish")

@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Game {
     private final List<Point> pointsOnScreen;
     private final Screen screen;
-    private final List<Runnable> crashHandlers;
     private final AtomicInteger collectedGarbageCount = new AtomicInteger(0);
     private final int garbageNumber;
 
@@ -28,7 +27,6 @@ public class Game {
         this.garbageNumber = garbageNumber;
         this.screen = screen;
         this.pointsOnScreen = new ArrayList<>();
-        this.crashHandlers = new ArrayList<>();
     }
 
     /**
@@ -36,7 +34,6 @@ public class Game {
      */
     public void refresh() {
         screen.update();
-        crashHandlers.forEach(Runnable::run);
         pointsOnScreen.forEach(screen::render);
     }
 
@@ -57,10 +54,6 @@ public class Game {
 
     public void addPoint(Point point) {
         pointsOnScreen.add(point);
-    }
-
-    public void addCrashHandler(Runnable onSpaceshipCrash) {
-        crashHandlers.add(onSpaceshipCrash);
     }
 
     public List<Point> getPointsOnScreen() {

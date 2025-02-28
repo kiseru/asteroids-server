@@ -13,8 +13,7 @@ import java.io.IOException
 import java.io.PrintWriter
 import java.net.ServerSocket
 import java.net.Socket
-import java.util.Random
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.thread
 import kotlin.concurrent.withLock
@@ -71,7 +70,6 @@ class ConnectionReceiverImpl(
         val roomHandler = RoomHandlerImpl(room, lock, condition, roomService)
         val spaceship = createSpaceship(room.game, user)
         room.game.addPoint(spaceship)
-        room.game.addCrashHandler { roomHandler.checkSpaceship(spaceship) }
         room.addUser(spaceship, onMessageSend)
         val spaceshipHandler = SpaceshipHandlerImpl(spaceship, onMessageSend)
         spaceshipHandler.onRoomJoin(room.name)
@@ -84,39 +82,22 @@ class ConnectionReceiverImpl(
                 }
             }
 
-            spaceshipHandler.onSpaceshipChangeDirection(Direction.UP)
             while (room.status != RoomStatus.FINISHED && spaceship.isAlive) {
                 val userMessage = onMessageReceive()
                 when (userMessage) {
                     "go" -> {
                         spaceshipHandler.onSpaceshipMove()
-                        room.game.refresh()
+                        roomHandler.checkSpaceship(spaceship)
                         spaceshipHandler.onSendScore()
                     }
 
-                    "left" -> {
-                        spaceshipHandler.onSpaceshipChangeDirection(Direction.LEFT)
-                        room.game.refresh()
-                        spaceshipHandler.onSuccess()
-                    }
+                    "left" -> spaceshipHandler.onSpaceshipChangeDirection(Direction.LEFT)
 
-                    "right" -> {
-                        spaceshipHandler.onSpaceshipChangeDirection(Direction.RIGHT)
-                        room.game.refresh()
-                        spaceshipHandler.onSuccess()
-                    }
+                    "right" -> spaceshipHandler.onSpaceshipChangeDirection(Direction.RIGHT)
 
-                    "up" -> {
-                        spaceshipHandler.onSpaceshipChangeDirection(Direction.UP)
-                        room.game.refresh()
-                        spaceshipHandler.onSuccess()
-                    }
+                    "up" -> spaceshipHandler.onSpaceshipChangeDirection(Direction.UP)
 
-                    "down" -> {
-                        spaceshipHandler.onSpaceshipChangeDirection(Direction.DOWN)
-                        room.game.refresh()
-                        spaceshipHandler.onSuccess()
-                    }
+                    "down" -> spaceshipHandler.onSpaceshipChangeDirection(Direction.DOWN)
 
                     "isAsteroid" -> spaceshipHandler.onIsAsteroid()
 
@@ -124,7 +105,10 @@ class ConnectionReceiverImpl(
 
                     "isWall" -> spaceshipHandler.onIsWall()
 
-                    "GAME_FIELD" -> roomService.writeGameField(room, onMessageSend)
+                    "GAME_FIELD" -> {
+                        room.game.refresh()
+                        roomService.writeGameField(room, onMessageSend)
+                    }
 
                     else -> spaceshipHandler.onUnknownCommand()
                 }
