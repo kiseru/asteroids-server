@@ -1,32 +1,31 @@
 package com.kiseru.asteroids.server.handler.impl
 
-import com.kiseru.asteroids.server.model.User
-import com.kiseru.asteroids.server.handler.UserHandler
+import com.kiseru.asteroids.server.handler.SpaceshipHandler
 import com.kiseru.asteroids.server.logics.auxiliary.Coordinates
 import com.kiseru.asteroids.server.logics.auxiliary.Direction
+import com.kiseru.asteroids.server.model.Spaceship
 
-class UserHandlerImpl(
-    private val user: User,
+class SpaceshipHandlerImpl(
+    private val spaceship: Spaceship,
     private val onMessageSend: (String) -> Unit,
-) : UserHandler {
+) : SpaceshipHandler {
 
     override fun onIncrementSteps() {
-        user.spaceship.steps += 1
-        if (user.spaceship.steps >= 1500 || user.spaceship.score < 0) {
+        spaceship.steps += 1
+        if (spaceship.steps >= 1500 || spaceship.score < 0) {
             handleDeath()
         }
     }
 
     private fun handleDeath() {
-        user.spaceship.isAlive = false
+        spaceship.isAlive = false
         onMessageSend("died")
-        val scoreMessage = String.format("You have collected %d score", user.spaceship.score)
-        onMessageSend(scoreMessage)
+        onMessageSend("You've collected ${spaceship.score} score")
     }
 
     override fun onSendInstructions() {
         onMessageSend("You need to keep a space garbage.")
-        onMessageSend("Your ID is " + user.id)
+        onMessageSend("Your ID is ${spaceship.user.id}")
         onMessageSend("Good luck, Commander!")
     }
 
@@ -35,7 +34,7 @@ class UserHandlerImpl(
     }
 
     override fun onSendScore() {
-        onMessageSend(user.spaceship.score.toString())
+        onMessageSend(spaceship.score.toString())
     }
 
     override fun onSuccess() {
@@ -43,15 +42,15 @@ class UserHandlerImpl(
     }
 
     override fun onIsAsteroid() {
-        onBooleanSend(user.spaceship.isAsteroidAhead())
+        onBooleanSend(spaceship.isAsteroidAhead())
     }
 
     override fun onIsGarbage() {
-        onBooleanSend(user.spaceship.isGarbageAhead())
+        onBooleanSend(spaceship.isGarbageAhead())
     }
 
     override fun onIsWall() {
-        onBooleanSend(user.spaceship.isWallAhead())
+        onBooleanSend(spaceship.isWallAhead())
     }
 
     private fun onBooleanSend(value: Boolean) {
@@ -64,15 +63,15 @@ class UserHandlerImpl(
     }
 
     override fun onSpaceshipMove() {
-        user.spaceship.coordinates = when (user.spaceship.direction) {
-            Direction.UP -> Coordinates(user.spaceship.x, user.spaceship.y - 1)
-            Direction.RIGHT -> Coordinates(user.spaceship.x + 1, user.spaceship.y)
-            Direction.DOWN -> Coordinates(user.spaceship.x, user.spaceship.y + 1)
-            Direction.LEFT -> Coordinates(user.spaceship.x - 1, user.spaceship.y)
+        spaceship.coordinates = when (spaceship.direction) {
+            Direction.UP -> Coordinates(spaceship.x, spaceship.y - 1)
+            Direction.RIGHT -> Coordinates(spaceship.x + 1, spaceship.y)
+            Direction.DOWN -> Coordinates(spaceship.x, spaceship.y + 1)
+            Direction.LEFT -> Coordinates(spaceship.x - 1, spaceship.y)
         }
     }
 
     override fun onSpaceshipChangeDirection(direction: Direction) {
-        user.spaceship.direction = direction
+        spaceship.direction = direction
     }
 }

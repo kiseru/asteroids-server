@@ -10,18 +10,18 @@ class Room(
     val size: Int,
 ) {
 
-    private val users = mutableListOf<User>()
+    private val spaceships = mutableListOf<Spaceship>()
     private val sendMessageHandlers = mutableListOf<(String) -> Unit>()
 
     var status = RoomStatus.WAITING_CONNECTIONS
 
-    fun addUser(user: User, onMessageSend: (String) -> Unit) {
-        users.add(user)
+    fun addUser(spaceship: Spaceship, onMessageSend: (String) -> Unit) {
+        spaceships.add(spaceship)
         sendMessageHandlers.add(onMessageSend)
     }
 
-    fun getUsers(): List<User> =
-        users.toMutableList()
+    fun getSpaceships(): List<Spaceship> =
+        spaceships.toList()
 
     fun getSendMessageHandlers(): List<(String) -> Unit> =
         sendMessageHandlers

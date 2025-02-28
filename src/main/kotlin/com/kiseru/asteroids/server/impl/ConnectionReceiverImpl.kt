@@ -1,17 +1,13 @@
 package com.kiseru.asteroids.server.impl
 
 import com.kiseru.asteroids.server.ConnectionReceiver
-import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.handler.impl.RoomHandlerImpl
-import com.kiseru.asteroids.server.handler.impl.UserHandlerImpl
+import com.kiseru.asteroids.server.handler.impl.SpaceshipHandlerImpl
 import com.kiseru.asteroids.server.logics.Game
 import com.kiseru.asteroids.server.logics.Screen
 import com.kiseru.asteroids.server.logics.auxiliary.Coordinates
 import com.kiseru.asteroids.server.logics.auxiliary.Direction
-import com.kiseru.asteroids.server.model.Asteroid
-import com.kiseru.asteroids.server.model.Garbage
-import com.kiseru.asteroids.server.model.Room
-import com.kiseru.asteroids.server.model.RoomStatus
+import com.kiseru.asteroids.server.model.*
 import com.kiseru.asteroids.server.service.RoomService
 import java.io.IOException
 import java.io.PrintWriter
@@ -68,15 +64,19 @@ class ConnectionReceiverImpl(
     }
 
     private fun handleUser(user: User, onMessageReceive: () -> String, onMessageSend: (String) -> Unit) {
-        val userHandler = UserHandlerImpl(user, onMessageSend)
         val lock = ReentrantLock()
         val condition = lock.newCondition()
         println("${user.username} has joined the server!")
-        val room = createRoom(user, onMessageSend)
-        userHandler.onRoomJoin(room.name)
+        val room = createRoom()
+        val roomHandler = RoomHandlerImpl(room, lock, condition, roomService)
+        val spaceship = createSpaceship(room.game, user)
+        room.game.addPoint(spaceship)
+        room.game.addCrashHandler { roomHandler.checkSpaceship(spaceship) }
+        room.addUser(spaceship, onMessageSend)
+        val spaceshipHandler = SpaceshipHandlerImpl(spaceship, onMessageSend)
+        spaceshipHandler.onRoomJoin(room.name)
         try {
-            userHandler.onSendInstructions()
-            val roomHandler = RoomHandlerImpl(room, lock, condition, roomService)
+            spaceshipHandler.onSendInstructions()
             thread { roomHandler.handle() }
             lock.withLock {
                 while (room.status != RoomStatus.GAMING) {
@@ -84,58 +84,58 @@ class ConnectionReceiverImpl(
                 }
             }
 
-            userHandler.onSpaceshipChangeDirection(Direction.UP)
-            while (room.status != RoomStatus.FINISHED && user.spaceship.isAlive) {
+            spaceshipHandler.onSpaceshipChangeDirection(Direction.UP)
+            while (room.status != RoomStatus.FINISHED && spaceship.isAlive) {
                 val userMessage = onMessageReceive()
                 when (userMessage) {
                     "go" -> {
-                        userHandler.onSpaceshipMove()
+                        spaceshipHandler.onSpaceshipMove()
                         room.game.refresh()
-                        userHandler.onSendScore()
+                        spaceshipHandler.onSendScore()
                     }
 
                     "left" -> {
-                        userHandler.onSpaceshipChangeDirection(Direction.LEFT)
+                        spaceshipHandler.onSpaceshipChangeDirection(Direction.LEFT)
                         room.game.refresh()
-                        userHandler.onSuccess()
+                        spaceshipHandler.onSuccess()
                     }
 
                     "right" -> {
-                        userHandler.onSpaceshipChangeDirection(Direction.RIGHT)
+                        spaceshipHandler.onSpaceshipChangeDirection(Direction.RIGHT)
                         room.game.refresh()
-                        userHandler.onSuccess()
+                        spaceshipHandler.onSuccess()
                     }
 
                     "up" -> {
-                        userHandler.onSpaceshipChangeDirection(Direction.UP)
+                        spaceshipHandler.onSpaceshipChangeDirection(Direction.UP)
                         room.game.refresh()
-                        userHandler.onSuccess()
+                        spaceshipHandler.onSuccess()
                     }
 
                     "down" -> {
-                        userHandler.onSpaceshipChangeDirection(Direction.DOWN)
+                        spaceshipHandler.onSpaceshipChangeDirection(Direction.DOWN)
                         room.game.refresh()
-                        userHandler.onSuccess()
+                        spaceshipHandler.onSuccess()
                     }
 
-                    "isAsteroid" -> userHandler.onIsAsteroid()
+                    "isAsteroid" -> spaceshipHandler.onIsAsteroid()
 
-                    "isGarbage" -> userHandler.onIsGarbage()
+                    "isGarbage" -> spaceshipHandler.onIsGarbage()
 
-                    "isWall" -> userHandler.onIsWall()
+                    "isWall" -> spaceshipHandler.onIsWall()
 
                     "GAME_FIELD" -> roomService.writeGameField(room, onMessageSend)
 
-                    else -> userHandler.onUnknownCommand()
+                    else -> spaceshipHandler.onUnknownCommand()
                 }
-                userHandler.onIncrementSteps()
+                spaceshipHandler.onIncrementSteps()
             }
         } catch (e: IOException) {
             println("Connection problems with user " + user.username)
         } finally {
-            user.spaceship.isAlive = false
+            spaceship.isAlive = false
             lock.withLock {
-                val aliveUsersCount = room.getUsers().count { it.spaceship.isAlive }
+                val aliveUsersCount = room.getSpaceships().count { it.isAlive }
                 if (aliveUsersCount == 0) {
                     room.status = RoomStatus.FINISHED
                 }
@@ -150,14 +150,12 @@ class ConnectionReceiverImpl(
         return onReceiveMessage()
     }
 
-    private fun createRoom(user: User, onMessageSend: (String) -> Unit): Room {
+    private fun createRoom(): Room {
         val roomId = UUID.randomUUID()
         val game = Game(Screen(GAME_FIELD_WIDTH, GAME_FIELD_HEIGHT), GARBAGE_AMOUNT)
         generateGarbage(game)
         generateAsteroids(game)
-        val room = Room(roomId, roomId.toString(), game, 1)
-        room.addUser(user, onMessageSend)
-        return room
+        return Room(roomId, roomId.toString(), game, 1)
     }
 
     private fun generateGarbage(game: Game) {
@@ -185,4 +183,10 @@ class ConnectionReceiverImpl(
                 yield(coordinates)
             }
         }
+
+    private fun createSpaceship(game: Game, user: User): Spaceship {
+        val spaceshipCoordinates = freeCoordinates(game)
+            .first()
+        return Spaceship(spaceshipCoordinates, user, game.pointsOnScreen, game.screen)
+    }
 }

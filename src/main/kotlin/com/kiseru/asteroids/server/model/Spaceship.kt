@@ -8,7 +8,7 @@ import com.kiseru.asteroids.server.logics.models.Point
 
 class Spaceship(
     coordinates: Coordinates,
-    private val ownerId: Int,
+    val user: User,
     private val pointsOnMap: List<Point>,
     private val screen: Screen,
 ) : Point(coordinates) {
@@ -19,7 +19,7 @@ class Spaceship(
     var isAlive = true
 
     override fun view(): String =
-        ownerId.toString()
+        user.id.toString()
 
     override fun getType(): Type =
         Type.SPACESHIP

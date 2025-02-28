@@ -2,7 +2,7 @@ package com.kiseru.asteroids.server.handler
 
 import com.kiseru.asteroids.server.logics.auxiliary.Direction
 
-interface UserHandler {
+interface SpaceshipHandler {
 
     fun onIncrementSteps()
 

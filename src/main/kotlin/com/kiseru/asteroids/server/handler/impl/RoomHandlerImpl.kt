@@ -1,6 +1,5 @@
 package com.kiseru.asteroids.server.handler.impl
 
-import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.handler.RoomHandler
 import com.kiseru.asteroids.server.logics.Game
 import com.kiseru.asteroids.server.logics.auxiliary.Coordinates
@@ -23,9 +22,6 @@ class RoomHandlerImpl(
 
     override fun handle() {
         awaitStart()
-        for (roomUser in room.getUsers()) {
-            registerSpaceshipForUser(roomUser)
-        }
         room.status = RoomStatus.GAMING
         lock.withLock { condition.signalAll() }
         room.game.refresh()
@@ -41,21 +37,13 @@ class RoomHandlerImpl(
 
     override fun awaitStart() {
         lock.withLock {
-            while (room.getUsers().size < room.size) {
+            while (room.getSpaceships().size < room.size) {
                 condition.await()
             }
         }
     }
 
-    private fun registerSpaceshipForUser(user: User) {
-        val coordinates = room.game.generateUniqueRandomCoordinates()
-        val spaceship = Spaceship(coordinates, user.id, room.game.pointsOnScreen, room.game.screen)
-        user.spaceship = spaceship
-        room.game.addPoint(spaceship)
-        room.game.addCrashHandler { checkSpaceship(spaceship) }
-    }
-
-    private fun checkSpaceship(spaceship: Spaceship) {
+    fun checkSpaceship(spaceship: Spaceship) {
         val collisionPoint = room.game.pointsOnScreen.firstOrNull {
             it.type != Type.SPACESHIP && it.isVisible && it.coordinates == spaceship.coordinates
         }
