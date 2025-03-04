@@ -1,7 +1,6 @@
 package com.kiseru.asteroids.server.handler.impl
 
 import com.kiseru.asteroids.server.handler.GameHandler
-import com.kiseru.asteroids.server.model.Direction
 import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.GameStatus
 import com.kiseru.asteroids.server.model.Spaceship
@@ -47,7 +46,7 @@ class GameHandlerImpl(
 
         if (collisionPoint != null) {
             lock.withLock {
-                onSpaceshipDestroy(spaceship, collisionPoint.type)
+                game.damageSpaceship(spaceship, collisionPoint.type)
                 condition.signalAll()
             }
             collisionPoint.destroy()
@@ -58,47 +57,9 @@ class GameHandlerImpl(
             || spaceship.y > game.screen.height
         ) {
             lock.withLock {
-                onSpaceshipDestroy(spaceship, Type.WALL)
+                game.damageSpaceship(spaceship, Type.WALL)
                 condition.signalAll()
             }
-        }
-    }
-
-    private fun onSpaceshipDestroy(spaceship: Spaceship, type: Type) {
-        if (type == Type.ASTEROID) {
-            if (game.status == GameStatus.STARTED) {
-                spaceship.subtractScore()
-            }
-        } else if (type == Type.GARBAGE) {
-            if (game.status == GameStatus.STARTED) {
-                spaceship.addScore()
-            }
-            checkCollectedGarbage(game)
-        } else if (type == Type.WALL) {
-            // возвращаемся назад, чтобы не находится на стене
-            rollbackLastStep(spaceship.direction, spaceship)
-            if (game.status == GameStatus.STARTED) {
-                spaceship.subtractScore()
-            }
-        }
-        if (!spaceship.isAlive) {
-            spaceship.destroy()
-        }
-    }
-
-    private fun checkCollectedGarbage(game: Game) {
-        val collected = game.incrementCollectedGarbageCount()
-        if (collected >= game.garbageNumber) {
-            game.status = GameStatus.FINISHED
-        }
-    }
-
-    private fun rollbackLastStep(direction: Direction, spaceship: Spaceship) {
-        spaceship.coordinates = when (direction) {
-            Direction.UP -> spaceship.x to spaceship.y + 1
-            Direction.RIGHT -> spaceship.x - 1 to spaceship.y
-            Direction.DOWN -> spaceship.x to spaceship.y - 1
-            Direction.LEFT -> spaceship.x + 1 to spaceship.y
         }
     }
 

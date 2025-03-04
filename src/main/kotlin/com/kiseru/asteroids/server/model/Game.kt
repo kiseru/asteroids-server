@@ -2,20 +2,18 @@ package com.kiseru.asteroids.server.model
 
 import java.util.Random
 import java.util.UUID
-import java.util.concurrent.atomic.AtomicInteger
 
 class Game(
     val id: UUID,
     val name: String,
     val size: Int,
     val screen: Screen,
-    val garbageNumber: Int,
+    private var garbageNumber: Int,
 ) {
 
     val gameObjects = mutableListOf<GameObject>()
     var status = GameStatus.CREATED
 
-    private val collectedGarbageCount = AtomicInteger(0)
     private val spaceships = mutableListOf<Spaceship>()
     private val sendMessageHandlers = mutableListOf<(String) -> Unit>()
 
@@ -40,9 +38,6 @@ class Game(
     fun addPoint(gameObject: GameObject) {
         gameObjects.add(gameObject)
     }
-
-    fun incrementCollectedGarbageCount(): Int =
-        collectedGarbageCount.incrementAndGet()
 
     fun isAsteroidAhead(spaceship: Spaceship): Boolean =
         gameObjects.any { it.type == Type.ASTEROID && isPointAhead(spaceship, it) }
@@ -76,4 +71,48 @@ class Game(
 
     fun getSendMessageHandlers(): List<(String) -> Unit> =
         sendMessageHandlers
+
+    fun damageSpaceship(spaceship: Spaceship, type: Type) {
+        if (status != GameStatus.STARTED) {
+            throw IllegalStateException("Game must have STARTED status")
+        }
+
+        when (type) {
+            Type.ASTEROID -> {
+                spaceship.subtractScore()
+            }
+            Type.GARBAGE -> {
+                spaceship.addScore()
+                onGarbageCollected()
+            }
+            Type.WALL -> {
+                rollback(spaceship)
+                spaceship.subtractScore()
+            }
+            Type.SPACESHIP -> {
+                rollback(spaceship)
+                spaceship.subtractScore()
+            }
+        }
+
+        if (!spaceship.isAlive) {
+            spaceship.destroy()
+        }
+    }
+
+    private fun onGarbageCollected() {
+        garbageNumber--
+        if (garbageNumber == 0) {
+            status = GameStatus.FINISHED
+        }
+    }
+
+    private fun rollback(spaceship: Spaceship) {
+        spaceship.coordinates = when (spaceship.direction) {
+            Direction.UP -> spaceship.x to spaceship.y + 1
+            Direction.RIGHT -> spaceship.x - 1 to spaceship.y
+            Direction.DOWN -> spaceship.x to spaceship.y - 1
+            Direction.LEFT -> spaceship.x + 1 to spaceship.y
+        }
+    }
 }
