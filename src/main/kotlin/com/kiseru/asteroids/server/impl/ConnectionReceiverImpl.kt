@@ -3,7 +3,6 @@ package com.kiseru.asteroids.server.impl
 import com.kiseru.asteroids.server.ConnectionReceiver
 import com.kiseru.asteroids.server.handler.impl.GameHandlerImpl
 import com.kiseru.asteroids.server.handler.impl.SpaceshipHandlerImpl
-import com.kiseru.asteroids.server.model.Screen
 import com.kiseru.asteroids.server.model.Direction
 import com.kiseru.asteroids.server.model.Asteroid
 import com.kiseru.asteroids.server.model.Game
@@ -109,10 +108,7 @@ class ConnectionReceiverImpl(
 
                     "isWall" -> spaceshipHandler.onIsWall()
 
-                    "GAME_FIELD" -> {
-                        game.refresh()
-                        gameService.writeGameField(game, onMessageSend)
-                    }
+                    "GAME_FIELD" -> gameService.writeGameField(game, onMessageSend)
 
                     else -> spaceshipHandler.onUnknownCommand()
                 }
@@ -140,8 +136,7 @@ class ConnectionReceiverImpl(
 
     private fun createGame(): Game {
         val gameId = UUID.randomUUID()
-        val screen = Screen(GAME_FIELD_WIDTH, GAME_FIELD_HEIGHT)
-        val game = Game(gameId, gameId.toString(), 1, screen, GARBAGE_AMOUNT)
+        val game = Game(gameId, gameId.toString(), 1, GAME_FIELD_WIDTH, GAME_FIELD_HEIGHT, GARBAGE_AMOUNT)
         generateGarbage(game)
         generateAsteroids(game)
         return game

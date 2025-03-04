@@ -7,7 +7,8 @@ class Game(
     val id: UUID,
     val name: String,
     val size: Int,
-    val screen: Screen,
+    var fieldWidth: Int,
+    var fieldHeight: Int,
     private var garbageNumber: Int,
 ) {
 
@@ -17,16 +18,11 @@ class Game(
     private val spaceships = mutableListOf<Spaceship>()
     private val sendMessageHandlers = mutableListOf<(String) -> Unit>()
 
-    fun refresh() {
-        screen.update()
-        gameObjects.forEach(screen::render)
-    }
-
     fun generateUniqueRandomCoordinates(): Pair<Int, Int> {
         val random = Random()
         var randomCoordinates: Pair<Int, Int>? = null
         while (randomCoordinates == null || isGameObjectsContainsCoordinates(randomCoordinates)) {
-            randomCoordinates = random.nextInt(screen.width) + 1 to random.nextInt(screen.height) + 1
+            randomCoordinates = random.nextInt(fieldWidth) + 1 to random.nextInt(fieldHeight) + 1
         }
 
         return randomCoordinates
@@ -56,9 +52,9 @@ class Game(
     fun isWallAhead(spaceship: Spaceship): Boolean =
         when (spaceship.direction) {
             Direction.UP -> spaceship.y == 1
-            Direction.DOWN -> spaceship.y == screen.height
+            Direction.DOWN -> spaceship.y == fieldHeight
             Direction.LEFT -> spaceship.x == 1
-            Direction.RIGHT -> spaceship.x == screen.width
+            Direction.RIGHT -> spaceship.x == fieldWidth
         }
 
     fun addSpaceship(spaceship: Spaceship, onMessageSend: (String) -> Unit) {

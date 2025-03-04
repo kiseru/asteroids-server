@@ -37,7 +37,7 @@ class GameServiceImpl : GameService {
 
     override fun writeGameField(game: Game, outputStream: OutputStream): Unit =
         try {
-            val gameField = game.screen.display()
+            val gameField = display(game)
             outputStream.write("$gameField\n".toByteArray())
         } catch (_: IOException) {
             println("Failed to write the room's game field")
@@ -45,11 +45,41 @@ class GameServiceImpl : GameService {
 
     override fun writeGameField(game: Game, onMessageSend: (String) -> Unit): Unit =
         try {
-            val gameField = game.screen.display()
+            val gameField = display(game)
             onMessageSend("$gameField\n")
         } catch (_: IOException) {
             println("Failed to write the room's game field")
         }
+
+    private fun display(game: Game): String {
+        val mainMatrix = Array(game.fieldHeight + 2) { Array(game.fieldWidth + 2) { "." } }
+        game.gameObjects.forEach {
+            if (it.isVisible) {
+                draw(mainMatrix, it.x, it.y, it.view())
+            }
+        }
+        val stringBuilder = StringBuilder()
+        for (i in 1 until game.fieldHeight + 1) {
+            for (j in 1 until game.fieldWidth + 1) {
+                stringBuilder.append(mainMatrix[i][j])
+                stringBuilder.append("\t")
+            }
+            stringBuilder.append("\n")
+        }
+        return stringBuilder.toString()
+    }
+
+    private fun draw(mainMatrix: Array<Array<String>>, x: Int, y: Int, symbol: String) {
+        if (symbol.isBlank()) {
+            mainMatrix[y][x] = "."
+        }
+
+        if (mainMatrix[y][x] == ".") {
+            mainMatrix[y][x] = symbol
+        } else {
+            mainMatrix[y][x] = "${mainMatrix[y][x]}|$symbol"
+        }
+    }
 
     override fun createGameHandler(lock: Lock, condition: Condition): (Game) -> Unit =
         { handleGame(lock, condition, it) }

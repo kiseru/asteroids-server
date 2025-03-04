@@ -53,8 +53,8 @@ class GameHandlerImpl(
             game.gameObjects.remove(collisionPoint)
         } else if (spaceship.x == 0
             || spaceship.y == 0
-            || spaceship.x > game.screen.width
-            || spaceship.y > game.screen.height
+            || spaceship.x > game.fieldWidth
+            || spaceship.y > game.fieldHeight
         ) {
             lock.withLock {
                 game.damageSpaceship(spaceship, Type.WALL)
