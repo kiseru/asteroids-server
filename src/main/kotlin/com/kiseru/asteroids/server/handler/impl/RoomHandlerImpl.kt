@@ -1,13 +1,13 @@
 package com.kiseru.asteroids.server.handler.impl
 
 import com.kiseru.asteroids.server.handler.RoomHandler
-import com.kiseru.asteroids.server.logics.Game
 import com.kiseru.asteroids.server.logics.auxiliary.Coordinates
 import com.kiseru.asteroids.server.logics.auxiliary.Direction
 import com.kiseru.asteroids.server.logics.auxiliary.Type
-import com.kiseru.asteroids.server.model.Spaceship
+import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.RoomStatus
+import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.service.RoomService
 import java.util.concurrent.locks.Condition
 import java.util.concurrent.locks.Lock
