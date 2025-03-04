@@ -115,4 +115,11 @@ class Game(
             Direction.LEFT -> spaceship.x + 1 to spaceship.y
         }
     }
+
+    fun freeCoordinates(): Sequence<Pair<Int, Int>> =
+        sequence {
+            while (true) {
+                yield(generateUniqueRandomCoordinates())
+            }
+        }
 }

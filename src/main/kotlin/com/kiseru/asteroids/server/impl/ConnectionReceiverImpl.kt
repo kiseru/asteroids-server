@@ -148,7 +148,7 @@ class ConnectionReceiverImpl(
     }
 
     private fun generateGarbage(game: Game) {
-        freeCoordinates(game)
+        game.freeCoordinates()
             .take(GARBAGE_AMOUNT)
             .forEach { (x, y) ->
                 val garbage = Garbage(x, y)
@@ -157,7 +157,7 @@ class ConnectionReceiverImpl(
     }
 
     private fun generateAsteroids(game: Game) {
-        freeCoordinates(game)
+        game.freeCoordinates()
             .take(ASTEROIDS_AMOUNT)
             .forEach { (x, y) ->
                 val asteroid = Asteroid(x, y)
@@ -165,16 +165,8 @@ class ConnectionReceiverImpl(
             }
     }
 
-    private fun freeCoordinates(game: Game): Sequence<Pair<Int, Int>> =
-        sequence {
-            while (true) {
-                yield(game.generateUniqueRandomCoordinates())
-            }
-        }
-
-
     private fun createSpaceship(game: Game, user: User): Spaceship {
-        val (x, y) = freeCoordinates(game)
+        val (x, y) = game.freeCoordinates()
             .first()
         return Spaceship(x, y, user)
     }
