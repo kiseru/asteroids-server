@@ -1,6 +1,6 @@
 package com.kiseru.asteroids.server.handler
 
-interface RoomHandler {
+interface GameHandler {
 
     fun awaitStart()
 

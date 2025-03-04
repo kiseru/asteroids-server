@@ -1,18 +1,23 @@
 package com.kiseru.asteroids.server.model
 
 import java.util.Random
+import java.util.UUID
 import java.util.concurrent.atomic.AtomicInteger
 
 class Game(
+    val id: UUID,
+    val name: String,
+    val size: Int,
     val screen: Screen,
     val garbageNumber: Int,
 ) {
 
     val gameObjects = mutableListOf<GameObject>()
-
     var status = GameStatus.CREATED
 
     private val collectedGarbageCount = AtomicInteger(0)
+    private val spaceships = mutableListOf<Spaceship>()
+    private val sendMessageHandlers = mutableListOf<(String) -> Unit>()
 
     fun refresh() {
         screen.update()
@@ -60,4 +65,15 @@ class Game(
             Direction.LEFT -> spaceship.x == 1
             Direction.RIGHT -> spaceship.x == screen.width
         }
+
+    fun addSpaceship(spaceship: Spaceship, onMessageSend: (String) -> Unit) {
+        spaceships.add(spaceship)
+        sendMessageHandlers.add(onMessageSend)
+    }
+
+    fun getSpaceships(): List<Spaceship> =
+        spaceships
+
+    fun getSendMessageHandlers(): List<(String) -> Unit> =
+        sendMessageHandlers
 }

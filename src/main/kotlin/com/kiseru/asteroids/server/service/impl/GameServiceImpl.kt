@@ -1,28 +1,28 @@
 package com.kiseru.asteroids.server.service.impl
 
+import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.GameStatus
-import com.kiseru.asteroids.server.model.Room
-import com.kiseru.asteroids.server.service.RoomService
+import com.kiseru.asteroids.server.service.GameService
 import java.io.IOException
 import java.io.OutputStream
 import java.util.concurrent.locks.Condition
 import java.util.concurrent.locks.Lock
 import kotlin.concurrent.withLock
 
-class RoomServiceImpl : RoomService {
+class GameServiceImpl : GameService {
 
-    private val rooms = mutableListOf<Room>()
+    private val games = mutableListOf<Game>()
 
     override fun writeRatings(outputStream: OutputStream): Unit =
         synchronized(this) {
-            for (room in rooms) {
-                writeRating(room, outputStream)
+            for (game in games) {
+                writeRating(game, outputStream)
             }
         }
 
-    private fun writeRating(room: Room, outputStream: OutputStream): Unit =
+    private fun writeRating(game: Game, outputStream: OutputStream): Unit =
         try {
-            val rating = getRoomRating(room)
+            val rating = getGameRating(game)
             outputStream.write("$rating\n".toByteArray())
         } catch (_: IOException) {
             println("Failed to write the room's rating")
@@ -30,46 +30,43 @@ class RoomServiceImpl : RoomService {
 
     override fun writeGameFields(outputStream: OutputStream): Unit =
         synchronized(this) {
-            for (room in rooms) {
-                writeGameField(room, outputStream)
+            for (game in games) {
+                writeGameField(game, outputStream)
             }
         }
 
-    override fun writeGameField(room: Room, outputStream: OutputStream): Unit =
+    override fun writeGameField(game: Game, outputStream: OutputStream): Unit =
         try {
-            val screen = room.game.screen
-            val gameField = screen.display()
+            val gameField = game.screen.display()
             outputStream.write("$gameField\n".toByteArray())
         } catch (_: IOException) {
             println("Failed to write the room's game field")
         }
 
-    override fun writeGameField(room: Room, onMessageSend: (String) -> Unit): Unit =
+    override fun writeGameField(game: Game, onMessageSend: (String) -> Unit): Unit =
         try {
-            val screen = room.game.screen
-            val gameField = screen.display()
+            val gameField = game.screen.display()
             onMessageSend("$gameField\n")
         } catch (_: IOException) {
             println("Failed to write the room's game field")
         }
 
-    override fun createRoomHandler(lock: Lock, condition: Condition): (Room) -> Unit {
-        return { room -> handleRoom(lock, condition, room) }
-    }
+    override fun createGameHandler(lock: Lock, condition: Condition): (Game) -> Unit =
+        { handleGame(lock, condition, it) }
 
-    private fun handleRoom(lock: Lock, condition: Condition, room: Room) {
+    private fun handleGame(lock: Lock, condition: Condition, game: Game) {
         lock.withLock {
-            while (room.game.status != GameStatus.FINISHED) {
+            while (game.status != GameStatus.FINISHED) {
                 condition.await()
             }
         }
 
-        for (handler in room.getSendMessageHandlers()) {
+        for (handler in game.getSendMessageHandlers()) {
             handler("finish")
         }
 
-        val rating = getRoomRating(room)
-        for (handler in room.getSendMessageHandlers()) {
+        val rating = getGameRating(game)
+        for (handler in game.getSendMessageHandlers()) {
             handler(rating)
         }
 
@@ -78,8 +75,8 @@ class RoomServiceImpl : RoomService {
         println()
     }
 
-    override fun getRoomRating(room: Room): String =
-        room.getSpaceships()
+    override fun getGameRating(game: Game): String =
+        game.getSpaceships()
             .sortedByDescending { it.score }
             .joinToString("\n") { "${it.user.username} ${it.score}" }
 }

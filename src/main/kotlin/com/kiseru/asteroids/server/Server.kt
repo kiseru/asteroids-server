@@ -1,7 +1,7 @@
 package com.kiseru.asteroids.server
 
 import com.kiseru.asteroids.server.impl.ConnectionReceiverImpl
-import com.kiseru.asteroids.server.service.RoomService
+import com.kiseru.asteroids.server.service.GameService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -9,7 +9,7 @@ import java.net.ServerSocket
 import java.util.Scanner
 
 class Server(
-    private val roomService: RoomService,
+    private val gameService: GameService,
     private val port: Int,
 ) {
 
@@ -21,7 +21,7 @@ class Server(
 
     private fun startHandlingConnections() {
         val serverSocket = ServerSocket(port)
-        val connectionReceiver = ConnectionReceiverImpl(serverSocket, roomService)
+        val connectionReceiver = ConnectionReceiverImpl(serverSocket, gameService)
         connectionReceiver.acceptConnections()
     }
 
@@ -40,8 +40,8 @@ class Server(
 
     private fun handleSystemCommand(command: String): Unit =
         when(command) {
-            "RATING" -> roomService.writeRatings(System.out)
-            "GAME_FIELD" -> roomService.writeGameFields(System.out)
+            "RATING" -> gameService.writeRatings(System.out)
+            "GAME_FIELD" -> gameService.writeGameFields(System.out)
             else -> println("Unknown command")
         }
 }
