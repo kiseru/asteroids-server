@@ -1,7 +1,7 @@
 package com.kiseru.asteroids.server.service.impl
 
+import com.kiseru.asteroids.server.model.GameStatus
 import com.kiseru.asteroids.server.model.Room
-import com.kiseru.asteroids.server.model.RoomStatus
 import com.kiseru.asteroids.server.service.RoomService
 import java.io.IOException
 import java.io.OutputStream
@@ -59,7 +59,7 @@ class RoomServiceImpl : RoomService {
 
     private fun handleRoom(lock: Lock, condition: Condition, room: Room) {
         lock.withLock {
-            while (room.status != RoomStatus.FINISHED) {
+            while (room.game.status != GameStatus.FINISHED) {
                 condition.await()
             }
         }

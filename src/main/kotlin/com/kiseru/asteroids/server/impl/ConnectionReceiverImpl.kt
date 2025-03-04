@@ -7,9 +7,9 @@ import com.kiseru.asteroids.server.model.Screen
 import com.kiseru.asteroids.server.model.Direction
 import com.kiseru.asteroids.server.model.Asteroid
 import com.kiseru.asteroids.server.model.Game
+import com.kiseru.asteroids.server.model.GameStatus
 import com.kiseru.asteroids.server.model.Garbage
 import com.kiseru.asteroids.server.model.Room
-import com.kiseru.asteroids.server.model.RoomStatus
 import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.RoomService
@@ -82,12 +82,12 @@ class ConnectionReceiverImpl(
             spaceshipHandler.onSendInstructions()
             thread { roomHandler.handle() }
             lock.withLock {
-                while (room.status != RoomStatus.GAMING) {
+                while (room.game.status != GameStatus.STARTED) {
                     condition.await()
                 }
             }
 
-            while (room.status != RoomStatus.FINISHED && spaceship.isAlive) {
+            while (room.game.status != GameStatus.FINISHED && spaceship.isAlive) {
                 val userMessage = onMessageReceive()
                 when (userMessage) {
                     "go" -> {
@@ -126,7 +126,7 @@ class ConnectionReceiverImpl(
             lock.withLock {
                 val aliveUsersCount = room.getSpaceships().count { it.isAlive }
                 if (aliveUsersCount == 0) {
-                    room.status = RoomStatus.FINISHED
+                    room.game.status = GameStatus.FINISHED
                 }
                 condition.signalAll()
             }

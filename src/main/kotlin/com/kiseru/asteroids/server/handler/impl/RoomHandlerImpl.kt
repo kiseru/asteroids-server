@@ -4,8 +4,8 @@ import com.kiseru.asteroids.server.handler.RoomHandler
 import com.kiseru.asteroids.server.model.Direction
 import com.kiseru.asteroids.server.model.Type
 import com.kiseru.asteroids.server.model.Game
+import com.kiseru.asteroids.server.model.GameStatus
 import com.kiseru.asteroids.server.model.Room
-import com.kiseru.asteroids.server.model.RoomStatus
 import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.service.RoomService
 import java.util.concurrent.locks.Condition
@@ -21,7 +21,7 @@ class RoomHandlerImpl(
 
     override fun handle() {
         awaitStart()
-        room.status = RoomStatus.GAMING
+        room.game.status = GameStatus.STARTED
         lock.withLock { condition.signalAll() }
         sendMessage("start")
         awaitFinish()
@@ -67,18 +67,18 @@ class RoomHandlerImpl(
 
     private fun onSpaceshipDestroy(spaceship: Spaceship, type: Type) {
         if (type == Type.ASTEROID) {
-            if (room.status == RoomStatus.GAMING) {
+            if (room.game.status == GameStatus.STARTED) {
                 spaceship.subtractScore()
             }
         } else if (type == Type.GARBAGE) {
-            if (room.status == RoomStatus.GAMING) {
+            if (room.game.status == GameStatus.STARTED) {
                 spaceship.addScore()
             }
             checkCollectedGarbage(room.game)
         } else if (type == Type.WALL) {
             // возвращаемся назад, чтобы не находится на стене
             rollbackLastStep(spaceship.direction, spaceship)
-            if (room.status == RoomStatus.GAMING) {
+            if (room.game.status == GameStatus.STARTED) {
                 spaceship.subtractScore()
             }
         }
@@ -90,7 +90,7 @@ class RoomHandlerImpl(
     private fun checkCollectedGarbage(game: Game) {
         val collected = game.incrementCollectedGarbageCount()
         if (collected >= game.garbageNumber) {
-            room.status = RoomStatus.FINISHED
+            room.game.status = GameStatus.FINISHED
         }
     }
 
@@ -105,7 +105,7 @@ class RoomHandlerImpl(
 
     override fun awaitFinish() {
         lock.withLock {
-            while (room.status != RoomStatus.FINISHED) {
+            while (room.game.status != GameStatus.FINISHED) {
                 condition.await()
             }
         }

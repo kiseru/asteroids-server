@@ -9,6 +9,9 @@ class Game(
 ) {
 
     val gameObjects = mutableListOf<GameObject>()
+
+    var status = GameStatus.CREATED
+
     private val collectedGarbageCount = AtomicInteger(0)
 
     fun refresh() {
