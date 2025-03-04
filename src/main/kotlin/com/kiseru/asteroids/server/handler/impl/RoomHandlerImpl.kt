@@ -1,9 +1,8 @@
 package com.kiseru.asteroids.server.handler.impl
 
 import com.kiseru.asteroids.server.handler.RoomHandler
-import com.kiseru.asteroids.server.logics.auxiliary.Coordinates
-import com.kiseru.asteroids.server.logics.auxiliary.Direction
-import com.kiseru.asteroids.server.logics.auxiliary.Type
+import com.kiseru.asteroids.server.model.Direction
+import com.kiseru.asteroids.server.model.Type
 import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.Room
 import com.kiseru.asteroids.server.model.RoomStatus
@@ -43,7 +42,7 @@ class RoomHandlerImpl(
     }
 
     fun checkSpaceship(spaceship: Spaceship) {
-        val collisionPoint = room.game.points.firstOrNull {
+        val collisionPoint = room.game.gameObjects.firstOrNull {
             it.type != Type.SPACESHIP && it.isVisible && it.coordinates == spaceship.coordinates
         }
 
@@ -53,7 +52,7 @@ class RoomHandlerImpl(
                 condition.signalAll()
             }
             collisionPoint.destroy()
-            room.game.points.remove(collisionPoint)
+            room.game.gameObjects.remove(collisionPoint)
         } else if (spaceship.x == 0
             || spaceship.y == 0
             || spaceship.x > room.game.screen.width
@@ -96,11 +95,11 @@ class RoomHandlerImpl(
     }
 
     private fun rollbackLastStep(direction: Direction, spaceship: Spaceship) {
-        when (direction) {
-            Direction.UP -> spaceship.coordinates = Coordinates(spaceship.x, spaceship.y + 1)
-            Direction.RIGHT -> spaceship.coordinates = Coordinates(spaceship.x - 1, spaceship.y)
-            Direction.DOWN -> spaceship.coordinates = Coordinates(spaceship.x, spaceship.y - 1)
-            Direction.LEFT -> spaceship.coordinates = Coordinates(spaceship.x + 1, spaceship.y)
+        spaceship.coordinates = when (direction) {
+            Direction.UP -> spaceship.x to spaceship.y + 1
+            Direction.RIGHT -> spaceship.x - 1 to spaceship.y
+            Direction.DOWN -> spaceship.x to spaceship.y - 1
+            Direction.LEFT -> spaceship.x + 1 to spaceship.y
         }
     }
 

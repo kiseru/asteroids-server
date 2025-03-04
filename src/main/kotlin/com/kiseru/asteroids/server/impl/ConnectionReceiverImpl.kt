@@ -3,9 +3,8 @@ package com.kiseru.asteroids.server.impl
 import com.kiseru.asteroids.server.ConnectionReceiver
 import com.kiseru.asteroids.server.handler.impl.RoomHandlerImpl
 import com.kiseru.asteroids.server.handler.impl.SpaceshipHandlerImpl
-import com.kiseru.asteroids.server.logics.Screen
-import com.kiseru.asteroids.server.logics.auxiliary.Coordinates
-import com.kiseru.asteroids.server.logics.auxiliary.Direction
+import com.kiseru.asteroids.server.model.Screen
+import com.kiseru.asteroids.server.model.Direction
 import com.kiseru.asteroids.server.model.Asteroid
 import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.Garbage
@@ -142,7 +141,11 @@ class ConnectionReceiverImpl(
 
     private fun createRoom(): Room {
         val roomId = UUID.randomUUID()
-        val game = Game(Screen(GAME_FIELD_WIDTH, GAME_FIELD_HEIGHT), GARBAGE_AMOUNT)
+        val game = Game(
+            Screen(
+                GAME_FIELD_WIDTH,
+                GAME_FIELD_HEIGHT
+            ), GARBAGE_AMOUNT)
         generateGarbage(game)
         generateAsteroids(game)
         return Room(roomId, roomId.toString(), game, 1)
@@ -151,8 +154,8 @@ class ConnectionReceiverImpl(
     private fun generateGarbage(game: Game) {
         freeCoordinates(game)
             .take(GARBAGE_AMOUNT)
-            .forEach {
-                val garbage = Garbage(it)
+            .forEach { (x, y) ->
+                val garbage = Garbage(x, y)
                 game.addPoint(garbage)
             }
     }
@@ -160,23 +163,23 @@ class ConnectionReceiverImpl(
     private fun generateAsteroids(game: Game) {
         freeCoordinates(game)
             .take(ASTEROIDS_AMOUNT)
-            .forEach {
-                val asteroid = Asteroid(it)
+            .forEach { (x, y) ->
+                val asteroid = Asteroid(x, y)
                 game.addPoint(asteroid)
             }
     }
 
-    private fun freeCoordinates(game: Game): Sequence<Coordinates> =
+    private fun freeCoordinates(game: Game): Sequence<Pair<Int, Int>> =
         sequence {
             while (true) {
-                val coordinates = game.generateUniqueRandomCoordinates()
-                yield(coordinates)
+                yield(game.generateUniqueRandomCoordinates())
             }
         }
 
+
     private fun createSpaceship(game: Game, user: User): Spaceship {
-        val spaceshipCoordinates = freeCoordinates(game)
+        val (x, y) = freeCoordinates(game)
             .first()
-        return Spaceship(spaceshipCoordinates, user)
+        return Spaceship(x, y, user)
     }
 }

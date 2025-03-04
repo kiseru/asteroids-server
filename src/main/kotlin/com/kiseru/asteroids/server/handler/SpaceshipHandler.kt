@@ -1,6 +1,6 @@
 package com.kiseru.asteroids.server.handler
 
-import com.kiseru.asteroids.server.logics.auxiliary.Direction
+import com.kiseru.asteroids.server.model.Direction
 
 interface SpaceshipHandler {
 

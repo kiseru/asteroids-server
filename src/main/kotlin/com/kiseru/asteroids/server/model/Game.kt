@@ -1,10 +1,5 @@
 package com.kiseru.asteroids.server.model
 
-import com.kiseru.asteroids.server.logics.Screen
-import com.kiseru.asteroids.server.logics.auxiliary.Coordinates
-import com.kiseru.asteroids.server.logics.auxiliary.Direction
-import com.kiseru.asteroids.server.logics.auxiliary.Type
-import com.kiseru.asteroids.server.logics.models.Point
 import java.util.Random
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -13,46 +8,46 @@ class Game(
     val garbageNumber: Int,
 ) {
 
-    val points = mutableListOf<Point>()
+    val gameObjects = mutableListOf<GameObject>()
     private val collectedGarbageCount = AtomicInteger(0)
 
     fun refresh() {
         screen.update()
-        points.forEach(screen::render)
+        gameObjects.forEach(screen::render)
     }
 
-    fun generateUniqueRandomCoordinates(): Coordinates {
+    fun generateUniqueRandomCoordinates(): Pair<Int, Int> {
         val random = Random()
-        var randomCoordinates: Coordinates? = null
+        var randomCoordinates: Pair<Int, Int>? = null
         while (randomCoordinates == null || isGameObjectsContainsCoordinates(randomCoordinates)) {
-            randomCoordinates = Coordinates(random.nextInt(screen.width) + 1, random.nextInt(screen.height) + 1)
+            randomCoordinates = random.nextInt(screen.width) + 1 to random.nextInt(screen.height) + 1
         }
 
         return randomCoordinates
     }
 
-    private fun isGameObjectsContainsCoordinates(coordinates: Coordinates): Boolean =
-        points.any { it.coordinates == coordinates }
+    private fun isGameObjectsContainsCoordinates(coordinates: Pair<Int, Int>): Boolean =
+        gameObjects.any { it.coordinates == coordinates }
 
-    fun addPoint(point: Point) {
-        points.add(point)
+    fun addPoint(gameObject: GameObject) {
+        gameObjects.add(gameObject)
     }
 
     fun incrementCollectedGarbageCount(): Int =
         collectedGarbageCount.incrementAndGet()
 
     fun isAsteroidAhead(spaceship: Spaceship): Boolean =
-        points.any { it.type == Type.ASTEROID && isPointAhead(spaceship, it) }
+        gameObjects.any { it.type == Type.ASTEROID && isPointAhead(spaceship, it) }
 
     fun isGarbageAhead(spaceship: Spaceship): Boolean =
-        points.any { it.type == Type.GARBAGE && isPointAhead(spaceship, it) }
+        gameObjects.any { it.type == Type.GARBAGE && isPointAhead(spaceship, it) }
 
-    private fun isPointAhead(spaceship: Spaceship, point: Point): Boolean =
+    private fun isPointAhead(spaceship: Spaceship, gameObject: GameObject): Boolean =
         when (spaceship.direction) {
-            Direction.UP -> spaceship.x == point.x && spaceship.y == point.y + 1
-            Direction.DOWN -> spaceship.x == point.x && spaceship.y == point.y - 1
-            Direction.LEFT -> spaceship.x == point.x + 1 && spaceship.y == point.y
-            Direction.RIGHT -> spaceship.x == point.x - 1 && spaceship.y == point.y
+            Direction.UP -> spaceship.x == gameObject.x && spaceship.y == gameObject.y + 1
+            Direction.DOWN -> spaceship.x == gameObject.x && spaceship.y == gameObject.y - 1
+            Direction.LEFT -> spaceship.x == gameObject.x + 1 && spaceship.y == gameObject.y
+            Direction.RIGHT -> spaceship.x == gameObject.x - 1 && spaceship.y == gameObject.y
         }
 
     fun isWallAhead(spaceship: Spaceship): Boolean =

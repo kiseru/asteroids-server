@@ -1,8 +1,7 @@
 package com.kiseru.asteroids.server.handler.impl
 
 import com.kiseru.asteroids.server.handler.SpaceshipHandler
-import com.kiseru.asteroids.server.logics.auxiliary.Coordinates
-import com.kiseru.asteroids.server.logics.auxiliary.Direction
+import com.kiseru.asteroids.server.model.Direction
 import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.Spaceship
 
@@ -66,10 +65,10 @@ class SpaceshipHandlerImpl(
 
     override fun onSpaceshipMove() {
         spaceship.coordinates = when (spaceship.direction) {
-            Direction.UP -> Coordinates(spaceship.x, spaceship.y - 1)
-            Direction.RIGHT -> Coordinates(spaceship.x + 1, spaceship.y)
-            Direction.DOWN -> Coordinates(spaceship.x, spaceship.y + 1)
-            Direction.LEFT -> Coordinates(spaceship.x - 1, spaceship.y)
+            Direction.UP -> spaceship.x to spaceship.y - 1
+            Direction.RIGHT -> spaceship.x + 1 to spaceship.y
+            Direction.DOWN -> spaceship.x to spaceship.y + 1
+            Direction.LEFT -> spaceship.x - 1 to spaceship.y
         }
     }
 
