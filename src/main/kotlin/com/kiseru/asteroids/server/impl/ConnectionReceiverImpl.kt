@@ -77,7 +77,7 @@ class ConnectionReceiverImpl(
         val spaceship = createSpaceship(room.game, user)
         room.game.addPoint(spaceship)
         room.addUser(spaceship, onMessageSend)
-        val spaceshipHandler = SpaceshipHandlerImpl(spaceship, onMessageSend)
+        val spaceshipHandler = SpaceshipHandlerImpl(spaceship, room.game, onMessageSend)
         spaceshipHandler.onRoomJoin(room.name)
         try {
             spaceshipHandler.onSendInstructions()
@@ -177,6 +177,6 @@ class ConnectionReceiverImpl(
     private fun createSpaceship(game: Game, user: User): Spaceship {
         val spaceshipCoordinates = freeCoordinates(game)
             .first()
-        return Spaceship(spaceshipCoordinates, user, game.pointsOnScreen, game.screen)
+        return Spaceship(spaceshipCoordinates, user)
     }
 }

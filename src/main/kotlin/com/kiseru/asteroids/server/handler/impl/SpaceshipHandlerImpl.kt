@@ -3,10 +3,12 @@ package com.kiseru.asteroids.server.handler.impl
 import com.kiseru.asteroids.server.handler.SpaceshipHandler
 import com.kiseru.asteroids.server.logics.auxiliary.Coordinates
 import com.kiseru.asteroids.server.logics.auxiliary.Direction
+import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.Spaceship
 
 class SpaceshipHandlerImpl(
     private val spaceship: Spaceship,
+    private val game: Game,
     private val onMessageSend: (String) -> Unit,
 ) : SpaceshipHandler {
 
@@ -42,15 +44,15 @@ class SpaceshipHandlerImpl(
     }
 
     override fun onIsAsteroid() {
-        onBooleanSend(spaceship.isAsteroidAhead())
+        onBooleanSend(game.isAsteroidAhead(spaceship))
     }
 
     override fun onIsGarbage() {
-        onBooleanSend(spaceship.isGarbageAhead())
+        onBooleanSend(game.isGarbageAhead(spaceship))
     }
 
     override fun onIsWall() {
-        onBooleanSend(spaceship.isWallAhead())
+        onBooleanSend(game.isWallAhead(spaceship))
     }
 
     private fun onBooleanSend(value: Boolean) {

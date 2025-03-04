@@ -43,7 +43,7 @@ class RoomHandlerImpl(
     }
 
     fun checkSpaceship(spaceship: Spaceship) {
-        val collisionPoint = room.game.pointsOnScreen.firstOrNull {
+        val collisionPoint = room.game.points.firstOrNull {
             it.type != Type.SPACESHIP && it.isVisible && it.coordinates == spaceship.coordinates
         }
 
@@ -53,7 +53,7 @@ class RoomHandlerImpl(
                 condition.signalAll()
             }
             collisionPoint.destroy()
-            room.game.pointsOnScreen.remove(collisionPoint)
+            room.game.points.remove(collisionPoint)
         } else if (spaceship.x == 0
             || spaceship.y == 0
             || spaceship.x > room.game.screen.width
