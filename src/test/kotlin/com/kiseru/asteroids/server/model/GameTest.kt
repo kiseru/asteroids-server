@@ -472,4 +472,24 @@ class GameTest {
         assertEquals(1, spaceships.size)
         assertEquals(spaceships.first(), spaceship)
     }
+
+    @Test
+    fun `test getSendMessagesHandlers`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, 1, 1)
+
+        val user = User(1, "Some cool username")
+
+        val spaceship = Spaceship(1, 1, user)
+        val onMessageSend: (String) -> Unit = {}
+        game.addSpaceship(spaceship, onMessageSend)
+
+        // when
+        val handlers = game.getSendMessageHandlers()
+
+        // then
+        assertEquals(1, handlers.size)
+        assertEquals(handlers.first(), onMessageSend)
+    }
 }
