@@ -2,16 +2,13 @@ package com.kiseru.asteroids.server.model
 
 import java.util.Objects
 
-abstract class GameObject(var coordinates: Pair<Int, Int>) {
+abstract class GameObject(
+    var x: Int,
+    var y: Int,
+) {
 
     var isVisible = true
-    val x: Int
-        get() = coordinates.first
-    val y: Int
-        get() = coordinates.second
     abstract val type: Type
-
-    constructor(x: Int, y: Int) : this(x to y)
 
     abstract fun view(): String
 

@@ -18,18 +18,18 @@ class Game(
     private val spaceships = mutableListOf<Spaceship>()
     private val sendMessageHandlers = mutableListOf<(String) -> Unit>()
 
-    fun generateUniqueRandomCoordinates(): Pair<Int, Int> {
-        val random = Random()
-        var randomCoordinates: Pair<Int, Int>? = null
-        while (randomCoordinates == null || isGameObjectsContainsCoordinates(randomCoordinates)) {
-            randomCoordinates = random.nextInt(fieldWidth) + 1 to random.nextInt(fieldHeight) + 1
+    private fun generateUniqueRandomCoordinates(): Pair<Int, Int> =
+        sequence {
+            val random = Random()
+            while (true) {
+                yield(random.nextInt(fieldWidth) + 1 to random.nextInt(fieldHeight) + 1)
+            }
         }
+            .filterNot { (x, y) -> isGameObjectsContainsCoordinates(x, y) }
+            .first()
 
-        return randomCoordinates
-    }
-
-    private fun isGameObjectsContainsCoordinates(coordinates: Pair<Int, Int>): Boolean =
-        gameObjects.any { it.coordinates == coordinates }
+    private fun isGameObjectsContainsCoordinates(x: Int, y: Int): Boolean =
+        gameObjects.any { it.x == x && it.y == y }
 
     fun addPoint(gameObject: GameObject) {
         gameObjects.add(gameObject)
@@ -77,14 +77,17 @@ class Game(
             Type.ASTEROID -> {
                 spaceship.subtractScore()
             }
+
             Type.GARBAGE -> {
                 spaceship.addScore()
                 onGarbageCollected()
             }
+
             Type.WALL -> {
                 rollback(spaceship)
                 spaceship.subtractScore()
             }
+
             Type.SPACESHIP -> {
                 rollback(spaceship)
                 spaceship.subtractScore()
@@ -104,11 +107,11 @@ class Game(
     }
 
     private fun rollback(spaceship: Spaceship) {
-        spaceship.coordinates = when (spaceship.direction) {
-            Direction.UP -> spaceship.x to spaceship.y + 1
-            Direction.RIGHT -> spaceship.x - 1 to spaceship.y
-            Direction.DOWN -> spaceship.x to spaceship.y - 1
-            Direction.LEFT -> spaceship.x + 1 to spaceship.y
+        when (spaceship.direction) {
+            Direction.UP -> spaceship.y += 1
+            Direction.RIGHT -> spaceship.x -= 1
+            Direction.DOWN -> spaceship.y -= 1
+            Direction.LEFT -> spaceship.x += 1
         }
     }
 

@@ -64,11 +64,11 @@ class SpaceshipHandlerImpl(
     }
 
     override fun onSpaceshipMove() {
-        spaceship.coordinates = when (spaceship.direction) {
-            Direction.UP -> spaceship.x to spaceship.y - 1
-            Direction.RIGHT -> spaceship.x + 1 to spaceship.y
-            Direction.DOWN -> spaceship.x to spaceship.y + 1
-            Direction.LEFT -> spaceship.x - 1 to spaceship.y
+        when (spaceship.direction) {
+            Direction.UP -> spaceship.y -= 1
+            Direction.RIGHT -> spaceship.x += 1
+            Direction.DOWN -> spaceship.y += 1
+            Direction.LEFT -> spaceship.x -= 1
         }
     }
 

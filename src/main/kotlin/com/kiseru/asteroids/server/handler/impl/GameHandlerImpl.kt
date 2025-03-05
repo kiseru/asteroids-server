@@ -41,7 +41,7 @@ class GameHandlerImpl(
 
     fun checkSpaceship(spaceship: Spaceship) {
         val collisionPoint = game.gameObjects.firstOrNull {
-            it.type != Type.SPACESHIP && it.isVisible && it.coordinates == spaceship.coordinates
+            it.type != Type.SPACESHIP && it.isVisible && it.x == spaceship.x && it.y == spaceship.y
         }
 
         if (collisionPoint != null) {
