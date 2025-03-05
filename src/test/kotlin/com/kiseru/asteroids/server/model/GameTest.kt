@@ -384,4 +384,42 @@ class GameTest {
         // then
         assertFalse(actual)
     }
+
+    @ParameterizedTest
+    @EnumSource(Direction::class)
+    fun `test isWallAhead when the wall is ahead`(direction: Direction) {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, 1, 1)
+
+        val user = User(1, "Some cool username")
+
+        val spaceship = Spaceship(1, 1, user)
+        spaceship.direction = direction
+
+        // when
+        val actual = game.isWallAhead(spaceship)
+
+        // then
+        assertTrue(actual)
+    }
+
+    @ParameterizedTest
+    @EnumSource(Direction::class)
+    fun `test isWallAhead when the wall isn't ahead`(direction: Direction) {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, 3, 3)
+
+        val user = User(1, "Some cool username")
+
+        val spaceship = Spaceship(2, 2, user)
+        spaceship.direction = direction
+
+        // when
+        val actual = game.isWallAhead(spaceship)
+
+        // then
+        assertFalse(actual)
+    }
 }
