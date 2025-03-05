@@ -9,7 +9,6 @@ class Game(
     val size: Int,
     var fieldWidth: Int,
     var fieldHeight: Int,
-    private var garbageNumber: Int,
 ) {
 
     val gameObjects = mutableListOf<GameObject>()
@@ -31,7 +30,7 @@ class Game(
     private fun isGameObjectsContainsCoordinates(x: Int, y: Int): Boolean =
         gameObjects.any { it.x == x && it.y == y }
 
-    fun addPoint(gameObject: GameObject) {
+    fun addGameObject(gameObject: GameObject) {
         gameObjects.add(gameObject)
     }
 
@@ -100,8 +99,8 @@ class Game(
     }
 
     private fun onGarbageCollected() {
-        garbageNumber--
-        if (garbageNumber == 0) {
+        val isGarbageExists = gameObjects.any { it.type == Type.GARBAGE }
+        if (!isGarbageExists) {
             status = GameStatus.FINISHED
         }
     }
