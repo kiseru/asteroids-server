@@ -17,8 +17,12 @@ class Game(
     private val spaceships = mutableListOf<Spaceship>()
     private val sendMessageHandlers = mutableListOf<(String) -> Unit>()
 
-    private fun generateUniqueRandomCoordinates(): Pair<Int, Int> =
-        sequence {
+    private fun generateUniqueRandomCoordinates(): Pair<Int, Int> {
+        if (gameObjects.size == fieldWidth * fieldHeight) {
+            throw IllegalStateException()
+        }
+
+        return sequence {
             val random = Random()
             while (true) {
                 yield(random.nextInt(fieldWidth) + 1 to random.nextInt(fieldHeight) + 1)
@@ -26,6 +30,7 @@ class Game(
         }
             .filterNot { (x, y) -> isGameObjectsContainsCoordinates(x, y) }
             .first()
+    }
 
     private fun isGameObjectsContainsCoordinates(x: Int, y: Int): Boolean =
         gameObjects.any { it.x == x && it.y == y }

@@ -422,4 +422,35 @@ class GameTest {
         // then
         assertFalse(actual)
     }
+
+    @Test
+    fun `test freeCoordinates when there are free coordinates`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, 1, 1)
+
+        // when
+        val (actualX, actualY) = game.freeCoordinates()
+            .first()
+
+        // then
+        assertEquals(1, actualX)
+        assertEquals(1, actualY)
+    }
+
+    @Test
+    fun `test freeCoordinates when there are no free coordinates`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, 1, 1)
+
+        val garbage = Garbage(1, 1)
+        game.addGameObject(garbage)
+
+        // when & then
+        assertFailsWith<IllegalStateException>("There is no free coordinate") {
+            game.freeCoordinates()
+                .first()
+        }
+    }
 }
