@@ -121,4 +121,24 @@ class Game(
                 yield(generateUniqueRandomCoordinates())
             }
         }
+
+    fun onSpaceshipMove(spaceship: Spaceship) {
+        val isBusy = when (spaceship.direction) {
+            Direction.UP -> spaceships.any { it.x == spaceship.x && it.y == spaceship.y - 1 }
+            Direction.DOWN -> spaceships.any { it.x == spaceship.x && it.y == spaceship.y + 1 }
+            Direction.LEFT -> spaceships.any { it.x == spaceship.x - 1 && it.y == spaceship.y }
+            Direction.RIGHT -> spaceships.any { it.x == spaceship.x + 1 && it.y == spaceship.y }
+        }
+
+        if (isBusy) {
+            throw IllegalStateException("Failed to move spaceship. There is an other spaceship ahead.")
+        }
+
+        when (spaceship.direction) {
+            Direction.UP -> spaceship.y -= 1
+            Direction.RIGHT -> spaceship.x += 1
+            Direction.DOWN -> spaceship.y += 1
+            Direction.LEFT -> spaceship.x -= 1
+        }
+    }
 }

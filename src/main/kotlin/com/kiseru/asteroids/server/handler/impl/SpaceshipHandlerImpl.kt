@@ -64,12 +64,7 @@ class SpaceshipHandlerImpl(
     }
 
     override fun onSpaceshipMove() {
-        when (spaceship.direction) {
-            Direction.UP -> spaceship.y -= 1
-            Direction.RIGHT -> spaceship.x += 1
-            Direction.DOWN -> spaceship.y += 1
-            Direction.LEFT -> spaceship.x -= 1
-        }
+        game.onSpaceshipMove(spaceship)
     }
 
     override fun onSpaceshipChangeDirection(direction: Direction) {

@@ -10,6 +10,8 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.1")
 }
 
 application {
@@ -18,4 +20,8 @@ application {
 
 tasks.named<JavaExec>("run") {
     standardInput = System.`in`
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
