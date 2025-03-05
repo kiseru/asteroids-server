@@ -7,6 +7,7 @@ import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class GameTest {
 
@@ -218,5 +219,169 @@ class GameTest {
         // then
         assertEquals(110, spaceship.score)
         assertEquals(GameStatus.FINISHED, game.status)
+    }
+
+    @ParameterizedTest
+    @EnumSource(Direction::class)
+    fun `test isAsteroidAhead when an asteroid is ahead`(direction: Direction) {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, 3, 3)
+
+        listOf(
+            1 to 1,
+            1 to 3,
+            3 to 1,
+            3 to 3,
+        )
+            .forEach { (x, y) ->
+                val garbage = Garbage(x, y)
+                game.addGameObject(garbage)
+            }
+
+        listOf(
+            1 to 2,
+            2 to 1,
+            2 to 3,
+            3 to 2,
+        )
+            .forEach { (x, y) ->
+                val asteroid = Asteroid(x, y)
+                game.addGameObject(asteroid)
+            }
+
+        val user = User(1, "Some cool username")
+
+        val spaceship = Spaceship(2, 2, user)
+        spaceship.direction = direction
+
+        // when
+        val actual = game.isAsteroidAhead(spaceship)
+
+        // then
+        assertTrue(actual)
+    }
+
+    @ParameterizedTest
+    @EnumSource(Direction::class)
+    fun `test isAsteroidAhead when an asteroid isn't ahead`(direction: Direction) {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, 3, 3)
+
+        listOf(
+            1 to 2,
+            2 to 3,
+            2 to 1,
+            3 to 2,
+        )
+            .forEach { (x, y) ->
+                val garbage = Garbage(x, y)
+                game.addGameObject(garbage)
+            }
+
+        listOf(
+            1 to 1,
+            1 to 3,
+            3 to 1,
+            3 to 3,
+        )
+            .forEach { (x, y) ->
+                val asteroid = Asteroid(x, y)
+                game.addGameObject(asteroid)
+            }
+
+        val user = User(1, "Some cool username")
+
+        val spaceship = Spaceship(2, 2, user)
+        spaceship.direction = direction
+
+        // when
+        val actual = game.isAsteroidAhead(spaceship)
+
+        // then
+        assertFalse(actual)
+    }
+
+    @ParameterizedTest
+    @EnumSource(Direction::class)
+    fun `test isAsteroidAhead when garbage is ahead`(direction: Direction) {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, 3, 3)
+
+        listOf(
+            1 to 1,
+            1 to 3,
+            3 to 1,
+            3 to 3,
+        )
+            .forEach { (x, y) ->
+                val asteroid = Asteroid(x, y)
+                game.addGameObject(asteroid)
+            }
+
+        listOf(
+            1 to 2,
+            2 to 1,
+            2 to 3,
+            3 to 2,
+        )
+            .forEach { (x, y) ->
+                val garbage = Garbage(x, y)
+                game.addGameObject(garbage)
+            }
+
+        val user = User(1, "Some cool username")
+
+        val spaceship = Spaceship(2, 2, user)
+        spaceship.direction = direction
+
+        // when
+        val actual = game.isGarbageAhead(spaceship)
+
+        // then
+        assertTrue(actual)
+    }
+
+    @ParameterizedTest
+    @EnumSource(Direction::class)
+    fun `test isAsteroidAhead when garbage isn't ahead`(direction: Direction) {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, 3, 3)
+
+        listOf(
+            1 to 2,
+            2 to 3,
+            2 to 1,
+            3 to 2,
+        )
+            .forEach { (x, y) ->
+                val asteroid = Asteroid(x, y)
+                game.addGameObject(asteroid)
+            }
+
+        listOf(
+            1 to 1,
+            1 to 3,
+            3 to 1,
+            3 to 3,
+        )
+            .forEach { (x, y) ->
+                val garbage = Garbage(x, y)
+                game.addGameObject(garbage)
+            }
+
+        val user = User(1, "Some cool username")
+
+        val spaceship = Spaceship(2, 2, user)
+        spaceship.direction = direction
+
+        // when
+        val actual = game.isGarbageAhead(spaceship)
+
+        // then
+        assertFalse(actual)
     }
 }
