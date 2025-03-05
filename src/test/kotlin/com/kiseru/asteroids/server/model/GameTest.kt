@@ -453,4 +453,23 @@ class GameTest {
                 .first()
         }
     }
+
+    @Test
+    fun `test getSpaceships`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, 1, 1)
+
+        val user = User(1, "Some cool username")
+
+        val spaceship = Spaceship(1, 1, user)
+        game.addSpaceship(spaceship) {}
+
+        // when
+        val spaceships = game.getSpaceships()
+
+        // then
+        assertEquals(1, spaceships.size)
+        assertEquals(spaceships.first(), spaceship)
+    }
 }
