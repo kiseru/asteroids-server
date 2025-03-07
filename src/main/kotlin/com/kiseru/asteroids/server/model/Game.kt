@@ -127,6 +127,10 @@ class Game(
         }
 
     fun onSpaceshipMove(spaceship: Spaceship) {
+        if (status != GameStatus.STARTED) {
+            throw IllegalStateException("Failed to move the spaceship because of the game's illegal status")
+        }
+
         val isBusy = when (spaceship.direction) {
             Direction.UP -> spaceships.any { it.x == spaceship.x && it.y == spaceship.y - 1 }
             Direction.DOWN -> spaceships.any { it.x == spaceship.x && it.y == spaceship.y + 1 }

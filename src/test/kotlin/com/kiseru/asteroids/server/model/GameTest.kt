@@ -11,6 +11,20 @@ import kotlin.test.assertTrue
 
 class GameTest {
 
+    @Test
+    fun `test onSpaceshipMove when the game isn't started`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, 3, 3)
+
+        val user = User(1, "Some cool username")
+
+        val spaceship = Spaceship(1, 1, user)
+
+        // when & then
+        assertFailsWith<IllegalStateException> { game.onSpaceshipMove(spaceship) }
+    }
+
     @ParameterizedTest
     @EnumSource(Direction::class)
     fun `test onSpaceshipMove when there is a spaceship ahead`(direction: Direction) {
@@ -19,6 +33,7 @@ class GameTest {
         val user2 = User(2, "Some cool an other username")
         val gameId = UUID.randomUUID()
         val game = Game(gameId, "Some cool game", 1, 3, 3)
+        game.status = GameStatus.STARTED
 
         val spaceship = Spaceship(2, 2, user1)
         spaceship.direction = direction
@@ -34,9 +49,7 @@ class GameTest {
 
 
         // when & then
-        assertFailsWith<IllegalStateException>("Failed to move spaceship. There is an other spaceship ahead.") {
-            game.onSpaceshipMove(spaceship)
-        }
+        assertFailsWith<IllegalStateException> { game.onSpaceshipMove(spaceship) }
         assertEquals(spaceship.x, 2)
         assertEquals(spaceship.y, 2)
     }
@@ -48,6 +61,7 @@ class GameTest {
         val user = User(1, "Some cool username")
         val gameId = UUID.randomUUID()
         val game = Game(gameId, "Some cool game", 1, 3, 3)
+        game.status = GameStatus.STARTED
 
         val spaceship = Spaceship(2, 2, user)
         spaceship.direction = direction
