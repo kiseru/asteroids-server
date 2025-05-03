@@ -97,10 +97,6 @@ class Game(
                 spaceship.subtractScore()
             }
         }
-
-        if (!spaceship.isAlive) {
-            spaceship.destroy()
-        }
     }
 
     private fun onGarbageCollected() {

@@ -213,7 +213,6 @@ class GameTest {
         // then
         assertEquals(-50, spaceship.score)
         assertFalse(spaceship.isAlive)
-        assertFalse(spaceship.isVisible)
     }
 
     @Test

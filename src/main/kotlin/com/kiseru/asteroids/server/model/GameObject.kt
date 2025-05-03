@@ -7,14 +7,9 @@ abstract class GameObject(
     var y: Int,
 ) {
 
-    var isVisible = true
     abstract val type: Type
 
     abstract fun view(): String
-
-    fun destroy() {
-        isVisible = false
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) {

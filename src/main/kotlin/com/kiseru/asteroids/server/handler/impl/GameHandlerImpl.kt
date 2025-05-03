@@ -2,6 +2,7 @@ package com.kiseru.asteroids.server.handler.impl
 
 import com.kiseru.asteroids.server.handler.GameHandler
 import com.kiseru.asteroids.server.model.Game
+import com.kiseru.asteroids.server.model.GameObject
 import com.kiseru.asteroids.server.model.GameStatus
 import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.Type
@@ -41,16 +42,16 @@ class GameHandlerImpl(
 
     fun checkSpaceship(spaceship: Spaceship) {
         val collisionPoint = game.gameObjects.firstOrNull {
-            it.type != Type.SPACESHIP && it.isVisible && it.x == spaceship.x && it.y == spaceship.y
+            it.type != Type.SPACESHIP && it.x == spaceship.x && it.y == spaceship.y
         }
 
         if (collisionPoint != null) {
             lock.withLock {
                 game.damageSpaceship(spaceship, collisionPoint.type)
+                onSpaceshipDamaged(game, spaceship)
+                onGameObjectDamaged(game, collisionPoint)
                 condition.signalAll()
             }
-            collisionPoint.destroy()
-            game.gameObjects.remove(collisionPoint)
         } else if (spaceship.x == 0
             || spaceship.y == 0
             || spaceship.x > game.fieldWidth
@@ -58,9 +59,20 @@ class GameHandlerImpl(
         ) {
             lock.withLock {
                 game.damageSpaceship(spaceship, Type.WALL)
+                onSpaceshipDamaged(game, spaceship)
                 condition.signalAll()
             }
         }
+    }
+
+    private fun onSpaceshipDamaged(game: Game, spaceship: Spaceship) {
+        if (!spaceship.isAlive) {
+            onGameObjectDamaged(game, spaceship)
+        }
+    }
+
+    private fun onGameObjectDamaged(game: Game, gameObject: GameObject) {
+        game.gameObjects.remove(gameObject)
     }
 
     override fun awaitFinish() {

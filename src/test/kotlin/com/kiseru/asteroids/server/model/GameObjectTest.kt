@@ -10,30 +10,6 @@ import kotlin.test.assertFalse
 class GameObjectTest {
 
     @Test
-    fun `test isVisible aster creating instance`() {
-        // given
-        val gameObject = Garbage(1, 1)
-
-        // when
-        val actual = gameObject.isVisible
-
-        // then
-        assertTrue(actual)
-    }
-
-    @Test
-    fun `test destroy`() {
-        // given
-        val gameObject = Garbage(1, 1)
-
-        // when
-        gameObject.destroy()
-
-        // then
-        assertFalse(gameObject.isVisible)
-    }
-
-    @Test
     fun `test equals when other is the same`() {
         // given
         val gameObject = Garbage(1, 1)

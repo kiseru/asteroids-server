@@ -54,9 +54,7 @@ class GameServiceImpl : GameService {
     private fun display(game: Game): String {
         val mainMatrix = Array(game.fieldHeight + 2) { Array(game.fieldWidth + 2) { "." } }
         game.gameObjects.forEach {
-            if (it.isVisible) {
-                draw(mainMatrix, it.x, it.y, it.view())
-            }
+            draw(mainMatrix, it.x, it.y, it.view())
         }
         val stringBuilder = StringBuilder()
         for (i in 1 until game.fieldHeight + 1) {
