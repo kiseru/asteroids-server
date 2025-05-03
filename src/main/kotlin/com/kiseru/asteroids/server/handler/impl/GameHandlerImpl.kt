@@ -15,7 +15,7 @@ class GameHandlerImpl(
     private val game: Game,
     private val lock: Lock,
     private val condition: Condition,
-    private val gameService: GameService
+    private val gameService: GameService,
 ) : GameHandler {
 
     override fun handle() {
@@ -45,25 +45,24 @@ class GameHandlerImpl(
             it.type != Type.SPACESHIP && it.x == spaceship.x && it.y == spaceship.y
         }
 
-        if (collisionPoint != null) {
-            lock.withLock {
-                game.damageSpaceship(spaceship, collisionPoint.type)
-                onSpaceshipDamaged(game, spaceship)
-                onGameObjectDamaged(game, collisionPoint)
-                condition.signalAll()
-            }
-        } else if (spaceship.x == 0
-            || spaceship.y == 0
-            || spaceship.x > game.fieldWidth
-            || spaceship.y > game.fieldHeight
-        ) {
-            lock.withLock {
-                game.damageSpaceship(spaceship, Type.WALL)
-                onSpaceshipDamaged(game, spaceship)
-                condition.signalAll()
-            }
+        val collisionPointType = getCollisionPointType(spaceship, collisionPoint)
+        lock.withLock {
+            onSpaceshipDamaged(game, spaceship)
+            collisionPoint?.let { onGameObjectDamaged(game, it) }
+            collisionPointType?.let { gameService.damageSpaceship(game, spaceship, it) }
+            condition.signalAll()
         }
     }
+
+    private fun getCollisionPointType(spaceship: Spaceship, collisionGameObject: GameObject?): Type? =
+        collisionGameObject?.type
+            ?: if (isOutOfField(spaceship)) Type.WALL else null
+
+    private fun isOutOfField(spaceship: Spaceship): Boolean =
+        spaceship.x == 0
+                || spaceship.y == 0
+                || spaceship.x > game.fieldWidth
+                || spaceship.y > game.fieldHeight
 
     private fun onSpaceshipDamaged(game: Game, spaceship: Spaceship) {
         if (!spaceship.isAlive) {

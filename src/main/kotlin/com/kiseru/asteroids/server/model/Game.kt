@@ -72,41 +72,14 @@ class Game(
     fun getSendMessageHandlers(): List<(String) -> Unit> =
         sendMessageHandlers
 
-    fun damageSpaceship(spaceship: Spaceship, type: Type) {
-        if (status != GameStatus.STARTED) {
-            throw IllegalStateException("Game must have STARTED status")
-        }
-
-        when (type) {
-            Type.ASTEROID -> {
-                spaceship.subtractScore()
-            }
-
-            Type.GARBAGE -> {
-                spaceship.addScore()
-                onGarbageCollected()
-            }
-
-            Type.WALL -> {
-                rollback(spaceship)
-                spaceship.subtractScore()
-            }
-
-            Type.SPACESHIP -> {
-                rollback(spaceship)
-                spaceship.subtractScore()
-            }
-        }
-    }
-
-    private fun onGarbageCollected() {
+    fun onGarbageCollected() {
         val isGarbageExists = gameObjects.any { it.type == Type.GARBAGE }
         if (!isGarbageExists) {
             status = GameStatus.FINISHED
         }
     }
 
-    private fun rollback(spaceship: Spaceship) {
+    fun rollback(spaceship: Spaceship) {
         when (spaceship.direction) {
             Direction.UP -> spaceship.y += 1
             Direction.RIGHT -> spaceship.x -= 1
