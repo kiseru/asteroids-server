@@ -1,33 +1,12 @@
 package com.kiseru.asteroids.server.model
 
-import java.util.Objects
+interface GameObject {
 
-abstract class GameObject(
-    var x: Int,
-    var y: Int,
-) {
+    val x: Int
 
-    abstract val type: Type
+    val y: Int
 
-    abstract fun view(): String
+    val type: Type
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-
-        if (other == null) {
-            return false
-        }
-
-        if (other !is GameObject) {
-            return false
-        }
-
-        return x == other.x && y == other.y
-    }
-
-    override fun hashCode(): Int {
-        return Objects.hash(x, y)
-    }
+    fun view(): String
 }

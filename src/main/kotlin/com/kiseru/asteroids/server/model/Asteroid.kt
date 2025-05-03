@@ -1,6 +1,9 @@
 package com.kiseru.asteroids.server.model
 
-class Asteroid(x: Int, y: Int) : GameObject(x, y) {
+class Asteroid(
+    override val x: Int,
+    override val y: Int
+) : GameObject {
 
     override val type: Type = Type.ASTEROID
 

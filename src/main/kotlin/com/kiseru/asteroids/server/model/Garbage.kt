@@ -1,6 +1,9 @@
 package com.kiseru.asteroids.server.model
 
-class Garbage(x: Int, y: Int) : GameObject(x, y) {
+class Garbage(
+    override val x: Int,
+    override val y: Int,
+) : GameObject {
 
     override val type: Type = Type.GARBAGE
 

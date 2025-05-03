@@ -1,6 +1,10 @@
 package com.kiseru.asteroids.server.model
 
-class Spaceship(x: Int, y: Int, val user: User) : GameObject(x, y) {
+class Spaceship(
+    override var x: Int,
+    override var y: Int,
+    val user: User,
+) : GameObject {
 
     var direction = Direction.UP
     var steps = 0
