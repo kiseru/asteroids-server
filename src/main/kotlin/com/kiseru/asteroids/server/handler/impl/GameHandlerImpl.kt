@@ -66,7 +66,7 @@ class GameHandlerImpl(
                 || spaceship.y > game.gameField.height
 
     private fun onSpaceshipDamaged(game: Game, player: Player, spaceship: Spaceship) {
-        if (!player.isAlive) {
+        if (player.status == Player.Status.Dead) {
             onGameObjectDamaged(game, spaceship)
         }
     }

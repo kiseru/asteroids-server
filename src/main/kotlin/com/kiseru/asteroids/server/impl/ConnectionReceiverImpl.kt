@@ -90,7 +90,7 @@ class ConnectionReceiverImpl(
                 }
             }
 
-            while (game.status != GameStatus.FINISHED && player.isAlive) {
+            while (game.status != GameStatus.FINISHED && player.status == Player.Status.Alive) {
                 val userMessage = onMessageReceive()
                 when (userMessage) {
                     "go" -> {
@@ -113,9 +113,9 @@ class ConnectionReceiverImpl(
         } catch (_: IOException) {
             println("Connection problems with user " + user.username)
         } finally {
-            player.isAlive = false
+            player.status = Player.Status.Dead
             lock.withLock {
-                val aliveUsersCount = game.getPlayers().count { (player, _) -> player.isAlive }
+                val aliveUsersCount = game.getPlayers().count { (player, _) -> player.status == Player.Status.Alive }
                 if (aliveUsersCount == 0) {
                     game.status = GameStatus.FINISHED
                 }

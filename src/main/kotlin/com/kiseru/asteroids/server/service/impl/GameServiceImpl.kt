@@ -138,7 +138,7 @@ class GameServiceImpl : GameService {
 
     private fun subtractScore(player: Player) {
         player.score -= 50
-        player.isAlive = player.score >= 0
+        player.status = if (player.score >= 0) Player.Status.Alive else Player.Status.Dead
     }
 
     override fun addGame(game: Game) {

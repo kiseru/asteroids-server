@@ -19,7 +19,7 @@ class SpaceshipHandlerImpl(
     }
 
     private fun handleDeath(player: Player) {
-        player.isAlive = false
+        player.status = Player.Status.Dead
         onMessageSend("died")
         onMessageSend("You've collected ${player.score} score")
     }
