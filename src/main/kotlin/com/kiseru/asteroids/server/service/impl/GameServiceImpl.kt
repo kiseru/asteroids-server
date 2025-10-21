@@ -1,6 +1,7 @@
 package com.kiseru.asteroids.server.service.impl
 
 import com.kiseru.asteroids.server.model.Game
+import com.kiseru.asteroids.server.model.GameField
 import com.kiseru.asteroids.server.model.GameObject
 import com.kiseru.asteroids.server.model.GameObject.Asteroid
 import com.kiseru.asteroids.server.model.GameObject.Garbage
@@ -41,7 +42,7 @@ class GameServiceImpl : GameService {
 
     override fun writeGameField(game: Game, outputStream: OutputStream): Unit =
         try {
-            val gameField = display(game)
+            val gameField = display(game.gameField)
             outputStream.write("$gameField\n".toByteArray())
         } catch (_: IOException) {
             println("Failed to write the room's game field")
@@ -49,38 +50,24 @@ class GameServiceImpl : GameService {
 
     override fun writeGameField(game: Game, onMessageSend: (String) -> Unit): Unit =
         try {
-            val gameField = display(game)
+            val gameField = display(game.gameField)
             onMessageSend("$gameField\n")
         } catch (_: IOException) {
             println("Failed to write the room's game field")
         }
 
-    private fun display(game: Game): String {
-        val mainMatrix = Array(game.gameField.height + 2) { Array(game.gameField.width + 2) { "." } }
-        game.gameField.objects.forEach {
-            draw(mainMatrix, it.x, it.y, view(it))
-        }
+    private fun display(gameField: GameField): String {
         val stringBuilder = StringBuilder()
-        for (i in 1 until game.gameField.height + 1) {
-            for (j in 1 until game.gameField.width + 1) {
-                stringBuilder.append(mainMatrix[i][j])
-                stringBuilder.append("\t")
+        for (i in 1 until gameField.height + 1) {
+            for (j in 1 until gameField.width + 1) {
+                val gameObject = gameField.objects.firstOrNull { it.x == j && it.y == i }
+                val symbol = if (gameObject != null) view(gameObject) else "."
+                val paddedSymbol = if (j == 1) symbol else symbol.padStart(3)
+                stringBuilder.append(paddedSymbol)
             }
             stringBuilder.append("\n")
         }
         return stringBuilder.toString()
-    }
-
-    private fun draw(mainMatrix: Array<Array<String>>, x: Int, y: Int, symbol: String) {
-        if (symbol.isBlank()) {
-            mainMatrix[y][x] = "."
-        }
-
-        if (mainMatrix[y][x] == ".") {
-            mainMatrix[y][x] = symbol
-        } else {
-            mainMatrix[y][x] = "${mainMatrix[y][x]}|$symbol"
-        }
     }
 
     private fun view(gameObject: GameObject): String =
