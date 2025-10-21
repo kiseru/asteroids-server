@@ -2,7 +2,8 @@ package com.kiseru.asteroids.server.service.impl
 
 import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.GameStatus
- import com.kiseru.asteroids.server.model.Spaceship
+import com.kiseru.asteroids.server.model.Player
+import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.Type
 import com.kiseru.asteroids.server.service.GameService
 import java.io.IOException
@@ -106,29 +107,38 @@ class GameServiceImpl : GameService {
     }
 
     override fun getGameRating(game: Game): String =
-        game.getSpaceships()
-            .sortedByDescending { it.score }
-            .joinToString("\n") { "${it.user.username} ${it.score}" }
+        game.getPlayers()
+            .sortedByDescending { (player, _) -> player.score }
+            .joinToString("\n") { (player, spaceship) -> "${spaceship.user.username} ${player.score}" }
 
-    override fun damageSpaceship(game: Game, spaceship: Spaceship, type: Type) {
+    override fun damageSpaceship(game: Game, player: Player, spaceship: Spaceship, type: Type) {
         if (game.status != GameStatus.STARTED) {
             throw IllegalStateException("Game must have STARTED status")
         }
 
         when (type) {
-            Type.ASTEROID -> spaceship.subtractScore()
+            Type.ASTEROID -> subtractScore(player)
             Type.GARBAGE -> {
-                spaceship.addScore()
+                addScore(player)
                 game.onGarbageCollected()
             }
-            Type.WALL -> rollbackSpaceship(game, spaceship)
-            Type.SPACESHIP -> rollbackSpaceship(game, spaceship)
+            Type.WALL -> rollbackSpaceship(game, player, spaceship)
+            Type.SPACESHIP -> rollbackSpaceship(game, player, spaceship)
         }
     }
 
-    private fun rollbackSpaceship(game: Game, spaceship: Spaceship) {
-        game.rollback(spaceship)
-        spaceship.subtractScore()
+    private fun rollbackSpaceship(game: Game, player: Player, spaceship: Spaceship) {
+        game.rollback(player.direction, spaceship)
+        subtractScore(player)
+    }
+
+    private fun addScore(player: Player) {
+        player.score += 10
+    }
+
+    private fun subtractScore(player: Player) {
+        player.score -= 50
+        player.isAlive = player.score >= 0
     }
 
     override fun addGame(game: Game) {

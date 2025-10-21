@@ -4,6 +4,7 @@ import com.kiseru.asteroids.server.handler.GameHandler
 import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.GameObject
 import com.kiseru.asteroids.server.model.GameStatus
+import com.kiseru.asteroids.server.model.Player
 import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.Type
 import com.kiseru.asteroids.server.service.GameService
@@ -34,22 +35,22 @@ class GameHandlerImpl(
 
     override fun awaitStart() {
         lock.withLock {
-            while (game.getSpaceships().size < game.spaceshipCapacity) {
+            while (game.getPlayers().size < game.spaceshipCapacity) {
                 condition.await()
             }
         }
     }
 
-    fun checkSpaceship(spaceship: Spaceship) {
+    fun checkSpaceship(player: Player, spaceship: Spaceship) {
         val collisionPoint = game.gameField.objects.firstOrNull {
             it.type != Type.SPACESHIP && it.x == spaceship.x && it.y == spaceship.y
         }
 
         val collisionPointType = getCollisionPointType(spaceship, collisionPoint)
         lock.withLock {
-            onSpaceshipDamaged(game, spaceship)
+            onSpaceshipDamaged(game, player, spaceship)
             collisionPoint?.let { onGameObjectDamaged(game, it) }
-            collisionPointType?.let { gameService.damageSpaceship(game, spaceship, it) }
+            collisionPointType?.let { gameService.damageSpaceship(game, player, spaceship, it) }
             condition.signalAll()
         }
     }
@@ -64,8 +65,8 @@ class GameHandlerImpl(
                 || spaceship.x > game.gameField.width
                 || spaceship.y > game.gameField.height
 
-    private fun onSpaceshipDamaged(game: Game, spaceship: Spaceship) {
-        if (!spaceship.isAlive) {
+    private fun onSpaceshipDamaged(game: Game, player: Player, spaceship: Spaceship) {
+        if (!player.isAlive) {
             onGameObjectDamaged(game, spaceship)
         }
     }

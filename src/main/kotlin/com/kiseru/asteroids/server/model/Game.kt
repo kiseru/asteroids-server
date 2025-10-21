@@ -12,8 +12,8 @@ class Game(
 
     var status = GameStatus.CREATED
 
-    private val spaceships = mutableListOf<Spaceship>()
     private val sendMessageHandlers = mutableListOf<(String) -> Unit>()
+    private val players = mutableListOf<Pair<Player, Spaceship>>()
 
     private fun generateUniqueRandomCoordinates(): Pair<Int, Int> {
         if (gameField.objects.size == gameField.width * gameField.height) {
@@ -34,46 +34,44 @@ class Game(
         gameField.objects.any { it.x == x && it.y == y }
 
     fun addGameObject(gameObject: GameObject) {
-        println("addGameObject")
         val gameObjects = gameField.objects + gameObject
         gameField = gameField.copy(objects = gameObjects)
     }
 
     fun addGameObjects(gameObjects: List<GameObject>) {
-        println("addGameObjects")
         val gameObjects = gameField.objects + gameObjects
         gameField = gameField.copy(objects = gameObjects)
     }
 
-    fun isAsteroidAhead(spaceship: Spaceship): Boolean =
-        gameField.objects.any { it.type == Type.ASTEROID && isPointAhead(spaceship, it) }
+    fun isAsteroidAhead(direction: Direction, spaceship: Spaceship): Boolean =
+        gameField.objects.any { it.type == Type.ASTEROID && isPointAhead(direction, spaceship, it) }
 
-    fun isGarbageAhead(spaceship: Spaceship): Boolean =
-        gameField.objects.any { it.type == Type.GARBAGE && isPointAhead(spaceship, it) }
+    fun isGarbageAhead(direction: Direction, spaceship: Spaceship): Boolean =
+        gameField.objects.any { it.type == Type.GARBAGE && isPointAhead(direction, spaceship, it) }
 
-    private fun isPointAhead(spaceship: Spaceship, gameObject: GameObject): Boolean =
-        when (spaceship.direction) {
+    private fun isPointAhead(direction: Direction, spaceship: Spaceship, gameObject: GameObject): Boolean =
+        when (direction) {
             Direction.UP -> spaceship.x == gameObject.x && spaceship.y == gameObject.y + 1
             Direction.DOWN -> spaceship.x == gameObject.x && spaceship.y == gameObject.y - 1
             Direction.LEFT -> spaceship.x == gameObject.x + 1 && spaceship.y == gameObject.y
             Direction.RIGHT -> spaceship.x == gameObject.x - 1 && spaceship.y == gameObject.y
         }
 
-    fun isWallAhead(spaceship: Spaceship): Boolean =
-        when (spaceship.direction) {
+    fun isWallAhead(direction: Direction, spaceship: Spaceship): Boolean =
+        when (direction) {
             Direction.UP -> spaceship.y == 1
             Direction.DOWN -> spaceship.y == gameField.height
             Direction.LEFT -> spaceship.x == 1
             Direction.RIGHT -> spaceship.x == gameField.width
         }
 
-    fun addSpaceship(spaceship: Spaceship, onMessageSend: (String) -> Unit) {
-        spaceships.add(spaceship)
+    fun addSpaceship(player: Player, spaceship: Spaceship, onMessageSend: (String) -> Unit) {
+        players.add(player to spaceship)
         sendMessageHandlers.add(onMessageSend)
     }
 
-    fun getSpaceships(): List<Spaceship> =
-        spaceships
+    fun getPlayers(): List<Pair<Player, Spaceship>> =
+        players
 
     fun getSendMessageHandlers(): List<(String) -> Unit> =
         sendMessageHandlers
@@ -85,8 +83,8 @@ class Game(
         }
     }
 
-    fun rollback(spaceship: Spaceship) {
-        when (spaceship.direction) {
+    fun rollback(direction: Direction, spaceship: Spaceship) {
+        when (direction) {
             Direction.UP -> spaceship.y += 1
             Direction.RIGHT -> spaceship.x -= 1
             Direction.DOWN -> spaceship.y -= 1
@@ -101,23 +99,23 @@ class Game(
             }
         }
 
-    fun onSpaceshipMove(spaceship: Spaceship) {
+    fun onSpaceshipMove(direction: Direction, spaceship: Spaceship) {
         if (status != GameStatus.STARTED) {
             throw IllegalStateException("Failed to move the spaceship because of the game's illegal status")
         }
 
-        val isBusy = when (spaceship.direction) {
-            Direction.UP -> spaceships.any { it.x == spaceship.x && it.y == spaceship.y - 1 }
-            Direction.DOWN -> spaceships.any { it.x == spaceship.x && it.y == spaceship.y + 1 }
-            Direction.LEFT -> spaceships.any { it.x == spaceship.x - 1 && it.y == spaceship.y }
-            Direction.RIGHT -> spaceships.any { it.x == spaceship.x + 1 && it.y == spaceship.y }
+        val isBusy = when (direction) {
+            Direction.UP -> players.any {  it.second.x == spaceship.x && it.second.y == spaceship.y - 1 }
+            Direction.DOWN -> players.any { it.second.x == spaceship.x && it.second.y == spaceship.y + 1 }
+            Direction.LEFT -> players.any { it.second.x == spaceship.x - 1 && it.second.y == spaceship.y }
+            Direction.RIGHT -> players.any { it.second.x == spaceship.x + 1 && it.second.y == spaceship.y }
         }
 
         if (isBusy) {
             throw IllegalStateException("Failed to move spaceship. There is an other spaceship ahead.")
         }
 
-        when (spaceship.direction) {
+        when (direction) {
             Direction.UP -> spaceship.y -= 1
             Direction.RIGHT -> spaceship.x += 1
             Direction.DOWN -> spaceship.y += 1

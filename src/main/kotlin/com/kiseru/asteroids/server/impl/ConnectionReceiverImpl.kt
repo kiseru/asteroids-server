@@ -9,6 +9,7 @@ import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.GameField
 import com.kiseru.asteroids.server.model.GameStatus
 import com.kiseru.asteroids.server.model.Garbage
+import com.kiseru.asteroids.server.model.Player
 import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.GameService
@@ -74,13 +75,14 @@ class ConnectionReceiverImpl(
         val game = createGame()
         val gameHandler = GameHandlerImpl(game, lock, condition, gameService)
         gameService.addGame(game)
+        val player = Player()
         val spaceship = createSpaceship(game, user)
         game.addGameObject(spaceship)
-        game.addSpaceship(spaceship, onMessageSend)
-        val spaceshipHandler = SpaceshipHandlerImpl(spaceship, game, onMessageSend)
+        game.addSpaceship(player, spaceship, onMessageSend)
+        val spaceshipHandler = SpaceshipHandlerImpl(game, onMessageSend)
         spaceshipHandler.onRoomJoin(game.name)
         try {
-            spaceshipHandler.onSendInstructions()
+            spaceshipHandler.onSendInstructions(spaceship)
             thread { gameHandler.handle() }
             lock.withLock {
                 while (game.status != GameStatus.STARTED) {
@@ -88,41 +90,32 @@ class ConnectionReceiverImpl(
                 }
             }
 
-            while (game.status != GameStatus.FINISHED && spaceship.isAlive) {
+            while (game.status != GameStatus.FINISHED && player.isAlive) {
                 val userMessage = onMessageReceive()
                 when (userMessage) {
                     "go" -> {
-                        spaceshipHandler.onSpaceshipMove()
-                        gameHandler.checkSpaceship(spaceship)
-                        spaceshipHandler.onSendScore()
+                        spaceshipHandler.onSpaceshipMove(player.direction, spaceship)
+                        gameHandler.checkSpaceship(player, spaceship)
+                        spaceshipHandler.onSendScore(player)
                     }
-
-                    "left" -> spaceshipHandler.onSpaceshipChangeDirection(Direction.LEFT)
-
-                    "right" -> spaceshipHandler.onSpaceshipChangeDirection(Direction.RIGHT)
-
-                    "up" -> spaceshipHandler.onSpaceshipChangeDirection(Direction.UP)
-
-                    "down" -> spaceshipHandler.onSpaceshipChangeDirection(Direction.DOWN)
-
-                    "isAsteroid" -> spaceshipHandler.onIsAsteroid()
-
-                    "isGarbage" -> spaceshipHandler.onIsGarbage()
-
-                    "isWall" -> spaceshipHandler.onIsWall()
-
+                    "left" -> spaceshipHandler.onSpaceshipChangeDirection(player, Direction.LEFT)
+                    "right" -> spaceshipHandler.onSpaceshipChangeDirection(player, Direction.RIGHT)
+                    "up" -> spaceshipHandler.onSpaceshipChangeDirection(player, Direction.UP)
+                    "down" -> spaceshipHandler.onSpaceshipChangeDirection(player, Direction.DOWN)
+                    "isAsteroid" -> spaceshipHandler.onIsAsteroid(player, spaceship)
+                    "isGarbage" -> spaceshipHandler.onIsGarbage(player, spaceship)
+                    "isWall" -> spaceshipHandler.onIsWall(player, spaceship)
                     "GAME_FIELD" -> gameService.writeGameField(game, onMessageSend)
-
                     else -> spaceshipHandler.onUnknownCommand()
                 }
-                spaceshipHandler.onIncrementSteps()
+                spaceshipHandler.onIncrementSteps(player)
             }
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             println("Connection problems with user " + user.username)
         } finally {
-            spaceship.isAlive = false
+            player.isAlive = false
             lock.withLock {
-                val aliveUsersCount = game.getSpaceships().count { it.isAlive }
+                val aliveUsersCount = game.getPlayers().count { (player, _) -> player.isAlive }
                 if (aliveUsersCount == 0) {
                     game.status = GameStatus.FINISHED
                 }
