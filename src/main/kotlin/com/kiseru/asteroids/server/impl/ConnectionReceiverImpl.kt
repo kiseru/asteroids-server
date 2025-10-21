@@ -4,13 +4,13 @@ import com.kiseru.asteroids.server.ConnectionReceiver
 import com.kiseru.asteroids.server.handler.impl.GameHandlerImpl
 import com.kiseru.asteroids.server.handler.impl.SpaceshipHandlerImpl
 import com.kiseru.asteroids.server.model.Direction
-import com.kiseru.asteroids.server.model.Asteroid
 import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.GameField
+import com.kiseru.asteroids.server.model.GameObject.Asteroid
+import com.kiseru.asteroids.server.model.GameObject.Garbage
+import com.kiseru.asteroids.server.model.GameObject.Spaceship
 import com.kiseru.asteroids.server.model.GameStatus
-import com.kiseru.asteroids.server.model.Garbage
 import com.kiseru.asteroids.server.model.Player
-import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.GameService
 import java.io.IOException

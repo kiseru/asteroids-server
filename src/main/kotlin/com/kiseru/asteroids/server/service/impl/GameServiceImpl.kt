@@ -1,10 +1,11 @@
 package com.kiseru.asteroids.server.service.impl
 
 import com.kiseru.asteroids.server.model.Game
+import com.kiseru.asteroids.server.model.GameObject
+import com.kiseru.asteroids.server.model.GameObject.Asteroid
+import com.kiseru.asteroids.server.model.GameObject.Garbage
+import com.kiseru.asteroids.server.model.GameObject.Spaceship
 import com.kiseru.asteroids.server.model.GameStatus
-import com.kiseru.asteroids.server.model.Player
-import com.kiseru.asteroids.server.model.Spaceship
-import com.kiseru.asteroids.server.model.Type
 import com.kiseru.asteroids.server.service.GameService
 import java.io.IOException
 import java.io.OutputStream
@@ -57,7 +58,7 @@ class GameServiceImpl : GameService {
     private fun display(game: Game): String {
         val mainMatrix = Array(game.gameField.height + 2) { Array(game.gameField.width + 2) { "." } }
         game.gameField.objects.forEach {
-            draw(mainMatrix, it.x, it.y, it.view())
+            draw(mainMatrix, it.x, it.y, view(it))
         }
         val stringBuilder = StringBuilder()
         for (i in 1 until game.gameField.height + 1) {
@@ -81,6 +82,13 @@ class GameServiceImpl : GameService {
             mainMatrix[y][x] = "${mainMatrix[y][x]}|$symbol"
         }
     }
+
+    private fun view(gameObject: GameObject): String =
+        when (gameObject) {
+            is Asteroid -> "A"
+            is Garbage -> "G"
+            is Spaceship -> gameObject.user.id.toString()
+        }
 
     override fun createGameHandler(lock: Lock, condition: Condition): (Game) -> Unit =
         { handleGame(lock, condition, it) }
@@ -110,36 +118,6 @@ class GameServiceImpl : GameService {
         game.getPlayers()
             .sortedByDescending { (player, _) -> player.score }
             .joinToString("\n") { (player, spaceship) -> "${spaceship.user.username} ${player.score}" }
-
-    override fun damageSpaceship(game: Game, player: Player, spaceship: Spaceship, type: Type) {
-        if (game.status != GameStatus.STARTED) {
-            throw IllegalStateException("Game must have STARTED status")
-        }
-
-        when (type) {
-            Type.ASTEROID -> subtractScore(player)
-            Type.GARBAGE -> {
-                addScore(player)
-                game.onGarbageCollected()
-            }
-            Type.WALL -> rollbackSpaceship(game, player, spaceship)
-            Type.SPACESHIP -> rollbackSpaceship(game, player, spaceship)
-        }
-    }
-
-    private fun rollbackSpaceship(game: Game, player: Player, spaceship: Spaceship) {
-        game.rollback(player.direction, spaceship)
-        subtractScore(player)
-    }
-
-    private fun addScore(player: Player) {
-        player.score += 10
-    }
-
-    private fun subtractScore(player: Player) {
-        player.score -= 50
-        player.status = if (player.score >= 0) Player.Status.Alive else Player.Status.Dead
-    }
 
     override fun addGame(game: Game) {
         synchronized(games) {

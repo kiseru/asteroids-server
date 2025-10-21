@@ -1,5 +1,6 @@
 package com.kiseru.asteroids.server.model
 
+import com.kiseru.asteroids.server.model.GameObject.*
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFalse

@@ -1,12 +1,7 @@
 package com.kiseru.asteroids.server.model
 
-interface GameObject {
-
-    val x: Int
-
-    val y: Int
-
-    val type: Type
-
-    fun view(): String
+sealed class GameObject(var x: Int, var y: Int) {
+    class Asteroid(x: Int, y: Int) : GameObject(x, y)
+    class Garbage(x: Int, y: Int) : GameObject(x, y)
+    class Spaceship(x: Int, y: Int, val user: User) : GameObject(x, y)
 }

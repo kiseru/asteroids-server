@@ -3,10 +3,11 @@ package com.kiseru.asteroids.server.handler.impl
 import com.kiseru.asteroids.server.handler.GameHandler
 import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.GameObject
+import com.kiseru.asteroids.server.model.GameObject.Asteroid
+import com.kiseru.asteroids.server.model.GameObject.Garbage
+import com.kiseru.asteroids.server.model.GameObject.Spaceship
 import com.kiseru.asteroids.server.model.GameStatus
 import com.kiseru.asteroids.server.model.Player
-import com.kiseru.asteroids.server.model.Spaceship
-import com.kiseru.asteroids.server.model.Type
 import com.kiseru.asteroids.server.service.GameService
 import java.util.concurrent.locks.Condition
 import java.util.concurrent.locks.Lock
@@ -43,21 +44,49 @@ class GameHandlerImpl(
 
     fun checkSpaceship(player: Player, spaceship: Spaceship) {
         val collisionPoint = game.gameField.objects.firstOrNull {
-            it.type != Type.SPACESHIP && it.x == spaceship.x && it.y == spaceship.y
+            it !is Spaceship && it.x == spaceship.x && it.y == spaceship.y
         }
 
-        val collisionPointType = getCollisionPointType(spaceship, collisionPoint)
         lock.withLock {
+            if (game.status != GameStatus.STARTED) {
+                throw IllegalStateException("Game must have STARTED status")
+            }
+
             onSpaceshipDamaged(game, player, spaceship)
             collisionPoint?.let { onGameObjectDamaged(game, it) }
-            collisionPointType?.let { gameService.damageSpaceship(game, player, spaceship, it) }
+            if (collisionPoint != null) {
+                when (collisionPoint) {
+                    is Asteroid -> subtractScore(player)
+
+                    is Garbage -> {
+                        addScore(player)
+                        game.onGarbageCollected()
+                    }
+
+                    is Spaceship -> rollbackSpaceship(game, player, spaceship)
+
+                }
+            } else if (isOutOfField(spaceship)) {
+                rollbackSpaceship(game, player, spaceship)
+            }
+
             condition.signalAll()
         }
     }
 
-    private fun getCollisionPointType(spaceship: Spaceship, collisionGameObject: GameObject?): Type? =
-        collisionGameObject?.type
-            ?: if (isOutOfField(spaceship)) Type.WALL else null
+    fun rollbackSpaceship(game: Game, player: Player, spaceship: Spaceship) {
+        game.rollback(player.direction, spaceship)
+        subtractScore(player)
+    }
+
+    private fun addScore(player: Player) {
+        player.score += 10
+    }
+
+    private fun subtractScore(player: Player) {
+        player.score -= 50
+        player.status = if (player.score >= 0) Player.Status.Alive else Player.Status.Dead
+    }
 
     private fun isOutOfField(spaceship: Spaceship): Boolean =
         spaceship.x == 0

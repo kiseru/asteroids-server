@@ -1,5 +1,6 @@
 package com.kiseru.asteroids.server.model
 
+import com.kiseru.asteroids.server.model.GameObject.*
 import java.util.Random
 import java.util.UUID
 
@@ -44,10 +45,10 @@ class Game(
     }
 
     fun isAsteroidAhead(direction: Direction, spaceship: Spaceship): Boolean =
-        gameField.objects.any { it.type == Type.ASTEROID && isPointAhead(direction, spaceship, it) }
+        gameField.objects.any { it is Asteroid && isPointAhead(direction, spaceship, it) }
 
     fun isGarbageAhead(direction: Direction, spaceship: Spaceship): Boolean =
-        gameField.objects.any { it.type == Type.GARBAGE && isPointAhead(direction, spaceship, it) }
+        gameField.objects.any { it is Garbage && isPointAhead(direction, spaceship, it) }
 
     private fun isPointAhead(direction: Direction, spaceship: Spaceship, gameObject: GameObject): Boolean =
         when (direction) {
@@ -77,7 +78,7 @@ class Game(
         sendMessageHandlers
 
     fun onGarbageCollected() {
-        val isGarbageExists = gameField.objects.any { it.type == Type.GARBAGE }
+        val isGarbageExists = gameField.objects.any { it is Garbage }
         if (!isGarbageExists) {
             status = GameStatus.FINISHED
         }

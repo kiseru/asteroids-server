@@ -1,5 +1,8 @@
 package com.kiseru.asteroids.server.model
 
+import com.kiseru.asteroids.server.model.GameObject.Asteroid
+import com.kiseru.asteroids.server.model.GameObject.Garbage
+import com.kiseru.asteroids.server.model.GameObject.Spaceship
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource

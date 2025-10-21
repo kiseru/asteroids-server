@@ -3,8 +3,8 @@ package com.kiseru.asteroids.server.handler.impl
 import com.kiseru.asteroids.server.handler.SpaceshipHandler
 import com.kiseru.asteroids.server.model.Direction
 import com.kiseru.asteroids.server.model.Game
+import com.kiseru.asteroids.server.model.GameObject.Spaceship
 import com.kiseru.asteroids.server.model.Player
-import com.kiseru.asteroids.server.model.Spaceship
 
 class SpaceshipHandlerImpl(
     private val game: Game,
