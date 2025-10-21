@@ -54,13 +54,13 @@ class GameServiceImpl : GameService {
         }
 
     private fun display(game: Game): String {
-        val mainMatrix = Array(game.fieldHeight + 2) { Array(game.fieldWidth + 2) { "." } }
-        game.gameObjects.forEach {
+        val mainMatrix = Array(game.gameField.height + 2) { Array(game.gameField.width + 2) { "." } }
+        game.gameField.objects.forEach {
             draw(mainMatrix, it.x, it.y, it.view())
         }
         val stringBuilder = StringBuilder()
-        for (i in 1 until game.fieldHeight + 1) {
-            for (j in 1 until game.fieldWidth + 1) {
+        for (i in 1 until game.gameField.height + 1) {
+            for (j in 1 until game.gameField.width + 1) {
                 stringBuilder.append(mainMatrix[i][j])
                 stringBuilder.append("\t")
             }
@@ -129,5 +129,11 @@ class GameServiceImpl : GameService {
     private fun rollbackSpaceship(game: Game, spaceship: Spaceship) {
         game.rollback(spaceship)
         spaceship.subtractScore()
+    }
+
+    override fun addGame(game: Game) {
+        synchronized(games) {
+            games.add(game)
+        }
     }
 }

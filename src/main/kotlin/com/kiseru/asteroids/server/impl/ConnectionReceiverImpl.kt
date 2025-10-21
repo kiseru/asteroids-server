@@ -6,6 +6,7 @@ import com.kiseru.asteroids.server.handler.impl.SpaceshipHandlerImpl
 import com.kiseru.asteroids.server.model.Direction
 import com.kiseru.asteroids.server.model.Asteroid
 import com.kiseru.asteroids.server.model.Game
+import com.kiseru.asteroids.server.model.GameField
 import com.kiseru.asteroids.server.model.GameStatus
 import com.kiseru.asteroids.server.model.Garbage
 import com.kiseru.asteroids.server.model.Spaceship
@@ -25,6 +26,7 @@ private const val GARBAGE_AMOUNT = 150
 private const val ASTEROIDS_AMOUNT = 150
 private const val GAME_FIELD_HEIGHT = 30
 private const val GAME_FIELD_WIDTH = 30
+private const val SPACESHIP_PER_GAME = 1
 
 class ConnectionReceiverImpl(
     private val serverSocket: ServerSocket,
@@ -71,6 +73,7 @@ class ConnectionReceiverImpl(
         println("${user.username} has joined the server!")
         val game = createGame()
         val gameHandler = GameHandlerImpl(game, lock, condition, gameService)
+        gameService.addGame(game)
         val spaceship = createSpaceship(game, user)
         game.addGameObject(spaceship)
         game.addSpaceship(spaceship, onMessageSend)
@@ -136,28 +139,22 @@ class ConnectionReceiverImpl(
 
     private fun createGame(): Game {
         val gameId = UUID.randomUUID()
-        val game = Game(gameId, gameId.toString(), 1, GAME_FIELD_WIDTH, GAME_FIELD_HEIGHT)
-        generateGarbage(game)
-        generateAsteroids(game)
+        val gameField = GameField(GAME_FIELD_WIDTH, GAME_FIELD_HEIGHT)
+        val game = Game(gameId, gameId.toString(), SPACESHIP_PER_GAME, gameField)
+        generateGameObjects(game)
         return game
     }
 
-    private fun generateGarbage(game: Game) {
-        game.freeCoordinates()
-            .take(GARBAGE_AMOUNT)
-            .forEach { (x, y) ->
-                val garbage = Garbage(x, y)
-                game.addGameObject(garbage)
-            }
-    }
-
-    private fun generateAsteroids(game: Game) {
-        game.freeCoordinates()
-            .take(ASTEROIDS_AMOUNT)
-            .forEach { (x, y) ->
-                val asteroid = Asteroid(x, y)
-                game.addGameObject(asteroid)
-            }
+    private fun generateGameObjects(game: Game) {
+        val freeCoordinates = game.freeCoordinates()
+            .distinct()
+            .take(ASTEROIDS_AMOUNT + GARBAGE_AMOUNT)
+            .toList()
+        val garbage = freeCoordinates.subList(0, GARBAGE_AMOUNT)
+            .map { (x, y) -> Garbage(x, y) }
+        val asteroids = freeCoordinates.subList(GARBAGE_AMOUNT, GARBAGE_AMOUNT + ASTEROIDS_AMOUNT)
+            .map { (x, y) -> Asteroid(x, y) }
+        game.addGameObjects(garbage + asteroids)
     }
 
     private fun createSpaceship(game: Game, user: User): Spaceship {

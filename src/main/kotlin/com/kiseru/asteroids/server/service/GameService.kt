@@ -22,4 +22,6 @@ interface GameService {
     fun getGameRating(game: Game): String
 
     fun damageSpaceship(game: Game, spaceship: Spaceship, type: Type)
+
+    fun addGame(game: Game)
 }

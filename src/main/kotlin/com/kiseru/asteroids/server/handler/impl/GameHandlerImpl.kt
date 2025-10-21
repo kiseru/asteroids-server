@@ -34,14 +34,14 @@ class GameHandlerImpl(
 
     override fun awaitStart() {
         lock.withLock {
-            while (game.getSpaceships().size < game.size) {
+            while (game.getSpaceships().size < game.spaceshipCapacity) {
                 condition.await()
             }
         }
     }
 
     fun checkSpaceship(spaceship: Spaceship) {
-        val collisionPoint = game.gameObjects.firstOrNull {
+        val collisionPoint = game.gameField.objects.firstOrNull {
             it.type != Type.SPACESHIP && it.x == spaceship.x && it.y == spaceship.y
         }
 
@@ -61,8 +61,8 @@ class GameHandlerImpl(
     private fun isOutOfField(spaceship: Spaceship): Boolean =
         spaceship.x == 0
                 || spaceship.y == 0
-                || spaceship.x > game.fieldWidth
-                || spaceship.y > game.fieldHeight
+                || spaceship.x > game.gameField.width
+                || spaceship.y > game.gameField.height
 
     private fun onSpaceshipDamaged(game: Game, spaceship: Spaceship) {
         if (!spaceship.isAlive) {
@@ -71,7 +71,7 @@ class GameHandlerImpl(
     }
 
     private fun onGameObjectDamaged(game: Game, gameObject: GameObject) {
-        game.gameObjects.remove(gameObject)
+        game.removeGameObject(gameObject)
     }
 
     override fun awaitFinish() {

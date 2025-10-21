@@ -6,26 +6,24 @@ import java.util.UUID
 class Game(
     val id: UUID,
     val name: String,
-    val size: Int,
-    var fieldWidth: Int,
-    var fieldHeight: Int,
+    val spaceshipCapacity: Int,
+    var gameField: GameField,
 ) {
 
-    val gameObjects = mutableListOf<GameObject>()
     var status = GameStatus.CREATED
 
     private val spaceships = mutableListOf<Spaceship>()
     private val sendMessageHandlers = mutableListOf<(String) -> Unit>()
 
     private fun generateUniqueRandomCoordinates(): Pair<Int, Int> {
-        if (gameObjects.size == fieldWidth * fieldHeight) {
+        if (gameField.objects.size == gameField.width * gameField.height) {
             throw IllegalStateException()
         }
 
         return sequence {
             val random = Random()
             while (true) {
-                yield(random.nextInt(fieldWidth) + 1 to random.nextInt(fieldHeight) + 1)
+                yield(random.nextInt(gameField.width) + 1 to random.nextInt(gameField.height) + 1)
             }
         }
             .filterNot { (x, y) -> isGameObjectsContainsCoordinates(x, y) }
@@ -33,17 +31,25 @@ class Game(
     }
 
     private fun isGameObjectsContainsCoordinates(x: Int, y: Int): Boolean =
-        gameObjects.any { it.x == x && it.y == y }
+        gameField.objects.any { it.x == x && it.y == y }
 
     fun addGameObject(gameObject: GameObject) {
-        gameObjects.add(gameObject)
+        println("addGameObject")
+        val gameObjects = gameField.objects + gameObject
+        gameField = gameField.copy(objects = gameObjects)
+    }
+
+    fun addGameObjects(gameObjects: List<GameObject>) {
+        println("addGameObjects")
+        val gameObjects = gameField.objects + gameObjects
+        gameField = gameField.copy(objects = gameObjects)
     }
 
     fun isAsteroidAhead(spaceship: Spaceship): Boolean =
-        gameObjects.any { it.type == Type.ASTEROID && isPointAhead(spaceship, it) }
+        gameField.objects.any { it.type == Type.ASTEROID && isPointAhead(spaceship, it) }
 
     fun isGarbageAhead(spaceship: Spaceship): Boolean =
-        gameObjects.any { it.type == Type.GARBAGE && isPointAhead(spaceship, it) }
+        gameField.objects.any { it.type == Type.GARBAGE && isPointAhead(spaceship, it) }
 
     private fun isPointAhead(spaceship: Spaceship, gameObject: GameObject): Boolean =
         when (spaceship.direction) {
@@ -56,9 +62,9 @@ class Game(
     fun isWallAhead(spaceship: Spaceship): Boolean =
         when (spaceship.direction) {
             Direction.UP -> spaceship.y == 1
-            Direction.DOWN -> spaceship.y == fieldHeight
+            Direction.DOWN -> spaceship.y == gameField.height
             Direction.LEFT -> spaceship.x == 1
-            Direction.RIGHT -> spaceship.x == fieldWidth
+            Direction.RIGHT -> spaceship.x == gameField.width
         }
 
     fun addSpaceship(spaceship: Spaceship, onMessageSend: (String) -> Unit) {
@@ -73,7 +79,7 @@ class Game(
         sendMessageHandlers
 
     fun onGarbageCollected() {
-        val isGarbageExists = gameObjects.any { it.type == Type.GARBAGE }
+        val isGarbageExists = gameField.objects.any { it.type == Type.GARBAGE }
         if (!isGarbageExists) {
             status = GameStatus.FINISHED
         }
@@ -118,4 +124,10 @@ class Game(
             Direction.LEFT -> spaceship.x -= 1
         }
     }
+
+    fun removeGameObject(gameObject: GameObject) {
+        val gameObjects = gameField.objects.filter { it != gameObject }
+        gameField = gameField.copy(objects = gameObjects)
+    }
 }
+
