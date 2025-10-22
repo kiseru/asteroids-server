@@ -2,16 +2,10 @@ package com.kiseru.asteroids.server.model
 
 import com.kiseru.asteroids.server.model.GameObject.*
 import java.util.Random
-import java.util.UUID
 
 class Game(
-    val id: UUID,
-    val name: String,
-    val spaceshipCapacity: Int,
     var gameField: GameField,
 ) {
-
-    var status = GameStatus.CREATED
 
     private val sendMessageHandlers = mutableListOf<(String) -> Unit>()
     private val players = mutableListOf<Pair<Player, Spaceship>>()
@@ -77,22 +71,6 @@ class Game(
     fun getSendMessageHandlers(): List<(String) -> Unit> =
         sendMessageHandlers
 
-    fun onGarbageCollected() {
-        val isGarbageExists = gameField.objects.any { it is Garbage }
-        if (!isGarbageExists) {
-            status = GameStatus.FINISHED
-        }
-    }
-
-    fun rollback(direction: Direction, spaceship: Spaceship) {
-        when (direction) {
-            Direction.UP -> spaceship.y += 1
-            Direction.RIGHT -> spaceship.x -= 1
-            Direction.DOWN -> spaceship.y -= 1
-            Direction.LEFT -> spaceship.x += 1
-        }
-    }
-
     fun freeCoordinates(): Sequence<Pair<Int, Int>> =
         sequence {
             while (true) {
@@ -100,22 +78,32 @@ class Game(
             }
         }
 
-    fun onSpaceshipMove(direction: Direction, spaceship: Spaceship) {
-        if (status != GameStatus.STARTED) {
-            throw IllegalStateException("Failed to move the spaceship because of the game's illegal status")
+    fun onSpaceshipMove(player: Player, spaceship: Spaceship) {
+        val (x, y) = when(player.direction) {
+            Direction.UP -> spaceship.x to spaceship.y - 1
+            Direction.DOWN -> spaceship.x to spaceship.y + 1
+            Direction.LEFT -> spaceship.x - 1 to spaceship.y
+            Direction.RIGHT -> spaceship.x + 1 to spaceship.y
         }
 
-        val isBusy = when (direction) {
-            Direction.UP -> players.any {  it.second.x == spaceship.x && it.second.y == spaceship.y - 1 }
-            Direction.DOWN -> players.any { it.second.x == spaceship.x && it.second.y == spaceship.y + 1 }
-            Direction.LEFT -> players.any { it.second.x == spaceship.x - 1 && it.second.y == spaceship.y }
-            Direction.RIGHT -> players.any { it.second.x == spaceship.x + 1 && it.second.y == spaceship.y }
+        if (isOutOfField(x, y)) {
+            subtractScore(player)
+        } else {
+            val gameObject = gameField.objects.firstOrNull { it.x == x && it.y == y }
+            when (gameObject) {
+                is Asteroid -> subtractScore(player)
+                is Garbage -> {
+                    removeGameObject(gameObject)
+                    moveSpaceship(player.direction, spaceship)
+                    addScore(player)
+                }
+                is Spaceship -> subtractScore(player)
+                else -> moveSpaceship(player.direction, spaceship)
+            }
         }
+    }
 
-        if (isBusy) {
-            throw IllegalStateException("Failed to move spaceship. There is an other spaceship ahead.")
-        }
-
+    fun moveSpaceship(direction: Direction, spaceship: Spaceship) {
         when (direction) {
             Direction.UP -> spaceship.y -= 1
             Direction.RIGHT -> spaceship.x += 1
@@ -124,9 +112,24 @@ class Game(
         }
     }
 
+    private fun addScore(player: Player) {
+        player.score += 10
+    }
+
+    private fun subtractScore(player: Player) {
+        player.score -= 50
+        player.status = if (player.score >= 0) Player.Status.Alive else Player.Status.Dead
+    }
+
+    private fun isOutOfField(x: Int, y: Int): Boolean =
+        x <= 0 || y <= 0 || x > gameField.width || y > gameField.height
+
     fun removeGameObject(gameObject: GameObject) {
         val gameObjects = gameField.objects.filter { it != gameObject }
         gameField = gameField.copy(objects = gameObjects)
     }
+
+    fun hasGarbage(): Boolean =
+        gameField.objects.any { it is Garbage }
 }
 
