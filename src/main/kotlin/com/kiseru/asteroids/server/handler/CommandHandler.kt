@@ -2,19 +2,19 @@ package com.kiseru.asteroids.server.handler
 
 import com.kiseru.asteroids.server.model.Direction
 import com.kiseru.asteroids.server.model.Game
-import com.kiseru.asteroids.server.model.GameField
 import com.kiseru.asteroids.server.model.GameObject
+import com.kiseru.asteroids.server.model.GameObject.Asteroid
+import com.kiseru.asteroids.server.model.GameObject.Garbage
+import com.kiseru.asteroids.server.model.GameObject.Spaceship
 import com.kiseru.asteroids.server.model.Player
-import java.io.IOException
 
 class CommandHandler(
-    private val connectionHandler: ConnectionHandler,
     private val game: Game,
     private val player: Player,
-    private val spaceship: GameObject.Spaceship,
+    private val spaceship: Spaceship,
 ) {
 
-    fun handleCommand(command: Command?) =
+    fun handleCommand(command: Command?): String =
         when (command) {
             Command.Go -> handleGo()
             Command.Left -> handleLeft()
@@ -28,96 +28,77 @@ class CommandHandler(
             else -> handleUnknownCommand()
         }
 
-    fun handleGo() {
-        player.steps += 1
-        if (player.steps > 1500) {
+    private fun handleGo(): String =
+        if (player.steps >= 1500) {
             handleDeath(player)
         } else {
             game.onSpaceshipMove(player, spaceship)
             if (player.status == Player.Status.Dead) {
                 handleDeath(player)
             } else {
-                connectionHandler.sendMessage(player.score.toString())
+                player.steps += 1
+                player.score.toString()
             }
         }
-    }
 
-    private fun handleDeath(player: Player) {
+    private fun handleDeath(player: Player): String {
         player.status = Player.Status.Dead
         game.removeGameObject(spaceship)
-        connectionHandler.sendMessage("died")
-        connectionHandler.sendMessage("You've collected ${player.score} score")
+        return "died\nYou've collected ${player.score} score"
     }
 
-    fun handleLeft() {
+    private fun handleLeft(): String =
         onChangeDirection(Direction.LEFT)
-    }
 
-    fun handleRight() {
+    private fun handleRight(): String =
         onChangeDirection(Direction.RIGHT)
-    }
 
-    fun handleUp() {
+    private fun handleUp(): String =
         onChangeDirection(Direction.UP)
-    }
 
-    fun handleDown() {
+    private fun handleDown(): String =
         onChangeDirection(Direction.DOWN)
-    }
 
-    private fun onChangeDirection(direction: Direction) {
+    private fun onChangeDirection(direction: Direction): String {
         player.direction = direction
-        connectionHandler.sendMessage("success")
+        return "success"
     }
 
-    fun handleIsAsteroid() {
+    private fun handleIsAsteroid(): String =
         onBooleanSend(game.isAsteroidAhead(player.direction, spaceship))
-    }
 
-    fun handleIsGarbage() {
+    private fun handleIsGarbage(): String =
         onBooleanSend(game.isGarbageAhead(player.direction, spaceship))
-    }
 
-    fun handleIsWall() {
+    private fun handleIsWall(): String =
         onBooleanSend(game.isWallAhead(player.direction, spaceship))
-    }
 
-    private fun onBooleanSend(value: Boolean) {
-        val message = if (value) "t" else "f"
-        connectionHandler.sendMessage(message)
-    }
+    private fun onBooleanSend(value: Boolean): String =
+        if (value) "t" else "f"
 
-    fun handleGameField() {
-        try {
-            val gameField = displayGameField(game.gameField)
-            connectionHandler.sendMessage("$gameField\n")
-        } catch (_: IOException) {
-            println("Failed to write the room's game field")
-        }
-    }
-
-    fun displayGameField(gameField: GameField): String {
+    private fun handleGameField(): String {
         val stringBuilder = StringBuilder()
-        for (i in 1 until gameField.height + 1) {
-            for (j in 1 until gameField.width + 1) {
-                val gameObject = gameField.objects.firstOrNull { it.x == j && it.y == i }
+        for (i in 1 until game.gameField.height + 1) {
+            for (j in 1 until game.gameField.width + 1) {
+                val gameObject = game.gameField.objects.firstOrNull { it.x == j && it.y == i }
                 val symbol = if (gameObject != null) view(gameObject) else "."
                 val paddedSymbol = if (j == 1) symbol else symbol.padStart(3)
                 stringBuilder.append(paddedSymbol)
             }
             stringBuilder.append("\n")
         }
-        return stringBuilder.toString()
+        return stringBuilder
+            .append("\n")
+            .toString()
     }
 
     private fun view(gameObject: GameObject): String =
         when (gameObject) {
-            is GameObject.Asteroid -> "A"
-            is GameObject.Garbage -> "G"
-            is GameObject.Spaceship -> gameObject.id
+            is Asteroid -> "A"
+            is Garbage -> "G"
+            is Spaceship -> gameObject.id
         }
 
-    fun handleUnknownCommand() {
-        connectionHandler.sendMessage("Unknown command")
-    }
+    private fun handleUnknownCommand(): String =
+        "Unknown command"
 }

@@ -31,11 +31,16 @@ class GameHandler(
         try {
             sendInstructions()
             connectionHandler.sendMessage("start")
-            val commandHandler = CommandHandler(connectionHandler, game, player, spaceship)
+            val commandHandler = CommandHandler(game, player, spaceship)
             while (gameStatus != GameStatus.FINISHED && player.status == Player.Status.Alive) {
                 val command = connectionHandler.receiveCommand()
                 synchronized(game) {
-                    if (game.hasGarbage()) commandHandler.handleCommand(command) else gameStatus = GameStatus.FINISHED
+                    if (game.hasGarbage()) {
+                        val message = commandHandler.handleCommand(command)
+                        connectionHandler.sendMessage(message)
+                    } else {
+                        gameStatus = GameStatus.FINISHED
+                    }
                 }
             }
             connectionHandler.sendMessage("finish")
