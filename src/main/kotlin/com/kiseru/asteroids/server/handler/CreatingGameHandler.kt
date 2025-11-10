@@ -14,13 +14,17 @@ import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
 
-private const val GARBAGE_AMOUNT = 10
-private const val ASTEROIDS_AMOUNT = 10
-private const val GAME_FIELD_HEIGHT = 10
-private const val GAME_FIELD_WIDTH = 10
-private const val SPACESHIP_PER_GAME = 2
+class CreatingGameHandler(
+    private val connectionQueue: BlockingQueue<Socket>,
+) {
 
-class CreatingGameHandler(private val connectionQueue: BlockingQueue<Socket>) {
+    private companion object {
+        private const val GARBAGE_AMOUNT = 10
+        private const val ASTEROIDS_AMOUNT = 10
+        private const val GAME_FIELD_HEIGHT = 10
+        private const val GAME_FIELD_WIDTH = 10
+        private const val SPACESHIP_PER_GAME = 2
+    }
 
     fun handle() {
         generateSequence { connectionQueue.take() }
