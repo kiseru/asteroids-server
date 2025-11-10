@@ -45,8 +45,8 @@ class GameHandler(
             }
             connectionHandler.sendMessage("finish")
             sendRating()
-        } catch (_: IOException) {
-            println("Connection problems with user " + user.username)
+        } catch (e: IOException) {
+            println("Connection problems with user ${user.username}: ${e.message}")
         } finally {
             player.status = Player.Status.Dead
             game.removeGameObject(spaceship)
