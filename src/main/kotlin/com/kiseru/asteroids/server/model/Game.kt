@@ -12,7 +12,7 @@ class Game(
 
     private fun generateUniqueRandomCoordinates(): Pair<Int, Int> {
         if (gameField.objects.size == gameField.width * gameField.height) {
-            throw IllegalStateException()
+            throw IllegalStateException("No free space on the game field")
         }
 
         return sequence {
@@ -29,8 +29,7 @@ class Game(
         gameField.objects.any { it.x == x && it.y == y }
 
     fun addGameObject(gameObject: GameObject) {
-        val gameObjects = gameField.objects + gameObject
-        gameField = gameField.copy(objects = gameObjects)
+        gameField = gameField.copy(objects = gameField.objects + gameObject)
     }
 
     fun addGameObjects(gameObjects: List<GameObject>) {
@@ -79,12 +78,7 @@ class Game(
         }
 
     fun onSpaceshipMove(player: Player, spaceship: Spaceship) {
-        val (x, y) = when(player.direction) {
-            Direction.UP -> spaceship.x to spaceship.y - 1
-            Direction.DOWN -> spaceship.x to spaceship.y + 1
-            Direction.LEFT -> spaceship.x - 1 to spaceship.y
-            Direction.RIGHT -> spaceship.x + 1 to spaceship.y
-        }
+        val (x, y) = calculateNewPosition(spaceship, player.direction)
 
         if (isOutOfField(x, y)) {
             subtractScore(player)
@@ -92,15 +86,29 @@ class Game(
             val gameObject = gameField.objects.firstOrNull { it.x == x && it.y == y }
             when (gameObject) {
                 is Asteroid -> subtractScore(player)
-                is Garbage -> {
-                    removeGameObject(gameObject)
-                    moveSpaceship(player.direction, spaceship)
-                    addScore(player)
-                }
+                is Garbage -> handleGarbageCollision(player, spaceship, gameObject)
                 is Spaceship -> subtractScore(player)
                 else -> moveSpaceship(player.direction, spaceship)
             }
         }
+    }
+
+    private fun calculateNewPosition(spaceship: Spaceship, direction: Direction): Pair<Int, Int> =
+        when (direction) {
+            Direction.UP -> spaceship.x to spaceship.y - 1
+            Direction.DOWN -> spaceship.x to spaceship.y + 1
+            Direction.LEFT -> spaceship.x - 1 to spaceship.y
+            Direction.RIGHT -> spaceship.x + 1 to spaceship.y
+        }
+
+    private fun handleGarbageCollision(
+        player: Player,
+        spaceship: Spaceship,
+        garbage: Garbage,
+    ) {
+        removeGameObject(garbage)
+        moveSpaceship(player.direction, spaceship)
+        addScore(player)
     }
 
     fun moveSpaceship(direction: Direction, spaceship: Spaceship) {
@@ -125,8 +133,7 @@ class Game(
         x <= 0 || y <= 0 || x > gameField.width || y > gameField.height
 
     fun removeGameObject(gameObject: GameObject) {
-        val gameObjects = gameField.objects.filter { it != gameObject }
-        gameField = gameField.copy(objects = gameObjects)
+        gameField = gameField.copy(objects = gameField.objects - gameObject)
     }
 
     fun hasGarbage(): Boolean =
