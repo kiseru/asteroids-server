@@ -56,7 +56,11 @@ class CreatingGameHandler(private val connectionQueue: BlockingQueue<Socket>) {
         connectionHandler.sendMessage("Welcome To Asteroids Server")
         connectionHandler.sendMessage("Please, introduce yourself!")
         val username = connectionHandler.receiveMessage()
-        val user = User(username)
+        if (username.isNullOrBlank()) {
+            throw IllegalArgumentException("Username cannot be null or blank. Client failed to provide a valid name.")
+        }
+
+        val user = User(username.trim())
         return user to connectionHandler
     }
 
