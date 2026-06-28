@@ -8,6 +8,10 @@ import kotlin.concurrent.thread
 
 class Server(private val port: Int) {
 
+    init {
+        require(port in 1..65535) { "Port must be between 1 and 65535, but was $port" }
+    }
+
     fun start() {
         val connectionQueue = LinkedBlockingQueue<Socket>()
         val acceptingConnectionHandler = AcceptingConnectionHandler(connectionQueue)
