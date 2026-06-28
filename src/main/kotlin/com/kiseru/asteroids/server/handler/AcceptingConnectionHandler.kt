@@ -7,8 +7,6 @@ import java.util.concurrent.BlockingQueue
 class AcceptingConnectionHandler(private val connectionQueue: BlockingQueue<Socket>) {
 
     fun handle(port: Int) {
-        require(port in 1..65535) { "Port must be between 1 and 65535, but was $port" }
-
         val serverSocket = ServerSocket(port)
 
         try {
