@@ -8,7 +8,7 @@ import kotlin.concurrent.thread
 
 class Server(private val port: Int) {
 
-    fun up() {
+    fun start() {
         val connectionQueue = LinkedBlockingQueue<Socket>()
         val acceptingConnectionHandler = AcceptingConnectionHandler(connectionQueue)
         thread(name = "AcceptingThread") {
