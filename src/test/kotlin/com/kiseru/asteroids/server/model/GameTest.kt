@@ -15,7 +15,7 @@ class GameTest {
     fun `test onSpaceshipMove when the game isn't started`() {
         // given
         val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, 3, 3)
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
 
         val user = User(1, "Some cool username")
 
@@ -32,7 +32,7 @@ class GameTest {
         val user1 = User(1, "Some cool username")
         val user2 = User(2, "Some cool an other username")
         val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, 3, 3)
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
         game.status = GameStatus.STARTED
 
         val spaceship = Spaceship(Position(2, 2), user1)
@@ -59,7 +59,7 @@ class GameTest {
         // given
         val user = User(1, "Some cool username")
         val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, 3, 3)
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
         game.status = GameStatus.STARTED
 
         val spaceship = Spaceship(Position(2, 2), user)
@@ -84,7 +84,7 @@ class GameTest {
     fun `test isAsteroidAhead when an asteroid is ahead`(direction: Direction) {
         // given
         val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, 3, 3)
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
 
         listOf(
             1 to 1,
@@ -125,7 +125,7 @@ class GameTest {
     fun `test isAsteroidAhead when an asteroid isn't ahead`(direction: Direction) {
         // given
         val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, 3, 3)
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
 
         listOf(
             1 to 2,
@@ -166,7 +166,7 @@ class GameTest {
     fun `test isAsteroidAhead when garbage is ahead`(direction: Direction) {
         // given
         val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, 3, 3)
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
 
         listOf(
             1 to 1,
@@ -207,7 +207,7 @@ class GameTest {
     fun `test isAsteroidAhead when garbage isn't ahead`(direction: Direction) {
         // given
         val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, 3, 3)
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
 
         listOf(
             1 to 2,
@@ -248,7 +248,7 @@ class GameTest {
     fun `test isWallAhead when the wall is ahead`(direction: Direction) {
         // given
         val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, 1, 1)
+        val game = Game(gameId, "Some cool game", 1, FieldSize(1, 1))
 
         val user = User(1, "Some cool username")
 
@@ -267,7 +267,7 @@ class GameTest {
     fun `test isWallAhead when the wall isn't ahead`(direction: Direction) {
         // given
         val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, 3, 3)
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
 
         val user = User(1, "Some cool username")
 
@@ -285,7 +285,7 @@ class GameTest {
     fun `test freeCoordinates when there are free coordinates`() {
         // given
         val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, 1, 1)
+        val game = Game(gameId, "Some cool game", 1, FieldSize(1, 1))
 
         // when
         val position = game.freeCoordinates()
@@ -299,7 +299,7 @@ class GameTest {
     fun `test freeCoordinates when there are no free coordinates`() {
         // given
         val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, 1, 1)
+        val game = Game(gameId, "Some cool game", 1, FieldSize(1, 1))
 
         val garbage = Garbage(Position(1, 1))
         game.addGameObject(garbage)
@@ -315,7 +315,7 @@ class GameTest {
     fun `test getSpaceships`() {
         // given
         val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, 1, 1)
+        val game = Game(gameId, "Some cool game", 1, FieldSize(1, 1))
 
         val user = User(1, "Some cool username")
 
@@ -334,7 +334,7 @@ class GameTest {
     fun `test getSendMessagesHandlers`() {
         // given
         val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, 1, 1)
+        val game = Game(gameId, "Some cool game", 1, FieldSize(1, 1))
 
         val user = User(1, "Some cool username")
 

@@ -59,7 +59,7 @@ class GameHandlerImpl(
             ?: if (isOutOfField(spaceship)) Type.WALL else null
 
     private fun isOutOfField(spaceship: Spaceship): Boolean =
-        spaceship.position.isOutOfBounds(game.fieldWidth, game.fieldHeight)
+        !game.fieldSize.contains(spaceship.position)
 
     private fun onSpaceshipDamaged(game: Game, spaceship: Spaceship) {
         if (!spaceship.isAlive) {

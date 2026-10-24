@@ -54,13 +54,13 @@ class GameServiceImpl : GameService {
         }
 
     private fun display(game: Game): String {
-        val mainMatrix = Array(game.fieldHeight + 2) { Array(game.fieldWidth + 2) { "." } }
+        val mainMatrix = Array(game.fieldSize.height + 2) { Array(game.fieldSize.width + 2) { "." } }
         game.gameObjects.forEach {
             draw(mainMatrix, it.position.x, it.position.y, it.view())
         }
         val stringBuilder = StringBuilder()
-        for (i in 1 until game.fieldHeight + 1) {
-            for (j in 1 until game.fieldWidth + 1) {
+        for (i in 1 until game.fieldSize.height + 1) {
+            for (j in 1 until game.fieldSize.width + 1) {
                 stringBuilder.append(mainMatrix[i][j])
                 stringBuilder.append("\t")
             }

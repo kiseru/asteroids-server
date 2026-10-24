@@ -7,8 +7,7 @@ class Game(
     val id: UUID,
     val name: String,
     val size: Int,
-    var fieldWidth: Int,
-    var fieldHeight: Int,
+    val fieldSize: FieldSize,
 ) {
 
     val gameObjects = mutableListOf<GameObject>()
@@ -18,14 +17,14 @@ class Game(
     private val sendMessageHandlers = mutableListOf<(String) -> Unit>()
 
     private fun generateUniqueRandomCoordinates(): Position {
-        if (gameObjects.size == fieldWidth * fieldHeight) {
-            throw IllegalStateException()
+        if (gameObjects.size.toLong() >= fieldSize.capacity) {
+            throw IllegalStateException("No free coordinates")
         }
 
         return sequence {
             val random = Random()
             while (true) {
-                yield(Position(random.nextInt(fieldWidth) + 1, random.nextInt(fieldHeight) + 1))
+                yield(Position(random.nextInt(fieldSize.width) + 1, random.nextInt(fieldSize.height) + 1))
             }
         }
             .filterNot { position -> isGameObjectsContainsCoordinates(position) }
@@ -49,7 +48,7 @@ class Game(
         gameObject.position == spaceship.position.aheadOf(spaceship.direction)
 
     fun isWallAhead(spaceship: Spaceship): Boolean =
-        spaceship.position.aheadOf(spaceship.direction).isOutOfBounds(fieldWidth, fieldHeight)
+        !fieldSize.contains(spaceship.position.aheadOf(spaceship.direction))
 
     fun addSpaceship(spaceship: Spaceship, onMessageSend: (String) -> Unit) {
         spaceships.add(spaceship)

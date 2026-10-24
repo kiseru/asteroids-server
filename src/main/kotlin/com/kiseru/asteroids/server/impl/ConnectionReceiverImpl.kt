@@ -5,6 +5,7 @@ import com.kiseru.asteroids.server.handler.impl.GameHandlerImpl
 import com.kiseru.asteroids.server.handler.impl.SpaceshipHandlerImpl
 import com.kiseru.asteroids.server.model.Direction
 import com.kiseru.asteroids.server.model.Asteroid
+import com.kiseru.asteroids.server.model.FieldSize
 import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.GameStatus
 import com.kiseru.asteroids.server.model.Garbage
@@ -136,7 +137,8 @@ class ConnectionReceiverImpl(
 
     private fun createGame(): Game {
         val gameId = UUID.randomUUID()
-        val game = Game(gameId, gameId.toString(), 1, GAME_FIELD_WIDTH, GAME_FIELD_HEIGHT)
+        val fieldSize = FieldSize(GAME_FIELD_WIDTH, GAME_FIELD_HEIGHT)
+        val game = Game(gameId, gameId.toString(), 1, fieldSize)
         generateGarbage(game)
         generateAsteroids(game)
         return game
