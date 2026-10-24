@@ -1,9 +1,12 @@
 package com.kiseru.asteroids.server.model
 
 class Spaceship(
-    override var position: Position,
+    position: Position,
     val user: User,
 ) : GameObject {
+
+    override var position: Position = position
+        private set
 
     var direction = Direction.UP
         private set
@@ -57,6 +60,12 @@ class Spaceship(
         } else {
             destroy()
         }
+    }
+
+    fun moveTo(position: Position) {
+        ensureAlive()
+
+        this.position = position
     }
 
     private fun ensureAlive() {

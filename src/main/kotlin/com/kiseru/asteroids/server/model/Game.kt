@@ -69,7 +69,7 @@ class Game(
     }
 
     fun rollback(spaceship: Spaceship) {
-        spaceship.position = spaceship.position.aheadOf(spaceship.direction.opposite())
+        spaceship.moveTo(spaceship.position.aheadOf(spaceship.direction.opposite()))
     }
 
     fun freeCoordinates(): Sequence<Position> =
@@ -91,6 +91,6 @@ class Game(
             throw IllegalStateException("Failed to move spaceship. There is an other spaceship ahead.")
         }
 
-        spaceship.position = aheadOfSpaceship
+        spaceship.moveTo(aheadOfSpaceship)
     }
 }

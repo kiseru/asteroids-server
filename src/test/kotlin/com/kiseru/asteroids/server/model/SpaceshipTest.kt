@@ -201,4 +201,29 @@ class SpaceshipTest {
         assertEquals(1500, spaceship.steps)
         assertEquals(Spaceship.Status.DESTROYED, spaceship.status)
     }
+
+    @Test
+    fun `test moveTo when spaceship is alive`() {
+        // given
+        val user = User(1, "Some cool name")
+        val spaceship = Spaceship(Position(1, 1), user)
+
+        // when
+        spaceship.moveTo(Position(2, 2))
+
+        // then
+        assertEquals(Position(2, 2), spaceship.position)
+    }
+
+    @Test
+    fun `test moveTo when spaceship isn't alive`() {
+        // given
+        val user = User(1, "Some cool name")
+        val spaceship = Spaceship(Position(1, 1), user)
+        spaceship.destroy()
+
+        // when & then
+        assertThrows<IllegalStateException> { spaceship.moveTo(Position(2, 2)) }
+        assertEquals(Position(1, 1), spaceship.position)
+    }
 }
