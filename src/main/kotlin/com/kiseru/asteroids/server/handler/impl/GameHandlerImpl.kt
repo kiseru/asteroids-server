@@ -19,7 +19,7 @@ class GameHandlerImpl(
 
     override fun handle() {
         awaitStart()
-        game.status = Game.Status.STARTED
+        game.start()
         lock.withLock { condition.signalAll() }
         sendMessage("start")
         awaitFinish()

@@ -123,7 +123,7 @@ class ConnectionReceiverImpl(
             lock.withLock {
                 val aliveUsersCount = game.getSpaceships().count { it.status == Spaceship.Status.ALIVE }
                 if (aliveUsersCount == 0) {
-                    game.status = Game.Status.FINISHED
+                    game.finish()
                 }
                 condition.signalAll()
             }

@@ -12,6 +12,7 @@ class Game(
 
     val gameObjects = mutableListOf<GameObject>()
     var status = Status.CREATED
+        private set
 
     private val spaceships = mutableListOf<Spaceship>()
     private val sendMessageHandlers = mutableListOf<(String) -> Unit>()
@@ -64,7 +65,7 @@ class Game(
     fun onGarbageCollected() {
         val isGarbageExists = gameObjects.any { it.type == Type.GARBAGE }
         if (!isGarbageExists) {
-            status = Status.FINISHED
+            finish()
         }
     }
 
@@ -92,6 +93,26 @@ class Game(
         }
 
         spaceship.moveTo(aheadOfSpaceship)
+    }
+
+    fun start() {
+        ensureCreated()
+
+        status = Status.STARTED
+    }
+
+    fun finish() {
+        ensureStarted()
+
+        status = Status.FINISHED
+    }
+
+    private fun ensureCreated() {
+        check(status == Status.CREATED) { "Game not in CREATED status" }
+    }
+
+    private fun ensureStarted() {
+        check(status == Status.STARTED) { "Game not in STARTED status" }
     }
 
     enum class Status {

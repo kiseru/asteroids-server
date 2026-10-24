@@ -1,6 +1,7 @@
 package com.kiseru.asteroids.server.model
 
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import java.util.UUID
@@ -33,7 +34,7 @@ class GameTest {
         val user2 = User(2, "Some cool an other username")
         val gameId = UUID.randomUUID()
         val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
-        game.status = Game.Status.STARTED
+        game.start()
 
         val spaceship = Spaceship(Position(2, 2), user1)
         spaceship.changeDirection(direction)
@@ -60,7 +61,7 @@ class GameTest {
         val user = User(1, "Some cool username")
         val gameId = UUID.randomUUID()
         val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
-        game.status = Game.Status.STARTED
+        game.start()
 
         val spaceship = Spaceship(Position(2, 2), user)
         spaceship.changeDirection(direction)
@@ -348,5 +349,81 @@ class GameTest {
         // then
         assertEquals(1, handlers.size)
         assertEquals(handlers.first(), onMessageSend)
+    }
+
+    @Test
+    fun `test start when game is in created status`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(1, 1))
+
+        // when
+        game.start()
+
+        assertEquals(Game.Status.STARTED, game.status)
+    }
+
+    @Test
+    fun `test start when game is in started status`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(1, 1))
+        game.start()
+
+        // when & then
+        assertThrows<IllegalStateException> { game.start() }
+        assertEquals(Game.Status.STARTED, game.status)
+    }
+
+    @Test
+    fun `test start when game is in finished status`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(1, 1))
+        game.start()
+        game.finish()
+
+        // when & then
+        assertThrows<IllegalStateException> { game.start() }
+        assertEquals(Game.Status.FINISHED, game.status)
+    }
+
+    @Test
+    fun `test finish when game is in created status`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(1, 1))
+
+        // when & then
+        assertThrows<IllegalStateException> { game.finish() }
+        assertEquals(Game.Status.CREATED, game.status)
+    }
+
+    @Test
+    fun `test finish when game is in started status`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(1, 1))
+        game.start()
+
+        // when
+        game.finish()
+
+        // then
+        assertEquals(Game.Status.FINISHED, game.status)
+
+    }
+
+    @Test
+    fun `test finish when game is in finished status`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(1, 1))
+        game.start()
+        game.finish()
+
+        // when & then
+        assertThrows<IllegalStateException> { game.start() }
+        assertEquals(Game.Status.FINISHED, game.status)
     }
 }
