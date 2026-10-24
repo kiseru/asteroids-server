@@ -33,7 +33,7 @@ class GameTest {
         val user2 = User(2, "Some cool an other username")
         val gameId = UUID.randomUUID()
         val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
-        game.status = GameStatus.STARTED
+        game.status = Game.Status.STARTED
 
         val spaceship = Spaceship(Position(2, 2), user1)
         spaceship.changeDirection(direction)
@@ -60,7 +60,7 @@ class GameTest {
         val user = User(1, "Some cool username")
         val gameId = UUID.randomUUID()
         val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
-        game.status = GameStatus.STARTED
+        game.status = Game.Status.STARTED
 
         val spaceship = Spaceship(Position(2, 2), user)
         spaceship.changeDirection(direction)

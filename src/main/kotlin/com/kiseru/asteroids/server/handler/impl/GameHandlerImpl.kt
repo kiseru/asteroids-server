@@ -3,7 +3,6 @@ package com.kiseru.asteroids.server.handler.impl
 import com.kiseru.asteroids.server.handler.GameHandler
 import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.GameObject
-import com.kiseru.asteroids.server.model.GameStatus
 import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.Type
 import com.kiseru.asteroids.server.service.GameService
@@ -20,7 +19,7 @@ class GameHandlerImpl(
 
     override fun handle() {
         awaitStart()
-        game.status = GameStatus.STARTED
+        game.status = Game.Status.STARTED
         lock.withLock { condition.signalAll() }
         sendMessage("start")
         awaitFinish()
@@ -73,7 +72,7 @@ class GameHandlerImpl(
 
     override fun awaitFinish() {
         lock.withLock {
-            while (game.status != GameStatus.FINISHED) {
+            while (game.status != Game.Status.FINISHED) {
                 condition.await()
             }
         }

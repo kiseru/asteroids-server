@@ -1,7 +1,6 @@
 package com.kiseru.asteroids.server.service.impl
 
 import com.kiseru.asteroids.server.model.Game
-import com.kiseru.asteroids.server.model.GameStatus
  import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.Type
 import com.kiseru.asteroids.server.service.GameService
@@ -86,7 +85,7 @@ class GameServiceImpl : GameService {
 
     private fun handleGame(lock: Lock, condition: Condition, game: Game) {
         lock.withLock {
-            while (game.status != GameStatus.FINISHED) {
+            while (game.status != Game.Status.FINISHED) {
                 condition.await()
             }
         }
@@ -111,7 +110,7 @@ class GameServiceImpl : GameService {
             .joinToString("\n") { "${it.user.username} ${it.score.value}" }
 
     override fun damageSpaceship(game: Game, spaceship: Spaceship, type: Type) {
-        if (game.status != GameStatus.STARTED) {
+        if (game.status != Game.Status.STARTED) {
             throw IllegalStateException("Game must have STARTED status")
         }
 

@@ -11,7 +11,7 @@ class Game(
 ) {
 
     val gameObjects = mutableListOf<GameObject>()
-    var status = GameStatus.CREATED
+    var status = Status.CREATED
 
     private val spaceships = mutableListOf<Spaceship>()
     private val sendMessageHandlers = mutableListOf<(String) -> Unit>()
@@ -64,7 +64,7 @@ class Game(
     fun onGarbageCollected() {
         val isGarbageExists = gameObjects.any { it.type == Type.GARBAGE }
         if (!isGarbageExists) {
-            status = GameStatus.FINISHED
+            status = Status.FINISHED
         }
     }
 
@@ -80,7 +80,7 @@ class Game(
         }
 
     fun onSpaceshipMove(spaceship: Spaceship) {
-        if (status != GameStatus.STARTED) {
+        if (status != Status.STARTED) {
             throw IllegalStateException("Failed to move the spaceship because of the game's illegal status")
         }
 
@@ -92,5 +92,11 @@ class Game(
         }
 
         spaceship.moveTo(aheadOfSpaceship)
+    }
+
+    enum class Status {
+        CREATED,
+        STARTED,
+        FINISHED,
     }
 }
