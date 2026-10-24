@@ -54,7 +54,7 @@ class GameServiceImpl : GameService {
 
     private fun display(game: Game): String {
         val mainMatrix = Array(game.fieldSize.height + 2) { Array(game.fieldSize.width + 2) { "." } }
-        game.gameObjects.forEach {
+        game.getGameObjects().forEach {
             draw(mainMatrix, it.position.x, it.position.y, it.view())
         }
         val stringBuilder = StringBuilder()

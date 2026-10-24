@@ -8,6 +8,8 @@ import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class GameTest {
@@ -425,5 +427,63 @@ class GameTest {
         // when & then
         assertThrows<IllegalStateException> { game.start() }
         assertEquals(Game.Status.FINISHED, game.status)
+    }
+
+    @Test
+    fun `test removeGameObject when status is started`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+        val gameObject = Garbage(Position(2, 2))
+        game.addGameObject(gameObject)
+        game.start()
+
+        // when
+        game.removeGameObject(gameObject)
+
+        // then
+        assertFalse(game.getGameObjects().contains(gameObject))
+    }
+
+    @Test
+    fun `test findCollidableObjectAt when position is empty`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+
+        // when
+        val actual = game.findCollidableObjectAt(Position(2, 2))
+
+        // then
+        assertNull(actual)
+    }
+
+    @Test
+    fun `test findCollidableObjectAt when position has garbage`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+        game.addGameObject(Garbage(Position(2, 2)))
+
+        // when
+        val actual = game.findCollidableObjectAt(Position(2, 2))
+
+        // then
+        assertNotNull(actual)
+    }
+
+    @Test
+    fun `test findCollidableObjectAt when position has spaceship`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+        val user = User(1, "Some cool name")
+        game.addSpaceship(Spaceship(Position(2, 2), user)) {}
+
+        // when
+        val actual = game.findCollidableObjectAt(Position(2, 2))
+
+        // then
+        assertNull(actual)
     }
 }

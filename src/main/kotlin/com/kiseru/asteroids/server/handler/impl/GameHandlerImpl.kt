@@ -40,10 +40,7 @@ class GameHandlerImpl(
     }
 
     fun checkSpaceship(spaceship: Spaceship) {
-        val collisionPoint = game.gameObjects.firstOrNull {
-            it.type != Type.SPACESHIP && it.position == spaceship.position
-        }
-
+        val collisionPoint = game.findCollidableObjectAt(spaceship.position)
         val collisionPointType = getCollisionPointType(spaceship, collisionPoint)
         lock.withLock {
             onSpaceshipDamaged(game, spaceship)
@@ -67,7 +64,7 @@ class GameHandlerImpl(
     }
 
     private fun onGameObjectDamaged(game: Game, gameObject: GameObject) {
-        game.gameObjects.remove(gameObject)
+        game.removeGameObject(gameObject)
     }
 
     override fun awaitFinish() {

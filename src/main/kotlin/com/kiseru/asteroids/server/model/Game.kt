@@ -1,5 +1,6 @@
 package com.kiseru.asteroids.server.model
 
+import java.util.Collections
 import java.util.Random
 import java.util.UUID
 
@@ -10,7 +11,8 @@ class Game(
     val fieldSize: FieldSize,
 ) {
 
-    val gameObjects = mutableListOf<GameObject>()
+    private val gameObjects = mutableListOf<GameObject>()
+
     var status = Status.CREATED
         private set
 
@@ -35,8 +37,24 @@ class Game(
     private fun isGameObjectsContainsCoordinates(position: Position): Boolean =
         gameObjects.any { it.position == position }
 
+    fun getGameObjects(): List<GameObject> =
+        gameObjects.toList()
+
     fun addGameObject(gameObject: GameObject) {
+        ensureCreated()
+
         gameObjects.add(gameObject)
+    }
+
+    fun removeGameObject(gameObject: GameObject) {
+        ensureStarted()
+
+        gameObjects.remove(gameObject)
+    }
+
+    fun findCollidableObjectAt(position: Position): GameObject? {
+        require(fieldSize.contains(position)) { "Position is out of the field" }
+        return gameObjects.firstOrNull { it.type != Type.SPACESHIP && it.position == position }
     }
 
     fun isAsteroidAhead(spaceship: Spaceship): Boolean =
