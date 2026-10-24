@@ -1,9 +1,9 @@
 package com.kiseru.asteroids.server.model
 
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 class SpaceshipTest {
 
@@ -17,7 +17,7 @@ class SpaceshipTest {
         assertEquals(Direction.UP, spaceship.direction)
         assertEquals(0, spaceship.steps)
         assertEquals(Score(100), spaceship.score)
-        assertTrue(spaceship.isAlive)
+        assertEquals(Spaceship.Status.ALIVE, spaceship.status)
     }
 
     @Test
@@ -73,6 +73,18 @@ class SpaceshipTest {
     }
 
     @Test
+    fun `test addScore when spaceship is destroyed`() {
+        // given
+        val user = User(1, "Some cool name")
+        val spaceship = Spaceship(Position(1, 1), user)
+        spaceship.destroy()
+
+        // when & then
+        assertThrows<IllegalStateException> { spaceship.addScore() }
+        assertEquals(Score(100), spaceship.score)
+    }
+
+    @Test
     fun `test subtractScore when it doesn't destroy spaceship`() {
         // given
         val user = User(1, "Some cool name")
@@ -83,7 +95,7 @@ class SpaceshipTest {
 
         // then
         assertEquals(Score(50), spaceship.score)
-        assertTrue(spaceship.isAlive)
+        assertEquals(Spaceship.Status.ALIVE, spaceship.status)
     }
 
     @Test
@@ -97,6 +109,42 @@ class SpaceshipTest {
 
         // then
         assertEquals(Score(-50), spaceship.score)
-        assertFalse(spaceship.isAlive)
+        assertNotEquals(Spaceship.Status.ALIVE, spaceship.status)
+    }
+
+    @Test
+    fun `test subtractScore when spaceship is destroyed`() {
+        // given
+        val user = User(1, "Some cool name")
+        val spaceship = Spaceship(Position(1, 1), user)
+        spaceship.destroy()
+
+        // when & then
+        assertThrows<IllegalStateException> { spaceship.subtractScore() }
+        assertEquals(Score(100), spaceship.score)
+    }
+
+    @Test
+    fun `test destroy when spaceship is alive`() {
+        // given
+        val user = User(1, "Some cool name")
+        val spaceship = Spaceship(Position(1, 1), user)
+
+        // when
+        spaceship.destroy()
+
+        // then
+        assertEquals(Spaceship.Status.DESTROYED, spaceship.status)
+    }
+
+    @Test
+    fun `test destroy when spaceship is destroyed`() {
+        // given
+        val user = User(1, "Some cool name")
+        val spaceship = Spaceship(Position(1, 1), user)
+        spaceship.destroy()
+
+        // when & then
+        assertThrows<IllegalStateException> { spaceship.destroy() }
     }
 }

@@ -62,7 +62,7 @@ class GameHandlerImpl(
         !game.fieldSize.contains(spaceship.position)
 
     private fun onSpaceshipDamaged(game: Game, spaceship: Spaceship) {
-        if (!spaceship.isAlive) {
+        if (spaceship.status != Spaceship.Status.ALIVE) {
             onGameObjectDamaged(game, spaceship)
         }
     }

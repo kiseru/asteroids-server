@@ -11,7 +11,8 @@ class Spaceship(
     var score = Score(100)
         private set
 
-    var isAlive = true
+    var status = Status.ALIVE
+        private set
 
     override val type: Type = Type.SPACESHIP
 
@@ -19,11 +20,32 @@ class Spaceship(
         user.id.toString()
 
     fun addScore() {
+        ensureAlive()
+
         score = score.increaseBy(10)
     }
 
     fun subtractScore() {
+        ensureAlive()
+
         score = score.decreaseBy(50)
-        isAlive = score.value >= 0
+        if (score.value < 0) {
+            destroy()
+        }
+    }
+
+    fun destroy() {
+        ensureAlive()
+
+        status = Status.DESTROYED
+    }
+
+    private fun ensureAlive() {
+        check(status == Status.ALIVE) { "Spaceship isn't alive" }
+    }
+
+    enum class Status {
+        ALIVE,
+        DESTROYED,
     }
 }

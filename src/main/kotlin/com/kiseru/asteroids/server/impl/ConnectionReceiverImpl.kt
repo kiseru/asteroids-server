@@ -86,7 +86,7 @@ class ConnectionReceiverImpl(
                 }
             }
 
-            while (game.status != GameStatus.FINISHED && spaceship.isAlive) {
+            while (game.status != GameStatus.FINISHED && spaceship.status == Spaceship.Status.ALIVE) {
                 val userMessage = onMessageReceive()
                 when (userMessage) {
                     "go" -> {
@@ -118,9 +118,11 @@ class ConnectionReceiverImpl(
         } catch (e: IOException) {
             println("Connection problems with user " + user.username)
         } finally {
-            spaceship.isAlive = false
+            if (spaceship.status == Spaceship.Status.ALIVE) {
+                spaceship.destroy()
+            }
             lock.withLock {
-                val aliveUsersCount = game.getSpaceships().count { it.isAlive }
+                val aliveUsersCount = game.getSpaceships().count { it.status == Spaceship.Status.ALIVE }
                 if (aliveUsersCount == 0) {
                     game.status = GameStatus.FINISHED
                 }

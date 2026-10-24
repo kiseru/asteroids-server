@@ -19,7 +19,6 @@ class SpaceshipHandlerImpl(
     }
 
     private fun handleDeath() {
-        spaceship.isAlive = false
         onMessageSend("died")
         onMessageSend("You've collected ${spaceship.score.value} score")
     }
