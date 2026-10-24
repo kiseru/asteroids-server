@@ -17,7 +17,7 @@ class Game(
     private val spaceships = mutableListOf<Spaceship>()
     private val sendMessageHandlers = mutableListOf<(String) -> Unit>()
 
-    private fun generateUniqueRandomCoordinates(): Pair<Int, Int> {
+    private fun generateUniqueRandomCoordinates(): Position {
         if (gameObjects.size == fieldWidth * fieldHeight) {
             throw IllegalStateException()
         }
@@ -25,15 +25,15 @@ class Game(
         return sequence {
             val random = Random()
             while (true) {
-                yield(random.nextInt(fieldWidth) + 1 to random.nextInt(fieldHeight) + 1)
+                yield(Position(random.nextInt(fieldWidth) + 1, random.nextInt(fieldHeight) + 1))
             }
         }
-            .filterNot { (x, y) -> isGameObjectsContainsCoordinates(x, y) }
+            .filterNot { position -> isGameObjectsContainsCoordinates(position) }
             .first()
     }
 
-    private fun isGameObjectsContainsCoordinates(x: Int, y: Int): Boolean =
-        gameObjects.any { it.x == x && it.y == y }
+    private fun isGameObjectsContainsCoordinates(position: Position): Boolean =
+        gameObjects.any { it.position == position }
 
     fun addGameObject(gameObject: GameObject) {
         gameObjects.add(gameObject)
@@ -46,20 +46,10 @@ class Game(
         gameObjects.any { it.type == Type.GARBAGE && isPointAhead(spaceship, it) }
 
     private fun isPointAhead(spaceship: Spaceship, gameObject: GameObject): Boolean =
-        when (spaceship.direction) {
-            Direction.UP -> spaceship.x == gameObject.x && spaceship.y == gameObject.y + 1
-            Direction.DOWN -> spaceship.x == gameObject.x && spaceship.y == gameObject.y - 1
-            Direction.LEFT -> spaceship.x == gameObject.x + 1 && spaceship.y == gameObject.y
-            Direction.RIGHT -> spaceship.x == gameObject.x - 1 && spaceship.y == gameObject.y
-        }
+        gameObject.position == spaceship.position.aheadOf(spaceship.direction)
 
     fun isWallAhead(spaceship: Spaceship): Boolean =
-        when (spaceship.direction) {
-            Direction.UP -> spaceship.y == 1
-            Direction.DOWN -> spaceship.y == fieldHeight
-            Direction.LEFT -> spaceship.x == 1
-            Direction.RIGHT -> spaceship.x == fieldWidth
-        }
+        spaceship.position.aheadOf(spaceship.direction).isOutOfBounds(fieldWidth, fieldHeight)
 
     fun addSpaceship(spaceship: Spaceship, onMessageSend: (String) -> Unit) {
         spaceships.add(spaceship)
@@ -80,15 +70,10 @@ class Game(
     }
 
     fun rollback(spaceship: Spaceship) {
-        when (spaceship.direction) {
-            Direction.UP -> spaceship.y += 1
-            Direction.RIGHT -> spaceship.x -= 1
-            Direction.DOWN -> spaceship.y -= 1
-            Direction.LEFT -> spaceship.x += 1
-        }
+        spaceship.position = spaceship.position.aheadOf(spaceship.direction.opposite())
     }
 
-    fun freeCoordinates(): Sequence<Pair<Int, Int>> =
+    fun freeCoordinates(): Sequence<Position> =
         sequence {
             while (true) {
                 yield(generateUniqueRandomCoordinates())
@@ -100,22 +85,13 @@ class Game(
             throw IllegalStateException("Failed to move the spaceship because of the game's illegal status")
         }
 
-        val isBusy = when (spaceship.direction) {
-            Direction.UP -> spaceships.any { it.x == spaceship.x && it.y == spaceship.y - 1 }
-            Direction.DOWN -> spaceships.any { it.x == spaceship.x && it.y == spaceship.y + 1 }
-            Direction.LEFT -> spaceships.any { it.x == spaceship.x - 1 && it.y == spaceship.y }
-            Direction.RIGHT -> spaceships.any { it.x == spaceship.x + 1 && it.y == spaceship.y }
-        }
+        val aheadOfSpaceship = spaceship.position.aheadOf(spaceship.direction)
+        val isBusy = spaceships.any { it.position == aheadOfSpaceship }
 
         if (isBusy) {
             throw IllegalStateException("Failed to move spaceship. There is an other spaceship ahead.")
         }
 
-        when (spaceship.direction) {
-            Direction.UP -> spaceship.y -= 1
-            Direction.RIGHT -> spaceship.x += 1
-            Direction.DOWN -> spaceship.y += 1
-            Direction.LEFT -> spaceship.x -= 1
-        }
+        spaceship.position = aheadOfSpaceship
     }
 }

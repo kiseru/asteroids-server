@@ -145,8 +145,8 @@ class ConnectionReceiverImpl(
     private fun generateGarbage(game: Game) {
         game.freeCoordinates()
             .take(GARBAGE_AMOUNT)
-            .forEach { (x, y) ->
-                val garbage = Garbage(x, y)
+            .forEach { position ->
+                val garbage = Garbage(position)
                 game.addGameObject(garbage)
             }
     }
@@ -154,15 +154,15 @@ class ConnectionReceiverImpl(
     private fun generateAsteroids(game: Game) {
         game.freeCoordinates()
             .take(ASTEROIDS_AMOUNT)
-            .forEach { (x, y) ->
-                val asteroid = Asteroid(x, y)
+            .forEach { position ->
+                val asteroid = Asteroid(position)
                 game.addGameObject(asteroid)
             }
     }
 
     private fun createSpaceship(game: Game, user: User): Spaceship {
-        val (x, y) = game.freeCoordinates()
+        val position = game.freeCoordinates()
             .first()
-        return Spaceship(x, y, user)
+        return Spaceship(position, user)
     }
 }

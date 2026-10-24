@@ -3,8 +3,6 @@ package com.kiseru.asteroids.server.model
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.junit.jupiter.params.provider.EnumSource
-import org.junit.jupiter.params.provider.ValueSource
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -14,7 +12,7 @@ class SpaceshipTest {
     fun `test default values after creation`() {
         // given
         val user = User(1, "Some cool name")
-        val spaceship = Spaceship(1, 1, user)
+        val spaceship = Spaceship(Position(1, 1), user)
 
         // when & then
         assertEquals(Direction.UP, spaceship.direction)
@@ -24,10 +22,23 @@ class SpaceshipTest {
     }
 
     @Test
+    fun `test position`() {
+        // given
+        val user = User(1, "Some cool name")
+        val spaceship = Spaceship(Position(1, 1), user)
+
+        // when
+        val actual = spaceship.position
+
+        // then
+        assertEquals(Position(1, 1), actual)
+    }
+
+    @Test
     fun `test type`() {
         // given
         val user = User(1, "Some cool name")
-        val spaceship = Spaceship(1, 1, user)
+        val spaceship = Spaceship(Position(1, 1), user)
 
         // when
         val actual = spaceship.type
@@ -40,7 +51,7 @@ class SpaceshipTest {
     fun `test view`() {
         // given
         val user = User(1, "Some cool name")
-        val spaceship = Spaceship(1, 1, user)
+        val spaceship = Spaceship(Position(1, 1), user)
 
         // when
         val actual = spaceship.view()
@@ -53,7 +64,7 @@ class SpaceshipTest {
     fun `test addScore`() {
         // given
         val user = User(1, "Some cool name")
-        val spaceship = Spaceship(1, 1, user)
+        val spaceship = Spaceship(Position(1, 1), user)
 
         // when
         spaceship.addScore()
@@ -70,7 +81,7 @@ class SpaceshipTest {
     fun `test subtractScore`(initialScore: Int, expectedScore: Int, expectedIsAlive: Boolean) {
         // given
         val user = User(1, "Some cool name")
-        val spaceship = Spaceship(1, 1, user)
+        val spaceship = Spaceship(Position(1, 1), user)
         spaceship.score = initialScore
 
         // when

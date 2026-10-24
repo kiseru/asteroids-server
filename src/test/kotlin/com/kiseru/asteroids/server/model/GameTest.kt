@@ -19,7 +19,7 @@ class GameTest {
 
         val user = User(1, "Some cool username")
 
-        val spaceship = Spaceship(1, 1, user)
+        val spaceship = Spaceship(Position(1, 1), user)
 
         // when & then
         assertFailsWith<IllegalStateException> { game.onSpaceshipMove(spaceship) }
@@ -35,23 +35,22 @@ class GameTest {
         val game = Game(gameId, "Some cool game", 1, 3, 3)
         game.status = GameStatus.STARTED
 
-        val spaceship = Spaceship(2, 2, user1)
+        val spaceship = Spaceship(Position(2, 2), user1)
         spaceship.direction = direction
         game.addSpaceship(spaceship) {}
-        game.addSpaceship(Spaceship(1, 1, user2)) {}
-        game.addSpaceship(Spaceship(2, 1, user2)) {}
-        game.addSpaceship(Spaceship(3, 1, user2)) {}
-        game.addSpaceship(Spaceship(1, 2, user2)) {}
-        game.addSpaceship(Spaceship(3, 2, user2)) {}
-        game.addSpaceship(Spaceship(1, 3, user2)) {}
-        game.addSpaceship(Spaceship(2, 3, user2)) {}
-        game.addSpaceship(Spaceship(3, 3, user2)) {}
+        game.addSpaceship(Spaceship(Position(1, 1), user2)) {}
+        game.addSpaceship(Spaceship(Position(2, 1), user2)) {}
+        game.addSpaceship(Spaceship(Position(3, 1), user2)) {}
+        game.addSpaceship(Spaceship(Position(1, 2), user2)) {}
+        game.addSpaceship(Spaceship(Position(3, 2), user2)) {}
+        game.addSpaceship(Spaceship(Position(1, 3), user2)) {}
+        game.addSpaceship(Spaceship(Position(2, 3), user2)) {}
+        game.addSpaceship(Spaceship(Position(3, 3), user2)) {}
 
 
         // when & then
         assertFailsWith<IllegalStateException> { game.onSpaceshipMove(spaceship) }
-        assertEquals(spaceship.x, 2)
-        assertEquals(spaceship.y, 2)
+        assertEquals(Position(2, 2), spaceship.position)
     }
 
     @ParameterizedTest
@@ -63,7 +62,7 @@ class GameTest {
         val game = Game(gameId, "Some cool game", 1, 3, 3)
         game.status = GameStatus.STARTED
 
-        val spaceship = Spaceship(2, 2, user)
+        val spaceship = Spaceship(Position(2, 2), user)
         spaceship.direction = direction
         game.addSpaceship(spaceship) {}
 
@@ -71,14 +70,13 @@ class GameTest {
         game.onSpaceshipMove(spaceship)
 
         // then
-        val (expectedX, expectedY) = when (direction) {
-            Direction.UP -> 2 to 1
-            Direction.DOWN -> 2 to 3
-            Direction.LEFT -> 1 to 2
-            Direction.RIGHT -> 3 to 2
+        val expectedPosition = when (direction) {
+            Direction.UP -> Position(2, 1)
+            Direction.DOWN -> Position(2, 3)
+            Direction.LEFT -> Position(1, 2)
+            Direction.RIGHT -> Position(3, 2)
         }
-        assertEquals(spaceship.x, expectedX)
-        assertEquals(spaceship.y, expectedY)
+        assertEquals(expectedPosition, spaceship.position)
     }
 
     @ParameterizedTest
@@ -95,7 +93,7 @@ class GameTest {
             3 to 3,
         )
             .forEach { (x, y) ->
-                val garbage = Garbage(x, y)
+                val garbage = Garbage(Position(x, y))
                 game.addGameObject(garbage)
             }
 
@@ -106,13 +104,13 @@ class GameTest {
             3 to 2,
         )
             .forEach { (x, y) ->
-                val asteroid = Asteroid(x, y)
+                val asteroid = Asteroid(Position(x, y))
                 game.addGameObject(asteroid)
             }
 
         val user = User(1, "Some cool username")
 
-        val spaceship = Spaceship(2, 2, user)
+        val spaceship = Spaceship(Position(2, 2), user)
         spaceship.direction = direction
 
         // when
@@ -136,7 +134,7 @@ class GameTest {
             3 to 2,
         )
             .forEach { (x, y) ->
-                val garbage = Garbage(x, y)
+                val garbage = Garbage(Position(x, y))
                 game.addGameObject(garbage)
             }
 
@@ -147,13 +145,13 @@ class GameTest {
             3 to 3,
         )
             .forEach { (x, y) ->
-                val asteroid = Asteroid(x, y)
+                val asteroid = Asteroid(Position(x, y))
                 game.addGameObject(asteroid)
             }
 
         val user = User(1, "Some cool username")
 
-        val spaceship = Spaceship(2, 2, user)
+        val spaceship = Spaceship(Position(2, 2), user)
         spaceship.direction = direction
 
         // when
@@ -177,7 +175,7 @@ class GameTest {
             3 to 3,
         )
             .forEach { (x, y) ->
-                val asteroid = Asteroid(x, y)
+                val asteroid = Asteroid(Position(x, y))
                 game.addGameObject(asteroid)
             }
 
@@ -188,13 +186,13 @@ class GameTest {
             3 to 2,
         )
             .forEach { (x, y) ->
-                val garbage = Garbage(x, y)
+                val garbage = Garbage(Position(x, y))
                 game.addGameObject(garbage)
             }
 
         val user = User(1, "Some cool username")
 
-        val spaceship = Spaceship(2, 2, user)
+        val spaceship = Spaceship(Position(2, 2), user)
         spaceship.direction = direction
 
         // when
@@ -218,7 +216,7 @@ class GameTest {
             3 to 2,
         )
             .forEach { (x, y) ->
-                val asteroid = Asteroid(x, y)
+                val asteroid = Asteroid(Position(x, y))
                 game.addGameObject(asteroid)
             }
 
@@ -229,13 +227,13 @@ class GameTest {
             3 to 3,
         )
             .forEach { (x, y) ->
-                val garbage = Garbage(x, y)
+                val garbage = Garbage(Position(x, y))
                 game.addGameObject(garbage)
             }
 
         val user = User(1, "Some cool username")
 
-        val spaceship = Spaceship(2, 2, user)
+        val spaceship = Spaceship(Position(2, 2), user)
         spaceship.direction = direction
 
         // when
@@ -254,7 +252,7 @@ class GameTest {
 
         val user = User(1, "Some cool username")
 
-        val spaceship = Spaceship(1, 1, user)
+        val spaceship = Spaceship(Position(1, 1), user)
         spaceship.direction = direction
 
         // when
@@ -273,7 +271,7 @@ class GameTest {
 
         val user = User(1, "Some cool username")
 
-        val spaceship = Spaceship(2, 2, user)
+        val spaceship = Spaceship(Position(2, 2), user)
         spaceship.direction = direction
 
         // when
@@ -290,12 +288,11 @@ class GameTest {
         val game = Game(gameId, "Some cool game", 1, 1, 1)
 
         // when
-        val (actualX, actualY) = game.freeCoordinates()
+        val position = game.freeCoordinates()
             .first()
 
         // then
-        assertEquals(1, actualX)
-        assertEquals(1, actualY)
+        assertEquals(Position(1, 1), position)
     }
 
     @Test
@@ -304,7 +301,7 @@ class GameTest {
         val gameId = UUID.randomUUID()
         val game = Game(gameId, "Some cool game", 1, 1, 1)
 
-        val garbage = Garbage(1, 1)
+        val garbage = Garbage(Position(1, 1))
         game.addGameObject(garbage)
 
         // when & then
@@ -322,7 +319,7 @@ class GameTest {
 
         val user = User(1, "Some cool username")
 
-        val spaceship = Spaceship(1, 1, user)
+        val spaceship = Spaceship(Position(1, 1), user)
         game.addSpaceship(spaceship) {}
 
         // when
@@ -341,7 +338,7 @@ class GameTest {
 
         val user = User(1, "Some cool username")
 
-        val spaceship = Spaceship(1, 1, user)
+        val spaceship = Spaceship(Position(1, 1), user)
         val onMessageSend: (String) -> Unit = {}
         game.addSpaceship(spaceship, onMessageSend)
 

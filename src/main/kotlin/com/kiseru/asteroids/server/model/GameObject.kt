@@ -2,9 +2,7 @@ package com.kiseru.asteroids.server.model
 
 interface GameObject {
 
-    val x: Int
-
-    val y: Int
+    val position: Position
 
     val type: Type
 

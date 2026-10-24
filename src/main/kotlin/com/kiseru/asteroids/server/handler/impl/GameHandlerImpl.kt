@@ -42,7 +42,7 @@ class GameHandlerImpl(
 
     fun checkSpaceship(spaceship: Spaceship) {
         val collisionPoint = game.gameObjects.firstOrNull {
-            it.type != Type.SPACESHIP && it.x == spaceship.x && it.y == spaceship.y
+            it.type != Type.SPACESHIP && it.position == spaceship.position
         }
 
         val collisionPointType = getCollisionPointType(spaceship, collisionPoint)
@@ -59,10 +59,7 @@ class GameHandlerImpl(
             ?: if (isOutOfField(spaceship)) Type.WALL else null
 
     private fun isOutOfField(spaceship: Spaceship): Boolean =
-        spaceship.x == 0
-                || spaceship.y == 0
-                || spaceship.x > game.fieldWidth
-                || spaceship.y > game.fieldHeight
+        spaceship.position.isOutOfBounds(game.fieldWidth, game.fieldHeight)
 
     private fun onSpaceshipDamaged(game: Game, spaceship: Spaceship) {
         if (!spaceship.isAlive) {

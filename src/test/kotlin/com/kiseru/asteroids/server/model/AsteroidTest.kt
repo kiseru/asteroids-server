@@ -8,7 +8,7 @@ class AsteroidTest {
     @Test
     fun `test type`() {
         // given
-        val asteroid = Asteroid(1, 1)
+        val asteroid = Asteroid(Position(1, 1))
 
         // when
         val actual = asteroid.type
@@ -18,9 +18,21 @@ class AsteroidTest {
     }
 
     @Test
+    fun `test position`() {
+        // given
+        val asteroid = Asteroid(Position(1, 1))
+
+        // when
+        val actual = asteroid.position
+
+        // then
+        assertEquals(Position(1, 1), actual)
+    }
+
+    @Test
     fun `test view`() {
         // given
-        val asteroid = Asteroid(1, 1)
+        val asteroid = Asteroid(Position(1, 1))
 
         // when
         val actual = asteroid.view()

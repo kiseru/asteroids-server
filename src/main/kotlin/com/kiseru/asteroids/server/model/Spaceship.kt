@@ -1,8 +1,7 @@
 package com.kiseru.asteroids.server.model
 
 class Spaceship(
-    override var x: Int,
-    override var y: Int,
+    override var position: Position,
     val user: User,
 ) : GameObject {
 
