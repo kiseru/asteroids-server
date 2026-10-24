@@ -75,10 +75,10 @@ class Game(
     }
 
     fun getSpaceships(): List<Spaceship> =
-        spaceships
+        spaceships.toList()
 
     fun getSendMessageHandlers(): List<(String) -> Unit> =
-        sendMessageHandlers
+        sendMessageHandlers.toList()
 
     fun onGarbageCollected() {
         val isGarbageExists = gameObjects.any { it.type == Type.GARBAGE }
