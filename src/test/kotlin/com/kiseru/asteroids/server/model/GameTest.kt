@@ -40,15 +40,15 @@ class GameTest {
 
         val spaceship = Spaceship(Position(2, 2), user1)
         spaceship.changeDirection(direction)
-        game.addSpaceship(spaceship) {}
-        game.addSpaceship(Spaceship(Position(1, 1), user2)) {}
-        game.addSpaceship(Spaceship(Position(2, 1), user2)) {}
-        game.addSpaceship(Spaceship(Position(3, 1), user2)) {}
-        game.addSpaceship(Spaceship(Position(1, 2), user2)) {}
-        game.addSpaceship(Spaceship(Position(3, 2), user2)) {}
-        game.addSpaceship(Spaceship(Position(1, 3), user2)) {}
-        game.addSpaceship(Spaceship(Position(2, 3), user2)) {}
-        game.addSpaceship(Spaceship(Position(3, 3), user2)) {}
+        game.addSpaceship(spaceship)
+        game.addSpaceship(Spaceship(Position(1, 1), user2))
+        game.addSpaceship(Spaceship(Position(2, 1), user2))
+        game.addSpaceship(Spaceship(Position(3, 1), user2))
+        game.addSpaceship(Spaceship(Position(1, 2), user2))
+        game.addSpaceship(Spaceship(Position(3, 2), user2))
+        game.addSpaceship(Spaceship(Position(1, 3), user2))
+        game.addSpaceship(Spaceship(Position(2, 3), user2))
+        game.addSpaceship(Spaceship(Position(3, 3), user2))
 
 
         // when & then
@@ -67,7 +67,7 @@ class GameTest {
 
         val spaceship = Spaceship(Position(2, 2), user)
         spaceship.changeDirection(direction)
-        game.addSpaceship(spaceship) {}
+        game.addSpaceship(spaceship)
 
         // when
         game.onSpaceshipMove(spaceship)
@@ -323,7 +323,7 @@ class GameTest {
         val user = User(1, "Some cool username")
 
         val spaceship = Spaceship(Position(1, 1), user)
-        game.addSpaceship(spaceship) {}
+        game.addSpaceship(spaceship)
 
         // when
         val spaceships = game.getSpaceships()
@@ -331,26 +331,6 @@ class GameTest {
         // then
         assertEquals(1, spaceships.size)
         assertEquals(spaceships.first(), spaceship)
-    }
-
-    @Test
-    fun `test getSendMessagesHandlers`() {
-        // given
-        val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, FieldSize(1, 1))
-
-        val user = User(1, "Some cool username")
-
-        val spaceship = Spaceship(Position(1, 1), user)
-        val onMessageSend: (String) -> Unit = {}
-        game.addSpaceship(spaceship, onMessageSend)
-
-        // when
-        val handlers = game.getSendMessageHandlers()
-
-        // then
-        assertEquals(1, handlers.size)
-        assertEquals(handlers.first(), onMessageSend)
     }
 
     @Test
@@ -478,7 +458,7 @@ class GameTest {
         val gameId = UUID.randomUUID()
         val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
         val user = User(1, "Some cool name")
-        game.addSpaceship(Spaceship(Position(2, 2), user)) {}
+        game.addSpaceship(Spaceship(Position(2, 2), user))
 
         // when
         val actual = game.findCollidableObjectAt(Position(2, 2))

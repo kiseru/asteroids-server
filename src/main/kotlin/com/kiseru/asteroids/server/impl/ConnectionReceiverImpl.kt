@@ -3,6 +3,7 @@ package com.kiseru.asteroids.server.impl
 import com.kiseru.asteroids.server.ConnectionReceiver
 import com.kiseru.asteroids.server.handler.impl.GameHandlerImpl
 import com.kiseru.asteroids.server.handler.impl.SpaceshipHandlerImpl
+import com.kiseru.asteroids.server.messaging.GameMessageBroadcaster
 import com.kiseru.asteroids.server.model.Direction
 import com.kiseru.asteroids.server.model.Asteroid
 import com.kiseru.asteroids.server.model.FieldSize
@@ -70,10 +71,14 @@ class ConnectionReceiverImpl(
         val condition = lock.newCondition()
         println("${user.username} has joined the server!")
         val game = createGame()
-        val gameHandler = GameHandlerImpl(game, lock, condition, gameService)
+
+        val gameMessageBroadcaster = GameMessageBroadcaster()
+        gameMessageBroadcaster.addRecipient(onMessageSend)
+
+        val gameHandler = GameHandlerImpl(game, gameMessageBroadcaster, lock, condition, gameService)
         val spaceship = createSpaceship(game, user)
         game.addGameObject(spaceship)
-        game.addSpaceship(spaceship, onMessageSend)
+        game.addSpaceship(spaceship)
         val spaceshipHandler = SpaceshipHandlerImpl(spaceship, game, onMessageSend)
         spaceshipHandler.onRoomJoin(game.name)
         try {

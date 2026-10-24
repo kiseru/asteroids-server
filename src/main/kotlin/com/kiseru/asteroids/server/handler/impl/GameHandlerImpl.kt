@@ -1,6 +1,7 @@
 package com.kiseru.asteroids.server.handler.impl
 
 import com.kiseru.asteroids.server.handler.GameHandler
+import com.kiseru.asteroids.server.messaging.GameMessageBroadcaster
 import com.kiseru.asteroids.server.model.Game
 import com.kiseru.asteroids.server.model.GameObject
 import com.kiseru.asteroids.server.model.Spaceship
@@ -12,6 +13,7 @@ import kotlin.concurrent.withLock
 
 class GameHandlerImpl(
     private val game: Game,
+    private val gameMessageBroadcaster: GameMessageBroadcaster,
     private val lock: Lock,
     private val condition: Condition,
     private val gameService: GameService,
@@ -76,8 +78,6 @@ class GameHandlerImpl(
     }
 
     override fun sendMessage(message: String) {
-        for (handler in game.getSendMessageHandlers()) {
-            handler(message)
-        }
+        gameMessageBroadcaster.broadcast(message)
     }
 }

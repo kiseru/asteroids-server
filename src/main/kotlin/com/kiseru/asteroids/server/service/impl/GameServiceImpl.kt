@@ -1,14 +1,11 @@
 package com.kiseru.asteroids.server.service.impl
 
 import com.kiseru.asteroids.server.model.Game
- import com.kiseru.asteroids.server.model.Spaceship
+import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.Type
 import com.kiseru.asteroids.server.service.GameService
 import java.io.IOException
 import java.io.OutputStream
-import java.util.concurrent.locks.Condition
-import java.util.concurrent.locks.Lock
-import kotlin.concurrent.withLock
 
 class GameServiceImpl : GameService {
 
@@ -78,30 +75,6 @@ class GameServiceImpl : GameService {
         } else {
             mainMatrix[y][x] = "${mainMatrix[y][x]}|$symbol"
         }
-    }
-
-    override fun createGameHandler(lock: Lock, condition: Condition): (Game) -> Unit =
-        { handleGame(lock, condition, it) }
-
-    private fun handleGame(lock: Lock, condition: Condition, game: Game) {
-        lock.withLock {
-            while (game.status != Game.Status.FINISHED) {
-                condition.await()
-            }
-        }
-
-        for (handler in game.getSendMessageHandlers()) {
-            handler("finish")
-        }
-
-        val rating = getGameRating(game)
-        for (handler in game.getSendMessageHandlers()) {
-            handler(rating)
-        }
-
-        println("Room released!")
-        println(rating)
-        println()
     }
 
     override fun getGameRating(game: Game): String =

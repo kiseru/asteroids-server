@@ -1,6 +1,5 @@
 package com.kiseru.asteroids.server.model
 
-import java.util.Collections
 import java.util.Random
 import java.util.UUID
 
@@ -17,7 +16,6 @@ class Game(
         private set
 
     private val spaceships = mutableListOf<Spaceship>()
-    private val sendMessageHandlers = mutableListOf<(String) -> Unit>()
 
     private fun generateUniqueRandomCoordinates(): Position {
         if (gameObjects.size.toLong() >= fieldSize.capacity) {
@@ -69,16 +67,12 @@ class Game(
     fun isWallAhead(spaceship: Spaceship): Boolean =
         !fieldSize.contains(spaceship.position.aheadOf(spaceship.direction))
 
-    fun addSpaceship(spaceship: Spaceship, onMessageSend: (String) -> Unit) {
+    fun addSpaceship(spaceship: Spaceship) {
         spaceships.add(spaceship)
-        sendMessageHandlers.add(onMessageSend)
     }
 
     fun getSpaceships(): List<Spaceship> =
         spaceships.toList()
-
-    fun getSendMessageHandlers(): List<(String) -> Unit> =
-        sendMessageHandlers.toList()
 
     fun onGarbageCollected() {
         val isGarbageExists = gameObjects.any { it.type == Type.GARBAGE }
