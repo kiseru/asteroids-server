@@ -162,4 +162,43 @@ class SpaceshipTest {
         assertThrows<IllegalStateException> { spaceship.changeDirection(direction) }
         assertEquals(Direction.UP, spaceship.direction)
     }
+
+    @Test
+    fun `test incrementSteps when spaceship is alive`() {
+        // given
+        val user = User(1, "Some cool name")
+        val spaceship = Spaceship(Position(1, 1), user)
+
+        // when
+        spaceship.incrementSteps()
+
+        // then
+        assertEquals(1, spaceship.steps)
+    }
+
+    @Test
+    fun `test incrementSteps when spaceship is destroyed`() {
+        // given
+        val user = User(1, "Some cool name")
+        val spaceship = Spaceship(Position(1, 1), user)
+        spaceship.destroy()
+
+        // when & then
+        assertThrows<IllegalStateException> { spaceship.incrementSteps() }
+        assertEquals(0, spaceship.steps)
+    }
+
+    @Test
+    fun `test call incrementSteps 1501 times`() {
+        // given
+        val user = User(1, "Some cool name")
+        val spaceship = Spaceship(Position(1, 1), user)
+
+        // when
+        repeat(1501) { spaceship.incrementSteps() }
+
+        // then
+        assertEquals(1500, spaceship.steps)
+        assertEquals(Spaceship.Status.DESTROYED, spaceship.status)
+    }
 }

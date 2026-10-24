@@ -9,6 +9,7 @@ class Spaceship(
         private set
 
     var steps = 0
+        private set
 
     var score = Score(100)
         private set
@@ -46,6 +47,16 @@ class Spaceship(
         ensureAlive()
 
         this.direction = direction
+    }
+
+    fun incrementSteps() {
+        ensureAlive()
+
+        if (steps < 1500) {
+            steps++
+        } else {
+            destroy()
+        }
     }
 
     private fun ensureAlive() {

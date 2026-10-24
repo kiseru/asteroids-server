@@ -12,8 +12,8 @@ class SpaceshipHandlerImpl(
 ) : SpaceshipHandler {
 
     override fun onIncrementSteps() {
-        spaceship.steps += 1
-        if (spaceship.steps >= 1500 || spaceship.score.value < 0) {
+        spaceship.incrementSteps()
+        if (spaceship.status != Spaceship.Status.ALIVE) {
             handleDeath()
         }
     }
