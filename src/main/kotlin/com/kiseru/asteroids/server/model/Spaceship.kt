@@ -7,7 +7,10 @@ class Spaceship(
 
     var direction = Direction.UP
     var steps = 0
-    var score = 100
+
+    var score = Score(100)
+        private set
+
     var isAlive = true
 
     override val type: Type = Type.SPACESHIP
@@ -16,11 +19,11 @@ class Spaceship(
         user.id.toString()
 
     fun addScore() {
-        score += 10
+        score = score.increaseBy(10)
     }
 
     fun subtractScore() {
-        score -= 50
-        isAlive = score >= 0
+        score = score.decreaseBy(50)
+        isAlive = score.value >= 0
     }
 }

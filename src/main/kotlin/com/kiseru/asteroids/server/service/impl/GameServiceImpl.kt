@@ -107,8 +107,8 @@ class GameServiceImpl : GameService {
 
     override fun getGameRating(game: Game): String =
         game.getSpaceships()
-            .sortedByDescending { it.score }
-            .joinToString("\n") { "${it.user.username} ${it.score}" }
+            .sortedByDescending { it.score.value }
+            .joinToString("\n") { "${it.user.username} ${it.score.value}" }
 
     override fun damageSpaceship(game: Game, spaceship: Spaceship, type: Type) {
         if (game.status != GameStatus.STARTED) {

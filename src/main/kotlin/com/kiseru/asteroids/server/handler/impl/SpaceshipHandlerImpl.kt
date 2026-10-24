@@ -13,7 +13,7 @@ class SpaceshipHandlerImpl(
 
     override fun onIncrementSteps() {
         spaceship.steps += 1
-        if (spaceship.steps >= 1500 || spaceship.score < 0) {
+        if (spaceship.steps >= 1500 || spaceship.score.value < 0) {
             handleDeath()
         }
     }
@@ -21,7 +21,7 @@ class SpaceshipHandlerImpl(
     private fun handleDeath() {
         spaceship.isAlive = false
         onMessageSend("died")
-        onMessageSend("You've collected ${spaceship.score} score")
+        onMessageSend("You've collected ${spaceship.score.value} score")
     }
 
     override fun onSendInstructions() {
@@ -35,7 +35,7 @@ class SpaceshipHandlerImpl(
     }
 
     override fun onSendScore() {
-        onMessageSend(spaceship.score.toString())
+        onMessageSend(spaceship.score.value.toString())
     }
 
     override fun onSuccess() {

@@ -1,9 +1,8 @@
 package com.kiseru.asteroids.server.model
 
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.CsvSource
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class SpaceshipTest {
@@ -17,7 +16,7 @@ class SpaceshipTest {
         // when & then
         assertEquals(Direction.UP, spaceship.direction)
         assertEquals(0, spaceship.steps)
-        assertEquals(100, spaceship.score)
+        assertEquals(Score(100), spaceship.score)
         assertTrue(spaceship.isAlive)
     }
 
@@ -70,25 +69,34 @@ class SpaceshipTest {
         spaceship.addScore()
 
         // then
-        assertEquals(110, spaceship.score)
+        assertEquals(Score(110), spaceship.score)
     }
 
-    @ParameterizedTest
-    @CsvSource(
-        "50,0,true",
-        "49,-1,false",
-    )
-    fun `test subtractScore`(initialScore: Int, expectedScore: Int, expectedIsAlive: Boolean) {
+    @Test
+    fun `test subtractScore when it doesn't destroy spaceship`() {
         // given
         val user = User(1, "Some cool name")
         val spaceship = Spaceship(Position(1, 1), user)
-        spaceship.score = initialScore
 
         // when
         spaceship.subtractScore()
 
         // then
-        assertEquals(expectedScore, spaceship.score)
-        assertEquals(expectedIsAlive, spaceship.isAlive)
+        assertEquals(Score(50), spaceship.score)
+        assertTrue(spaceship.isAlive)
+    }
+
+    @Test
+    fun `test subtractScore when it destroys spaceship`() {
+        // given
+        val user = User(1, "Some cool name")
+        val spaceship = Spaceship(Position(1, 1), user)
+
+        // when
+        repeat(3) { spaceship.subtractScore() }
+
+        // then
+        assertEquals(Score(-50), spaceship.score)
+        assertFalse(spaceship.isAlive)
     }
 }
