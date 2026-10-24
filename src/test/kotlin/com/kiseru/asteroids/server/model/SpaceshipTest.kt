@@ -3,6 +3,8 @@ package com.kiseru.asteroids.server.model
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import kotlin.test.assertEquals
 
 class SpaceshipTest {
@@ -146,5 +148,18 @@ class SpaceshipTest {
 
         // when & then
         assertThrows<IllegalStateException> { spaceship.destroy() }
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = Direction::class, mode = EnumSource.Mode.MATCH_ALL)
+    fun `test changeDirection when spaceship is destroyed`(direction: Direction) {
+        // given
+        val user = User(1, "Some cool name")
+        val spaceship = Spaceship(Position(1, 1), user)
+        spaceship.destroy()
+
+        // when & then
+        assertThrows<IllegalStateException> { spaceship.changeDirection(direction) }
+        assertEquals(Direction.UP, spaceship.direction)
     }
 }

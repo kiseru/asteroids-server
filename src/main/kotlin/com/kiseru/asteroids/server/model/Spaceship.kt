@@ -6,6 +6,8 @@ class Spaceship(
 ) : GameObject {
 
     var direction = Direction.UP
+        private set
+
     var steps = 0
 
     var score = Score(100)
@@ -38,6 +40,12 @@ class Spaceship(
         ensureAlive()
 
         status = Status.DESTROYED
+    }
+
+    fun changeDirection(direction: Direction) {
+        ensureAlive()
+
+        this.direction = direction
     }
 
     private fun ensureAlive() {

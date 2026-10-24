@@ -36,7 +36,7 @@ class GameTest {
         game.status = GameStatus.STARTED
 
         val spaceship = Spaceship(Position(2, 2), user1)
-        spaceship.direction = direction
+        spaceship.changeDirection(direction)
         game.addSpaceship(spaceship) {}
         game.addSpaceship(Spaceship(Position(1, 1), user2)) {}
         game.addSpaceship(Spaceship(Position(2, 1), user2)) {}
@@ -63,7 +63,7 @@ class GameTest {
         game.status = GameStatus.STARTED
 
         val spaceship = Spaceship(Position(2, 2), user)
-        spaceship.direction = direction
+        spaceship.changeDirection(direction)
         game.addSpaceship(spaceship) {}
 
         // when
@@ -111,7 +111,7 @@ class GameTest {
         val user = User(1, "Some cool username")
 
         val spaceship = Spaceship(Position(2, 2), user)
-        spaceship.direction = direction
+        spaceship.changeDirection(direction)
 
         // when
         val actual = game.isAsteroidAhead(spaceship)
@@ -152,7 +152,7 @@ class GameTest {
         val user = User(1, "Some cool username")
 
         val spaceship = Spaceship(Position(2, 2), user)
-        spaceship.direction = direction
+        spaceship.changeDirection(direction)
 
         // when
         val actual = game.isAsteroidAhead(spaceship)
@@ -193,7 +193,7 @@ class GameTest {
         val user = User(1, "Some cool username")
 
         val spaceship = Spaceship(Position(2, 2), user)
-        spaceship.direction = direction
+        spaceship.changeDirection(direction)
 
         // when
         val actual = game.isGarbageAhead(spaceship)
@@ -234,7 +234,7 @@ class GameTest {
         val user = User(1, "Some cool username")
 
         val spaceship = Spaceship(Position(2, 2), user)
-        spaceship.direction = direction
+        spaceship.changeDirection(direction)
 
         // when
         val actual = game.isGarbageAhead(spaceship)
@@ -253,7 +253,7 @@ class GameTest {
         val user = User(1, "Some cool username")
 
         val spaceship = Spaceship(Position(1, 1), user)
-        spaceship.direction = direction
+        spaceship.changeDirection(direction)
 
         // when
         val actual = game.isWallAhead(spaceship)
@@ -272,7 +272,7 @@ class GameTest {
         val user = User(1, "Some cool username")
 
         val spaceship = Spaceship(Position(2, 2), user)
-        spaceship.direction = direction
+        spaceship.changeDirection(direction)
 
         // when
         val actual = game.isWallAhead(spaceship)
