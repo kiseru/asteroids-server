@@ -81,8 +81,11 @@ class Game(
         }
     }
 
-    fun rollback(spaceship: Spaceship) {
+    fun rollbackSpaceship(spaceship: Spaceship) {
+        ensureStarted()
+
         spaceship.moveTo(spaceship.position.aheadOf(spaceship.direction.opposite()))
+        spaceship.subtractScore()
     }
 
     fun freeCoordinates(): Sequence<Position> =

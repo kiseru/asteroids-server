@@ -466,4 +466,32 @@ class GameTest {
         // then
         assertNull(actual)
     }
+
+    @Test
+    fun `test rollbackSpaceship when game isn't started`() {
+        // given
+        val game = Game(UUID.randomUUID(), "Some cool game", 1, FieldSize(3, 3))
+        val spaceship = Spaceship(Position(2, 2), User(1, "Some cool name"))
+
+        // when & then
+        assertThrows<IllegalStateException> { game.rollbackSpaceship(spaceship) }
+        assertEquals(Position(2, 2), spaceship.position)
+        assertEquals(Score(100), spaceship.score)
+    }
+
+    @Test
+    fun `test rollbackSpaceship when game is started`() {
+        // given
+        val game = Game(UUID.randomUUID(), "Some cool game", 1, FieldSize(3, 3))
+        game.start()
+
+        val spaceship = Spaceship(Position(2, 2), User(1, "Some cool name"))
+
+        // when
+        game.rollbackSpaceship(spaceship)
+
+        // then
+        assertEquals(Position(2, 3), spaceship.position)
+        assertEquals(Score(50), spaceship.score)
+    }
 }

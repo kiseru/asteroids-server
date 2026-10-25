@@ -93,13 +93,8 @@ class GameServiceImpl : GameService {
                 spaceship.addScore()
                 game.onGarbageCollected()
             }
-            Type.WALL -> rollbackSpaceship(game, spaceship)
-            Type.SPACESHIP -> rollbackSpaceship(game, spaceship)
+            Type.WALL -> game.rollbackSpaceship(spaceship)
+            Type.SPACESHIP -> game.rollbackSpaceship(spaceship)
         }
-    }
-
-    private fun rollbackSpaceship(game: Game, spaceship: Spaceship) {
-        game.rollback(spaceship)
-        spaceship.subtractScore()
     }
 }
