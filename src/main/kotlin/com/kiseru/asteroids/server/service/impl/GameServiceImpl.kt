@@ -83,18 +83,6 @@ class GameServiceImpl : GameService {
             .joinToString("\n") { "${it.user.username} ${it.score.value}" }
 
     override fun damageSpaceship(game: Game, spaceship: Spaceship, type: Type) {
-        if (game.status != Game.Status.STARTED) {
-            throw IllegalStateException("Game must have STARTED status")
-        }
-
-        when (type) {
-            Type.ASTEROID -> spaceship.subtractScore()
-            Type.GARBAGE -> {
-                spaceship.addScore()
-                game.onGarbageCollected()
-            }
-            Type.WALL -> game.rollbackSpaceship(spaceship)
-            Type.SPACESHIP -> game.rollbackSpaceship(spaceship)
-        }
+        game.damageSpaceship(spaceship, type)
     }
 }

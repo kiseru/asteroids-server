@@ -74,14 +74,28 @@ class Game(
     fun getSpaceships(): List<Spaceship> =
         spaceships.toList()
 
-    fun onGarbageCollected() {
+    fun damageSpaceship(spaceship: Spaceship, type: Type) {
+        ensureStarted()
+
+        when (type) {
+            Type.ASTEROID -> spaceship.subtractScore()
+            Type.GARBAGE -> {
+                spaceship.addScore()
+                onGarbageCollected()
+            }
+            Type.WALL -> rollbackSpaceship(spaceship)
+            Type.SPACESHIP -> rollbackSpaceship(spaceship)
+        }
+    }
+
+    private fun onGarbageCollected() {
         val isGarbageExists = gameObjects.any { it.type == Type.GARBAGE }
         if (!isGarbageExists) {
             finish()
         }
     }
 
-    fun rollbackSpaceship(spaceship: Spaceship) {
+    private fun rollbackSpaceship(spaceship: Spaceship) {
         ensureStarted()
 
         spaceship.moveTo(spaceship.position.aheadOf(spaceship.direction.opposite()))

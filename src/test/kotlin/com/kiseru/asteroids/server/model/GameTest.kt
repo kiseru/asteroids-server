@@ -468,27 +468,99 @@ class GameTest {
     }
 
     @Test
-    fun `test rollbackSpaceship when game isn't started`() {
+    fun `test damageSpaceship when game isn't started`() {
         // given
-        val game = Game(UUID.randomUUID(), "Some cool game", 1, FieldSize(3, 3))
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+
         val spaceship = Spaceship(Position(2, 2), User(1, "Some cool name"))
 
         // when & then
-        assertThrows<IllegalStateException> { game.rollbackSpaceship(spaceship) }
-        assertEquals(Position(2, 2), spaceship.position)
-        assertEquals(Score(100), spaceship.score)
+        assertThrows<IllegalStateException> { game.damageSpaceship(spaceship, Type.ASTEROID) }
     }
 
     @Test
-    fun `test rollbackSpaceship when game is started`() {
+    fun `test damageSpaceship when type is ASTEROID`() {
         // given
-        val game = Game(UUID.randomUUID(), "Some cool game", 1, FieldSize(3, 3))
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
         game.start()
 
         val spaceship = Spaceship(Position(2, 2), User(1, "Some cool name"))
 
         // when
-        game.rollbackSpaceship(spaceship)
+        game.damageSpaceship(spaceship, Type.ASTEROID)
+
+        // then
+        assertEquals(Position(2, 2), spaceship.position)
+        assertEquals(Score(50), spaceship.score)
+    }
+
+    @Test
+    fun `test damageSpaceship when type is GARBAGE and after that garbage exists`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+        game.addGameObject(Garbage(Position(1, 1)))
+        game.start()
+
+        val spaceship = Spaceship(Position(2, 2), User(1, "Some cool name"))
+
+        // when
+        game.damageSpaceship(spaceship, Type.GARBAGE)
+
+        // then
+        assertEquals(Game.Status.STARTED, game.status)
+        assertEquals(Position(2, 2), spaceship.position)
+        assertEquals(Score(110), spaceship.score)
+    }
+
+    @Test
+    fun `test damageSpaceship when type is GARBAGE and after that garbage doesn't exist`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+        game.start()
+
+        val spaceship = Spaceship(Position(2, 2), User(1, "Some cool name"))
+
+        // when
+        game.damageSpaceship(spaceship, Type.GARBAGE)
+
+        // then
+        assertEquals(Game.Status.FINISHED, game.status)
+        assertEquals(Position(2, 2), spaceship.position)
+        assertEquals(Score(110), spaceship.score)
+    }
+
+    @Test
+    fun `test damageSpaceship when type is WALL`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+        game.start()
+
+        val spaceship = Spaceship(Position(2, 2), User(1, "Some cool name"))
+
+        // when
+        game.damageSpaceship(spaceship, Type.WALL)
+
+        // then
+        assertEquals(Position(2, 3), spaceship.position)
+        assertEquals(Score(50), spaceship.score)
+    }
+
+    @Test
+    fun `test damageSpaceship when type is SPACESHIP`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+        game.start()
+
+        val spaceship = Spaceship(Position(2, 2), User(1, "Some cool name"))
+
+        // when
+        game.damageSpaceship(spaceship, Type.SPACESHIP)
 
         // then
         assertEquals(Position(2, 3), spaceship.position)
