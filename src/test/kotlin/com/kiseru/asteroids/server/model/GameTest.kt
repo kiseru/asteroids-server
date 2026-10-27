@@ -566,4 +566,54 @@ class GameTest {
         assertEquals(Position(2, 3), spaceship.position)
         assertEquals(Score(50), spaceship.score)
     }
+
+    @Test
+    fun `test destroySpaceship when game isn't started`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+
+        val spaceship = Spaceship(Position(2, 2), User(1, "Some cool name"))
+        game.addSpaceship(spaceship)
+
+        // when & then
+        assertThrows<IllegalStateException> { game.destroySpaceship(spaceship) }
+    }
+
+    @Test
+    fun `test destroySpaceship when spaceship is already destroyed`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+
+        val spaceship = Spaceship(Position(2, 2), User(1, "Some cool name"))
+        spaceship.destroy()
+
+        game.addSpaceship(spaceship)
+
+        game.start()
+
+        // when
+        assertThrows<IllegalStateException> { game.destroySpaceship(spaceship) }
+    }
+
+    @Test
+    fun `test destroySpaceship`() {
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+
+        val spaceship = Spaceship(Position(2, 2), User(1, "Some cool name"))
+        game.addSpaceship(spaceship)
+
+        game.start()
+
+        // when
+        game.destroySpaceship(spaceship)
+
+        // then
+        assertEquals(Spaceship.Status.DESTROYED, spaceship.status)
+        val searchResult = game.getGameObjects()
+            .firstOrNull { it == spaceship }
+        assertNull(searchResult)
+    }
 }

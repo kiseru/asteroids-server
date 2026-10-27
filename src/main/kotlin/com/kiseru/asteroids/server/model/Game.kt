@@ -35,6 +35,13 @@ class Game(
     private fun isGameObjectsContainsCoordinates(position: Position): Boolean =
         gameObjects.any { it.position == position }
 
+    fun destroySpaceship(spaceship: Spaceship) {
+        ensureStarted()
+
+        spaceship.destroy()
+        removeGameObject(spaceship)
+    }
+
     fun getGameObjects(): List<GameObject> =
         gameObjects.toList()
 

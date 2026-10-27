@@ -45,8 +45,8 @@ class GameHandlerImpl(
         val collisionPoint = game.findCollidableObjectAt(spaceship.position)
         val collisionPointType = getCollisionPointType(spaceship, collisionPoint)
         lock.withLock {
-            onSpaceshipDamaged(game, spaceship)
-            collisionPoint?.let { onGameObjectDamaged(game, it) }
+            game.destroySpaceship(spaceship)
+            collisionPoint?.let { game.removeGameObject(it) }
             collisionPointType?.let { gameService.damageSpaceship(game, spaceship, it) }
             condition.signalAll()
         }
@@ -58,16 +58,6 @@ class GameHandlerImpl(
 
     private fun isOutOfField(spaceship: Spaceship): Boolean =
         !game.fieldSize.contains(spaceship.position)
-
-    private fun onSpaceshipDamaged(game: Game, spaceship: Spaceship) {
-        if (spaceship.status != Spaceship.Status.ALIVE) {
-            onGameObjectDamaged(game, spaceship)
-        }
-    }
-
-    private fun onGameObjectDamaged(game: Game, gameObject: GameObject) {
-        game.removeGameObject(gameObject)
-    }
 
     override fun awaitFinish() {
         lock.withLock {
