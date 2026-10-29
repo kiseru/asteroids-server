@@ -54,10 +54,7 @@ class GameHandlerImpl(
 
     private fun getCollisionPointType(spaceship: Spaceship, collisionGameObject: GameObject?): Type? =
         collisionGameObject?.type
-            ?: if (isOutOfField(spaceship)) Type.WALL else null
-
-    private fun isOutOfField(spaceship: Spaceship): Boolean =
-        !game.fieldSize.contains(spaceship.position)
+            ?: if (game.isOutOfField(spaceship)) Type.WALL else null
 
     override fun awaitFinish() {
         lock.withLock {

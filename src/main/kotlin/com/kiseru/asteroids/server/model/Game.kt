@@ -166,6 +166,9 @@ class Game(
         status = Status.FINISHED
     }
 
+    fun isOutOfField(spaceship: Spaceship): Boolean =
+        !fieldSize.contains(spaceship.position)
+
     private fun ensureCreated() {
         check(status == Status.CREATED) { "Game not in CREATED status" }
     }
