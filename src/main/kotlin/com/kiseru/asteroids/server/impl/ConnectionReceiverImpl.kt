@@ -5,10 +5,8 @@ import com.kiseru.asteroids.server.handler.impl.GameHandlerImpl
 import com.kiseru.asteroids.server.handler.impl.SpaceshipHandlerImpl
 import com.kiseru.asteroids.server.messaging.GameMessageBroadcaster
 import com.kiseru.asteroids.server.model.Direction
-import com.kiseru.asteroids.server.model.Asteroid
 import com.kiseru.asteroids.server.model.FieldSize
 import com.kiseru.asteroids.server.model.Game
-import com.kiseru.asteroids.server.model.Garbage
 import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.model.User
 import com.kiseru.asteroids.server.service.GameService
@@ -145,27 +143,9 @@ class ConnectionReceiverImpl(
         val gameId = UUID.randomUUID()
         val fieldSize = FieldSize(GAME_FIELD_WIDTH, GAME_FIELD_HEIGHT)
         val game = Game(gameId, gameId.toString(), 1, fieldSize)
-        generateGarbage(game)
-        generateAsteroids(game)
+        game.generateGarbage(GARBAGE_AMOUNT)
+        game.generateAsteroids(ASTEROIDS_AMOUNT)
         return game
-    }
-
-    private fun generateGarbage(game: Game) {
-        game.freeCoordinates()
-            .take(GARBAGE_AMOUNT)
-            .forEach { position ->
-                val garbage = Garbage(position)
-                game.addGameObject(garbage)
-            }
-    }
-
-    private fun generateAsteroids(game: Game) {
-        game.freeCoordinates()
-            .take(ASTEROIDS_AMOUNT)
-            .forEach { position ->
-                val asteroid = Asteroid(position)
-                game.addGameObject(asteroid)
-            }
     }
 
     private fun createSpaceship(game: Game, user: User): Spaceship {

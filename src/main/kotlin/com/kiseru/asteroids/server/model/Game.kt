@@ -109,6 +109,28 @@ class Game(
         spaceship.subtractScore()
     }
 
+    fun generateAsteroids(count: Int) {
+        ensureCreated()
+
+        require(count > 0) { "Count must be greater than zero" }
+
+        val asteroids = freeCoordinates()
+            .take(count)
+            .map(::Asteroid)
+        gameObjects.addAll(asteroids)
+    }
+
+    fun generateGarbage(count: Int) {
+        ensureCreated()
+
+        require(count > 0) { "Count must be greater than zero" }
+
+        val garbage = freeCoordinates()
+            .take(count)
+            .map(::Garbage)
+        gameObjects.addAll(garbage)
+    }
+
     fun freeCoordinates(): Sequence<Position> =
         sequence {
             while (true) {

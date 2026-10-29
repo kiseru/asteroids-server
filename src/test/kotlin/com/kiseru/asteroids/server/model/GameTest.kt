@@ -593,12 +593,13 @@ class GameTest {
 
         game.start()
 
-        // when
+        // when & then
         assertThrows<IllegalStateException> { game.destroySpaceship(spaceship) }
     }
 
     @Test
     fun `test destroySpaceship`() {
+        // given
         val gameId = UUID.randomUUID()
         val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
 
@@ -615,5 +616,99 @@ class GameTest {
         val searchResult = game.getGameObjects()
             .firstOrNull { it == spaceship }
         assertNull(searchResult)
+    }
+
+    @Test
+    fun `test generateAsteroids when game isn't created`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+        game.start()
+
+        // when & then
+        assertThrows<IllegalStateException> { game.generateAsteroids(3) }
+    }
+
+    @Test
+    fun `test generateAsteroids when count is less than 1`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+
+        // when & then
+        assertThrows<IllegalArgumentException> { game.generateAsteroids(0) }
+    }
+
+    @Test
+    fun `test generateAsteroids when count is greater than free positions`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+
+        // when & then
+        assertThrows<IllegalStateException> { game.generateAsteroids(10) }
+    }
+
+    @Test
+    fun `test generateAsteroids`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+
+        // when
+        game.generateAsteroids(3)
+
+        // then
+        val gameObjects = game.getGameObjects()
+        assertEquals(3, gameObjects.size)
+
+        assertEquals(3, gameObjects.count { it.type == Type.ASTEROID })
+    }
+
+    @Test
+    fun `test generateGarbage when game isn't created`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+        game.start()
+
+        // when & then
+        assertThrows<IllegalStateException> { game.generateGarbage(3) }
+    }
+
+    @Test
+    fun `test generateGarbage when count is less than 1`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+
+        // when & then
+        assertThrows<IllegalArgumentException> { game.generateGarbage(0) }
+    }
+
+    @Test
+    fun `test generateGarbage when count is greater than free positions`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+
+        // when & then
+        assertThrows<IllegalStateException> { game.generateGarbage(10) }
+    }
+
+    @Test
+    fun `test generateGarbage`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+
+        // when
+        game.generateGarbage(3)
+
+        // then
+        val gameObjects = game.getGameObjects()
+        assertEquals(3, gameObjects.size)
+
+        assertEquals(3, gameObjects.count { it.type == Type.GARBAGE })
     }
 }
