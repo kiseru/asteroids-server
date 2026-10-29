@@ -47,7 +47,7 @@ class GameHandlerImpl(
         lock.withLock {
             game.destroySpaceship(spaceship)
             collisionPoint?.let { game.removeGameObject(it) }
-            collisionPointType?.let { gameService.damageSpaceship(game, spaceship, it) }
+            collisionPointType?.let { game.damageSpaceship(spaceship, it) }
             condition.signalAll()
         }
     }

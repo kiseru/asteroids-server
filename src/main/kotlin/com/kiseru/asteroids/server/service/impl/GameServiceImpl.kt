@@ -1,8 +1,6 @@
 package com.kiseru.asteroids.server.service.impl
 
 import com.kiseru.asteroids.server.model.Game
-import com.kiseru.asteroids.server.model.Spaceship
-import com.kiseru.asteroids.server.model.Type
 import com.kiseru.asteroids.server.service.GameService
 import java.io.IOException
 import java.io.OutputStream
@@ -81,8 +79,4 @@ class GameServiceImpl : GameService {
         game.getSpaceships()
             .sortedByDescending { it.score.value }
             .joinToString("\n") { "${it.user.username} ${it.score.value}" }
-
-    override fun damageSpaceship(game: Game, spaceship: Spaceship, type: Type) {
-        game.damageSpaceship(spaceship, type)
-    }
 }
