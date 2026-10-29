@@ -45,12 +45,6 @@ class Game(
     fun getGameObjects(): List<GameObject> =
         gameObjects.toList()
 
-    fun addGameObject(gameObject: GameObject) {
-        ensureCreated()
-
-        gameObjects.add(gameObject)
-    }
-
     fun removeGameObject(gameObject: GameObject) {
         ensureStarted()
 
@@ -73,10 +67,6 @@ class Game(
 
     fun isWallAhead(spaceship: Spaceship): Boolean =
         !fieldSize.contains(spaceship.position.aheadOf(spaceship.direction))
-
-    fun addSpaceship(spaceship: Spaceship) {
-        spaceships.add(spaceship)
-    }
 
     fun getSpaceships(): List<Spaceship> =
         spaceships.toList()
@@ -131,7 +121,18 @@ class Game(
         gameObjects.addAll(garbage)
     }
 
-    fun freeCoordinates(): Sequence<Position> =
+    fun createSpaceship(user: User): Spaceship {
+        ensureCreated()
+
+        val position = freeCoordinates()
+            .first()
+        val spaceship = Spaceship(position, user)
+        gameObjects.add(spaceship)
+        spaceships.add(spaceship)
+        return spaceship
+    }
+
+    private fun freeCoordinates(): Sequence<Position> =
         sequence {
             while (true) {
                 yield(generateUniqueRandomCoordinates())

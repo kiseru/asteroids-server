@@ -74,9 +74,7 @@ class ConnectionReceiverImpl(
         gameMessageBroadcaster.addRecipient(onMessageSend)
 
         val gameHandler = GameHandlerImpl(game, gameMessageBroadcaster, lock, condition, gameService)
-        val spaceship = createSpaceship(game, user)
-        game.addGameObject(spaceship)
-        game.addSpaceship(spaceship)
+        val spaceship = game.createSpaceship(user)
         val spaceshipHandler = SpaceshipHandlerImpl(spaceship, game, onMessageSend)
         spaceshipHandler.onRoomJoin(game.name)
         try {
@@ -146,11 +144,5 @@ class ConnectionReceiverImpl(
         game.generateGarbage(GARBAGE_AMOUNT)
         game.generateAsteroids(ASTEROIDS_AMOUNT)
         return game
-    }
-
-    private fun createSpaceship(game: Game, user: User): Spaceship {
-        val position = game.freeCoordinates()
-            .first()
-        return Spaceship(position, user)
     }
 }

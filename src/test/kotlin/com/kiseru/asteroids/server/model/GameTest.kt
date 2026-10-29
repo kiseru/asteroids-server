@@ -30,224 +30,6 @@ class GameTest {
 
     @ParameterizedTest
     @EnumSource(Direction::class)
-    fun `test onSpaceshipMove when there is a spaceship ahead`(direction: Direction) {
-        // given
-        val user1 = User(1, "Some cool username")
-        val user2 = User(2, "Some cool an other username")
-        val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
-        game.start()
-
-        val spaceship = Spaceship(Position(2, 2), user1)
-        spaceship.changeDirection(direction)
-        game.addSpaceship(spaceship)
-        game.addSpaceship(Spaceship(Position(1, 1), user2))
-        game.addSpaceship(Spaceship(Position(2, 1), user2))
-        game.addSpaceship(Spaceship(Position(3, 1), user2))
-        game.addSpaceship(Spaceship(Position(1, 2), user2))
-        game.addSpaceship(Spaceship(Position(3, 2), user2))
-        game.addSpaceship(Spaceship(Position(1, 3), user2))
-        game.addSpaceship(Spaceship(Position(2, 3), user2))
-        game.addSpaceship(Spaceship(Position(3, 3), user2))
-
-
-        // when & then
-        assertFailsWith<IllegalStateException> { game.onSpaceshipMove(spaceship) }
-        assertEquals(Position(2, 2), spaceship.position)
-    }
-
-    @ParameterizedTest
-    @EnumSource(Direction::class)
-    fun `test onSpaceshipMove when there is no spaceship ahead`(direction: Direction) {
-        // given
-        val user = User(1, "Some cool username")
-        val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
-        game.start()
-
-        val spaceship = Spaceship(Position(2, 2), user)
-        spaceship.changeDirection(direction)
-        game.addSpaceship(spaceship)
-
-        // when
-        game.onSpaceshipMove(spaceship)
-
-        // then
-        val expectedPosition = when (direction) {
-            Direction.UP -> Position(2, 1)
-            Direction.DOWN -> Position(2, 3)
-            Direction.LEFT -> Position(1, 2)
-            Direction.RIGHT -> Position(3, 2)
-        }
-        assertEquals(expectedPosition, spaceship.position)
-    }
-
-    @ParameterizedTest
-    @EnumSource(Direction::class)
-    fun `test isAsteroidAhead when an asteroid is ahead`(direction: Direction) {
-        // given
-        val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
-
-        listOf(
-            1 to 1,
-            1 to 3,
-            3 to 1,
-            3 to 3,
-        )
-            .forEach { (x, y) ->
-                val garbage = Garbage(Position(x, y))
-                game.addGameObject(garbage)
-            }
-
-        listOf(
-            1 to 2,
-            2 to 1,
-            2 to 3,
-            3 to 2,
-        )
-            .forEach { (x, y) ->
-                val asteroid = Asteroid(Position(x, y))
-                game.addGameObject(asteroid)
-            }
-
-        val user = User(1, "Some cool username")
-
-        val spaceship = Spaceship(Position(2, 2), user)
-        spaceship.changeDirection(direction)
-
-        // when
-        val actual = game.isAsteroidAhead(spaceship)
-
-        // then
-        assertTrue(actual)
-    }
-
-    @ParameterizedTest
-    @EnumSource(Direction::class)
-    fun `test isAsteroidAhead when an asteroid isn't ahead`(direction: Direction) {
-        // given
-        val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
-
-        listOf(
-            1 to 2,
-            2 to 3,
-            2 to 1,
-            3 to 2,
-        )
-            .forEach { (x, y) ->
-                val garbage = Garbage(Position(x, y))
-                game.addGameObject(garbage)
-            }
-
-        listOf(
-            1 to 1,
-            1 to 3,
-            3 to 1,
-            3 to 3,
-        )
-            .forEach { (x, y) ->
-                val asteroid = Asteroid(Position(x, y))
-                game.addGameObject(asteroid)
-            }
-
-        val user = User(1, "Some cool username")
-
-        val spaceship = Spaceship(Position(2, 2), user)
-        spaceship.changeDirection(direction)
-
-        // when
-        val actual = game.isAsteroidAhead(spaceship)
-
-        // then
-        assertFalse(actual)
-    }
-
-    @ParameterizedTest
-    @EnumSource(Direction::class)
-    fun `test isAsteroidAhead when garbage is ahead`(direction: Direction) {
-        // given
-        val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
-
-        listOf(
-            1 to 1,
-            1 to 3,
-            3 to 1,
-            3 to 3,
-        )
-            .forEach { (x, y) ->
-                val asteroid = Asteroid(Position(x, y))
-                game.addGameObject(asteroid)
-            }
-
-        listOf(
-            1 to 2,
-            2 to 1,
-            2 to 3,
-            3 to 2,
-        )
-            .forEach { (x, y) ->
-                val garbage = Garbage(Position(x, y))
-                game.addGameObject(garbage)
-            }
-
-        val user = User(1, "Some cool username")
-
-        val spaceship = Spaceship(Position(2, 2), user)
-        spaceship.changeDirection(direction)
-
-        // when
-        val actual = game.isGarbageAhead(spaceship)
-
-        // then
-        assertTrue(actual)
-    }
-
-    @ParameterizedTest
-    @EnumSource(Direction::class)
-    fun `test isAsteroidAhead when garbage isn't ahead`(direction: Direction) {
-        // given
-        val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
-
-        listOf(
-            1 to 2,
-            2 to 3,
-            2 to 1,
-            3 to 2,
-        )
-            .forEach { (x, y) ->
-                val asteroid = Asteroid(Position(x, y))
-                game.addGameObject(asteroid)
-            }
-
-        listOf(
-            1 to 1,
-            1 to 3,
-            3 to 1,
-            3 to 3,
-        )
-            .forEach { (x, y) ->
-                val garbage = Garbage(Position(x, y))
-                game.addGameObject(garbage)
-            }
-
-        val user = User(1, "Some cool username")
-
-        val spaceship = Spaceship(Position(2, 2), user)
-        spaceship.changeDirection(direction)
-
-        // when
-        val actual = game.isGarbageAhead(spaceship)
-
-        // then
-        assertFalse(actual)
-    }
-
-    @ParameterizedTest
-    @EnumSource(Direction::class)
     fun `test isWallAhead when the wall is ahead`(direction: Direction) {
         // given
         val gameId = UUID.randomUUID()
@@ -255,7 +37,7 @@ class GameTest {
 
         val user = User(1, "Some cool username")
 
-        val spaceship = Spaceship(Position(1, 1), user)
+        val spaceship = game.createSpaceship(user)
         spaceship.changeDirection(direction)
 
         // when
@@ -285,36 +67,6 @@ class GameTest {
     }
 
     @Test
-    fun `test freeCoordinates when there are free coordinates`() {
-        // given
-        val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, FieldSize(1, 1))
-
-        // when
-        val position = game.freeCoordinates()
-            .first()
-
-        // then
-        assertEquals(Position(1, 1), position)
-    }
-
-    @Test
-    fun `test freeCoordinates when there are no free coordinates`() {
-        // given
-        val gameId = UUID.randomUUID()
-        val game = Game(gameId, "Some cool game", 1, FieldSize(1, 1))
-
-        val garbage = Garbage(Position(1, 1))
-        game.addGameObject(garbage)
-
-        // when & then
-        assertFailsWith<IllegalStateException>("There is no free coordinate") {
-            game.freeCoordinates()
-                .first()
-        }
-    }
-
-    @Test
     fun `test getSpaceships`() {
         // given
         val gameId = UUID.randomUUID()
@@ -322,8 +74,7 @@ class GameTest {
 
         val user = User(1, "Some cool username")
 
-        val spaceship = Spaceship(Position(1, 1), user)
-        game.addSpaceship(spaceship)
+        val spaceship = game.createSpaceship(user)
 
         // when
         val spaceships = game.getSpaceships()
@@ -414,9 +165,11 @@ class GameTest {
         // given
         val gameId = UUID.randomUUID()
         val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
-        val gameObject = Garbage(Position(2, 2))
-        game.addGameObject(gameObject)
+        game.generateGarbage(1)
         game.start()
+
+        val gameObject = game.getGameObjects()
+            .single()
 
         // when
         game.removeGameObject(gameObject)
@@ -443,10 +196,12 @@ class GameTest {
         // given
         val gameId = UUID.randomUUID()
         val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
-        game.addGameObject(Garbage(Position(2, 2)))
+        game.generateGarbage(1)
+
+        val gameObject = game.getGameObjects().single()
 
         // when
-        val actual = game.findCollidableObjectAt(Position(2, 2))
+        val actual = game.findCollidableObjectAt(gameObject.position)
 
         // then
         assertNotNull(actual)
@@ -458,10 +213,10 @@ class GameTest {
         val gameId = UUID.randomUUID()
         val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
         val user = User(1, "Some cool name")
-        game.addSpaceship(Spaceship(Position(2, 2), user))
+        val spaceship = game.createSpaceship(user)
 
         // when
-        val actual = game.findCollidableObjectAt(Position(2, 2))
+        val actual = game.findCollidableObjectAt(spaceship.position)
 
         // then
         assertNull(actual)
@@ -501,17 +256,17 @@ class GameTest {
         // given
         val gameId = UUID.randomUUID()
         val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
-        game.addGameObject(Garbage(Position(1, 1)))
-        game.start()
+        game.generateGarbage(1)
 
-        val spaceship = Spaceship(Position(2, 2), User(1, "Some cool name"))
+        val spaceship = game.createSpaceship(User(1, "Some cool name"))
+
+        game.start()
 
         // when
         game.damageSpaceship(spaceship, Type.GARBAGE)
 
         // then
         assertEquals(Game.Status.STARTED, game.status)
-        assertEquals(Position(2, 2), spaceship.position)
         assertEquals(Score(110), spaceship.score)
     }
 
@@ -573,8 +328,7 @@ class GameTest {
         val gameId = UUID.randomUUID()
         val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
 
-        val spaceship = Spaceship(Position(2, 2), User(1, "Some cool name"))
-        game.addSpaceship(spaceship)
+        val spaceship = game.createSpaceship(User(1, "Some cool name"))
 
         // when & then
         assertThrows<IllegalStateException> { game.destroySpaceship(spaceship) }
@@ -586,10 +340,8 @@ class GameTest {
         val gameId = UUID.randomUUID()
         val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
 
-        val spaceship = Spaceship(Position(2, 2), User(1, "Some cool name"))
+        val spaceship = game.createSpaceship(User(1, "Some cool name"))
         spaceship.destroy()
-
-        game.addSpaceship(spaceship)
 
         game.start()
 
@@ -603,8 +355,7 @@ class GameTest {
         val gameId = UUID.randomUUID()
         val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
 
-        val spaceship = Spaceship(Position(2, 2), User(1, "Some cool name"))
-        game.addSpaceship(spaceship)
+        val spaceship = game.createSpaceship(User(1, "Some cool name"))
 
         game.start()
 
@@ -710,5 +461,39 @@ class GameTest {
         assertEquals(3, gameObjects.size)
 
         assertEquals(3, gameObjects.count { it.type == Type.GARBAGE })
+    }
+
+    @Test
+    fun `test createSpaceship when game isn't created`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+        game.start()
+
+        val user = User(1, "Some cool user")
+
+        // when & then
+        assertThrows<IllegalStateException> { game.createSpaceship(user) }
+    }
+
+    @Test
+    fun `test createSpaceship`() {
+        // given
+        val gameId = UUID.randomUUID()
+        val game = Game(gameId, "Some cool game", 1, FieldSize(3, 3))
+
+        val user = User(1, "Some cool user")
+
+        // when
+        val spaceship = game.createSpaceship(user)
+
+        // then
+        val spaceships = game.getGameObjects()
+        assertEquals(1, spaceships.size)
+        assertTrue(spaceships.contains(spaceship))
+
+        val gameObjects = game.getGameObjects()
+        assertEquals(1, gameObjects.size)
+        assertTrue(gameObjects.contains(spaceship))
     }
 }
