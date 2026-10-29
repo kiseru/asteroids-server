@@ -37,6 +37,7 @@ class Game(
 
     fun destroySpaceship(spaceship: Spaceship) {
         ensureStarted()
+        ensureInGame(spaceship)
 
         spaceship.destroy()
         removeGameObject(spaceship)
@@ -47,6 +48,7 @@ class Game(
 
     fun removeGameObject(gameObject: GameObject) {
         ensureStarted()
+        ensureInGame(gameObject)
 
         gameObjects.remove(gameObject)
     }
@@ -56,23 +58,37 @@ class Game(
         return gameObjects.firstOrNull { it.type != Type.SPACESHIP && it.position == position }
     }
 
-    fun isAsteroidAhead(spaceship: Spaceship): Boolean =
-        gameObjects.any { it.type == Type.ASTEROID && isPointAhead(spaceship, it) }
+    fun isAsteroidAhead(spaceship: Spaceship): Boolean {
+        ensureInGame(spaceship)
 
-    fun isGarbageAhead(spaceship: Spaceship): Boolean =
-        gameObjects.any { it.type == Type.GARBAGE && isPointAhead(spaceship, it) }
+        return gameObjects.any { it.type == Type.ASTEROID && isPointAhead(spaceship, it) }
+    }
 
-    private fun isPointAhead(spaceship: Spaceship, gameObject: GameObject): Boolean =
-        gameObject.position == spaceship.position.aheadOf(spaceship.direction)
+    fun isGarbageAhead(spaceship: Spaceship): Boolean {
+        ensureInGame(spaceship)
 
-    fun isWallAhead(spaceship: Spaceship): Boolean =
-        !fieldSize.contains(spaceship.position.aheadOf(spaceship.direction))
+        return gameObjects.any { it.type == Type.GARBAGE && isPointAhead(spaceship, it) }
+    }
+
+    private fun isPointAhead(spaceship: Spaceship, gameObject: GameObject): Boolean {
+        ensureInGame(spaceship)
+        ensureInGame(gameObject)
+
+        return gameObject.position == spaceship.position.aheadOf(spaceship.direction)
+    }
+
+    fun isWallAhead(spaceship: Spaceship): Boolean {
+        ensureInGame(spaceship)
+
+        return !fieldSize.contains(spaceship.position.aheadOf(spaceship.direction))
+    }
 
     fun getSpaceships(): List<Spaceship> =
         spaceships.toList()
 
     fun damageSpaceship(spaceship: Spaceship, type: Type) {
         ensureStarted()
+        ensureInGame(spaceship)
 
         when (type) {
             Type.ASTEROID -> spaceship.subtractScore()
@@ -93,8 +109,6 @@ class Game(
     }
 
     private fun rollbackSpaceship(spaceship: Spaceship) {
-        ensureStarted()
-
         spaceship.moveTo(spaceship.position.aheadOf(spaceship.direction.opposite()))
         spaceship.subtractScore()
     }
@@ -140,9 +154,8 @@ class Game(
         }
 
     fun onSpaceshipMove(spaceship: Spaceship) {
-        if (status != Status.STARTED) {
-            throw IllegalStateException("Failed to move the spaceship because of the game's illegal status")
-        }
+        ensureStarted()
+        ensureInGame(spaceship)
 
         val aheadOfSpaceship = spaceship.position.aheadOf(spaceship.direction)
         val isBusy = spaceships.any { it.position == aheadOfSpaceship }
@@ -175,6 +188,14 @@ class Game(
 
     private fun ensureStarted() {
         check(status == Status.STARTED) { "Game not in STARTED status" }
+    }
+
+    private fun ensureInGame(spaceship: Spaceship) {
+        require(spaceships.contains(spaceship)) { "Spaceship does not belong to the game" }
+    }
+
+    private fun ensureInGame(gameObject: GameObject) {
+        require(gameObjects.contains(gameObject)) { "GameObject does not belong to the game" }
     }
 
     enum class Status {
