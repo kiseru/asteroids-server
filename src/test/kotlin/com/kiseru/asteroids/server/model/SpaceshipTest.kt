@@ -49,19 +49,6 @@ class SpaceshipTest {
     }
 
     @Test
-    fun `test view`() {
-        // given
-        val user = User(1, "Some cool name")
-        val spaceship = Spaceship(Position(1, 1), user)
-
-        // when
-        val actual = spaceship.view()
-
-        // then
-        assertEquals("1", actual)
-    }
-
-    @Test
     fun `test addScore`() {
         // given
         val user = User(1, "Some cool name")

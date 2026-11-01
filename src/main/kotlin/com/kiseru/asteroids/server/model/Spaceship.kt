@@ -22,9 +22,6 @@ class Spaceship(
 
     override val type: Type = Type.SPACESHIP
 
-    override fun view(): String =
-        user.id.toString()
-
     fun addScore() {
         ensureAlive()
 

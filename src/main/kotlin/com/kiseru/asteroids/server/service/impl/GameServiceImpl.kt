@@ -1,6 +1,10 @@
 package com.kiseru.asteroids.server.service.impl
 
+import com.kiseru.asteroids.server.model.Asteroid
 import com.kiseru.asteroids.server.model.Game
+import com.kiseru.asteroids.server.model.GameObject
+import com.kiseru.asteroids.server.model.Garbage
+import com.kiseru.asteroids.server.model.Spaceship
 import com.kiseru.asteroids.server.service.GameService
 import java.io.IOException
 import java.io.OutputStream
@@ -50,7 +54,7 @@ class GameServiceImpl : GameService {
     private fun display(game: Game): String {
         val mainMatrix = Array(game.fieldSize.height + 2) { Array(game.fieldSize.width + 2) { "." } }
         game.getGameObjects().forEach {
-            draw(mainMatrix, it.position.x, it.position.y, it.view())
+            draw(mainMatrix, it.position.x, it.position.y, view(it))
         }
         val stringBuilder = StringBuilder()
         for (i in 1 until game.fieldSize.height + 1) {
@@ -61,6 +65,15 @@ class GameServiceImpl : GameService {
             stringBuilder.append("\n")
         }
         return stringBuilder.toString()
+    }
+
+    private fun view(gameObject: GameObject): String {
+        return when (gameObject) {
+            is Asteroid -> "A"
+            is Garbage -> "G"
+            is Spaceship -> gameObject.user.id.toString()
+            else -> throw IllegalArgumentException("Unknown game object type: ${gameObject.type}")
+        }
     }
 
     private fun draw(mainMatrix: Array<Array<String>>, x: Int, y: Int, symbol: String) {

@@ -28,16 +28,4 @@ class AsteroidTest {
         // then
         assertEquals(Position(1, 1), actual)
     }
-
-    @Test
-    fun `test view`() {
-        // given
-        val asteroid = Asteroid(Position(1, 1))
-
-        // when
-        val actual = asteroid.view()
-
-        // then
-        assertEquals("A", actual)
-    }
 }

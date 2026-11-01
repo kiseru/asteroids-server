@@ -5,7 +5,4 @@ class Asteroid(
 ) : GameObject {
 
     override val type: Type = Type.ASTEROID
-
-    override fun view(): String =
-        "A"
 }

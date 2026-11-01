@@ -1,6 +1,8 @@
 package com.kiseru.asteroids.server.model
 
+import com.kiseru.asteroids.server.service.impl.GameServiceImpl
 import org.junit.jupiter.api.Test
+import java.io.ByteArrayOutputStream
 import kotlin.test.assertEquals
 import kotlin.test.assertNotSame
 
@@ -23,16 +25,21 @@ class UserTest {
     @Test
     fun `test spaceships of users with the same id are indistinguishable on the game field`() {
         // given
-        val first = Spaceship(Position(1, 1), User(42, "first"))
-        val second = Spaceship(Position(2, 2), User(42, "second"))
+        val gameService = GameServiceImpl()
+        val firstGame = Game(java.util.UUID.randomUUID(), "first", 1, FieldSize(1, 1))
+        firstGame.createSpaceship(User(42, "first"))
+        val secondGame = Game(java.util.UUID.randomUUID(), "second", 1, FieldSize(1, 1))
+        secondGame.createSpaceship(User(42, "second"))
+        val firstOutputStream = ByteArrayOutputStream()
+        val secondOutputStream = ByteArrayOutputStream()
 
         // when
-        val firstView = first.view()
-        val secondView = second.view()
+        gameService.writeGameField(firstGame, firstOutputStream)
+        gameService.writeGameField(secondGame, secondOutputStream)
 
         // then
         // known bug: user id is used as the spaceship view, so colliding ids
         // make two different ships look identical on the game field
-        assertEquals(secondView, firstView)
+        assertEquals(secondOutputStream.toString(), firstOutputStream.toString())
     }
 }

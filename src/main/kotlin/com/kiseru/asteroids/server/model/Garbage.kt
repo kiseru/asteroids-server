@@ -5,7 +5,4 @@ class Garbage(
 ) : GameObject {
 
     override val type: Type = Type.GARBAGE
-
-    override fun view(): String =
-        "G"
 }
