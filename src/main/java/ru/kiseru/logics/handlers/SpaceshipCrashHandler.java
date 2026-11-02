@@ -4,7 +4,7 @@ import ru.kiseru.logics.Game;
 import ru.kiseru.logics.auxiliary.Type;
 import ru.kiseru.logics.models.Crashable;
 import ru.kiseru.logics.models.Point;
-import ru.kiseru.logics.models.SpaceShip;
+import ru.kiseru.logics.models.Spaceship;
 
 import java.util.List;
 
@@ -13,11 +13,11 @@ import java.util.List;
  * 08 Декабрь 2017
  */
 
-public class SpaceShipCrashHandler {
-    private SpaceShip spaceShip;
+public class SpaceshipCrashHandler {
+    private Spaceship spaceShip;
     private Game game;
 
-    public SpaceShipCrashHandler(Game game, SpaceShip spaceShip) {
+    public SpaceshipCrashHandler(Game game, Spaceship spaceShip) {
         this.spaceShip = spaceShip;
         this.game = game;
     }

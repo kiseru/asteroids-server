@@ -2,7 +2,7 @@ package ru.kiseru.logics;
 
 import ru.kiseru.logics.auxiliary.Coordinates;
 import ru.kiseru.logics.auxiliary.Type;
-import ru.kiseru.logics.handlers.SpaceShipCrashHandler;
+import ru.kiseru.logics.handlers.SpaceshipCrashHandler;
 import ru.kiseru.logics.models.*;
 import ru.kiseru.server.User;
 
@@ -20,7 +20,7 @@ public class Game {
     private List<Model> gameObjects;
     private List<Point> pointsOnScreen;
     private Screen screen;
-    private List<SpaceShipCrashHandler> crashHandlers;
+    private List<SpaceshipCrashHandler> crashHandlers;
     private AtomicInteger collectedGarbageCount = new AtomicInteger(0);
     private int garbageNumber;
 
@@ -56,11 +56,11 @@ public class Game {
      * @param user - юзер, для которого регистриуется корабль
      */
     public void registerSpaceShipForUser(User user) {
-        SpaceShip spaceShip = new SpaceShip(generateUniqueRandomCoordinates(), user);
+        Spaceship spaceShip = new Spaceship(generateUniqueRandomCoordinates(), user);
         user.setSpaceShip(spaceShip);
         this.pointsOnScreen.add(spaceShip);
         this.gameObjects.add(spaceShip);
-        crashHandlers.add(new SpaceShipCrashHandler(this, spaceShip));
+        crashHandlers.add(new SpaceshipCrashHandler(this, spaceShip));
         spaceShip.setCourseChecker(new CourseChecker(spaceShip, this.pointsOnScreen, this.screen));
     }
 
@@ -69,7 +69,7 @@ public class Game {
      */
     public void refresh() {
         screen.update();
-        crashHandlers.forEach(SpaceShipCrashHandler::check);
+        crashHandlers.forEach(SpaceshipCrashHandler::check);
         gameObjects.forEach(o -> o.render(screen));
         //System.out.println(screen.display());
     }
@@ -77,7 +77,7 @@ public class Game {
     public boolean isAnyoneAlive() {
         return pointsOnScreen.stream()
                 .filter(p -> p.getType() == Type.SPACESHIP)
-                .map(s -> ((SpaceShip)s).isOwnerAlive())
+                .map(s -> ((Spaceship)s).isOwnerAlive())
                 .reduce((b1, b2) -> b1 || b2)
                 .get();
     }
@@ -113,7 +113,7 @@ public class Game {
         return garbageNumber;
     }
 
-    public List<SpaceShipCrashHandler> getCrashHandlers() {
+    public List<SpaceshipCrashHandler> getCrashHandlers() {
         return crashHandlers;
     }
 

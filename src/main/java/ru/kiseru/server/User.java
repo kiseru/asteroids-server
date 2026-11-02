@@ -1,7 +1,7 @@
 package ru.kiseru.server;
 
 import ru.kiseru.logics.auxiliary.Direction;
-import ru.kiseru.logics.models.SpaceShip;
+import ru.kiseru.logics.models.Spaceship;
 import ru.kiseru.server.room.Room;
 
 import java.io.BufferedReader;
@@ -19,7 +19,7 @@ final public class User extends Thread {
     private int steps;
     private boolean isAlive;
     private final Room room;
-    private SpaceShip spaceShip;
+    private Spaceship spaceShip;
 
     User(Socket newConnection, Room room) throws IOException {
         reader = new BufferedReader(new InputStreamReader(newConnection.getInputStream()));
@@ -143,7 +143,7 @@ final public class User extends Thread {
         this.sendMessage(scoreMessage);
     }
 
-    public void setSpaceShip(SpaceShip spaceShip) {
+    public void setSpaceShip(Spaceship spaceShip) {
         this.spaceShip = spaceShip;
     }
 

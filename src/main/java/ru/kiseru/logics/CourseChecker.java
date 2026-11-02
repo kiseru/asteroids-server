@@ -3,7 +3,7 @@ package ru.kiseru.logics;
 import ru.kiseru.logics.auxiliary.Coordinates;
 import ru.kiseru.logics.auxiliary.Type;
 import ru.kiseru.logics.models.Point;
-import ru.kiseru.logics.models.SpaceShip;
+import ru.kiseru.logics.models.Spaceship;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,11 +14,11 @@ import java.util.stream.Collectors;
  */
 
 public class CourseChecker {
-    private SpaceShip spaceShip;
+    private Spaceship spaceShip;
     private List<Point> pointsOnMap;
     private Screen screen;
 
-    public CourseChecker(SpaceShip spaceShip, List<Point> pointsOnMap, Screen screen) {
+    public CourseChecker(Spaceship spaceShip, List<Point> pointsOnMap, Screen screen) {
         this.spaceShip = spaceShip;
         this.pointsOnMap = pointsOnMap;
         this.screen = screen;
