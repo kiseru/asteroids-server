@@ -3,7 +3,7 @@ plugins {
     application
 }
 
-group = "com.tutorteam"
+group = "ru.kiseru"
 version = "1.0.0"
 
 java {
@@ -13,7 +13,7 @@ java {
 }
 
 application {
-    mainClass = "com.tutorteam.ApplicationRunner"
+    mainClass = "ru.kiseru.ApplicationRunner"
 }
 
 tasks.wrapper {

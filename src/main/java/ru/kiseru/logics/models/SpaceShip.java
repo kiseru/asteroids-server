@@ -1,11 +1,11 @@
-package com.tutorteam.logics.models;
+package ru.kiseru.logics.models;
 
-import com.tutorteam.logics.Screen;
-import com.tutorteam.logics.auxiliary.Coordinates;
-import com.tutorteam.logics.auxiliary.Direction;
-import com.tutorteam.logics.auxiliary.Type;
-import com.tutorteam.logics.CourseChecker;
-import com.tutorteam.server.User;
+import ru.kiseru.logics.Screen;
+import ru.kiseru.logics.auxiliary.Coordinates;
+import ru.kiseru.logics.auxiliary.Direction;
+import ru.kiseru.logics.auxiliary.Type;
+import ru.kiseru.logics.CourseChecker;
+import ru.kiseru.server.User;
 
 /**
  * @author Bulat Giniyatullin

@@ -1,10 +1,10 @@
-package com.tutorteam.logics;
+package ru.kiseru.logics;
 
-import com.tutorteam.logics.auxiliary.Coordinates;
-import com.tutorteam.logics.auxiliary.Type;
-import com.tutorteam.logics.handlers.SpaceShipCrashHandler;
-import com.tutorteam.logics.models.*;
-import com.tutorteam.server.User;
+import ru.kiseru.logics.auxiliary.Coordinates;
+import ru.kiseru.logics.auxiliary.Type;
+import ru.kiseru.logics.handlers.SpaceShipCrashHandler;
+import ru.kiseru.logics.models.*;
+import ru.kiseru.server.User;
 
 import java.util.ArrayList;
 import java.util.List;

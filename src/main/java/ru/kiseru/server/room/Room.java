@@ -1,9 +1,9 @@
-package com.tutorteam.server.room;
+package ru.kiseru.server.room;
 
-import com.tutorteam.logics.Game;
-import com.tutorteam.logics.Screen;
-import com.tutorteam.server.Server;
-import com.tutorteam.server.User;
+import ru.kiseru.logics.Game;
+import ru.kiseru.logics.Screen;
+import ru.kiseru.server.Server;
+import ru.kiseru.server.User;
 
 import java.util.ArrayList;
 import java.util.Comparator;

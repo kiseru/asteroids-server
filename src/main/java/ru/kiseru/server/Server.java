@@ -1,6 +1,6 @@
-package com.tutorteam.server;
+package ru.kiseru.server;
 
-import com.tutorteam.server.room.Room;
+import ru.kiseru.server.room.Room;
 
 import java.io.IOException;
 import java.net.ServerSocket;

@@ -1,4 +1,4 @@
-package com.tutorteam.server.room;
+package ru.kiseru.server.room;
 
 public enum RoomStatus {
     WAITING_CONNECTIONS,

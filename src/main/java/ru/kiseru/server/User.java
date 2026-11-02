@@ -1,8 +1,8 @@
-package com.tutorteam.server;
+package ru.kiseru.server;
 
-import com.tutorteam.logics.auxiliary.Direction;
-import com.tutorteam.logics.models.SpaceShip;
-import com.tutorteam.server.room.Room;
+import ru.kiseru.logics.auxiliary.Direction;
+import ru.kiseru.logics.models.SpaceShip;
+import ru.kiseru.server.room.Room;
 
 import java.io.BufferedReader;
 import java.io.IOException;

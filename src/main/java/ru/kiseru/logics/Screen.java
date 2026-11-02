@@ -1,6 +1,6 @@
-package com.tutorteam.logics;
+package ru.kiseru.logics;
 
-import com.tutorteam.logics.auxiliary.Coordinates;
+import ru.kiseru.logics.auxiliary.Coordinates;
 
 import java.util.Arrays;
 

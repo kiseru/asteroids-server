@@ -1,6 +1,6 @@
-package com.tutorteam.logics.models;
+package ru.kiseru.logics.models;
 
-import com.tutorteam.logics.Screen;
+import ru.kiseru.logics.Screen;
 
 /**
  * @author Bulat Giniyatullin

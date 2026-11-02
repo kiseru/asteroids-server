@@ -1,4 +1,4 @@
-package com.tutorteam.logics.auxiliary;
+package ru.kiseru.logics.auxiliary;
 
 /**
  * @author Bulat Giniyatullin

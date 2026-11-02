@@ -1,9 +1,9 @@
-package com.tutorteam.logics;
+package ru.kiseru.logics;
 
-import com.tutorteam.logics.auxiliary.Coordinates;
-import com.tutorteam.logics.auxiliary.Type;
-import com.tutorteam.logics.models.Point;
-import com.tutorteam.logics.models.SpaceShip;
+import ru.kiseru.logics.auxiliary.Coordinates;
+import ru.kiseru.logics.auxiliary.Type;
+import ru.kiseru.logics.models.Point;
+import ru.kiseru.logics.models.SpaceShip;
 
 import java.util.List;
 import java.util.stream.Collectors;

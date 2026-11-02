@@ -1,6 +1,6 @@
-package com.tutorteam;
+package ru.kiseru;
 
-import com.tutorteam.server.Server;
+import ru.kiseru.server.Server;
 
 import java.io.IOException;
 

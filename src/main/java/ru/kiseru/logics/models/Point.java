@@ -1,7 +1,7 @@
-package com.tutorteam.logics.models;
+package ru.kiseru.logics.models;
 
-import com.tutorteam.logics.auxiliary.Coordinates;
-import com.tutorteam.logics.auxiliary.Type;
+import ru.kiseru.logics.auxiliary.Coordinates;
+import ru.kiseru.logics.auxiliary.Type;
 
 /**
  * @author Bulat Giniyatullin

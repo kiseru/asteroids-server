@@ -1,4 +1,4 @@
-package com.tutorteam.logics.models;
+package ru.kiseru.logics.models;
 
 /**
  * @author Bulat Giniyatullin
