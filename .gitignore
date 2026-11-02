@@ -1,4 +1,8 @@
 *.iml
 *.class
 *.jar
+!gradle/wrapper/gradle-wrapper.jar
 .idea
+.gradle
+build
+.DS_Store
