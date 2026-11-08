@@ -4,12 +4,8 @@ import ru.kiseru.logics.Screen;
 import ru.kiseru.logics.auxiliary.Coordinates;
 import ru.kiseru.logics.auxiliary.Type;
 
-/**
- * @author Bulat Giniyatullin
- * 08 Декабрь 2017
- */
+public class Garbage extends Point implements Model, Crashable {
 
-public class Garbage extends Point implements Model, Crashable{
     public Garbage(Coordinates coordinates) {
         super(coordinates);
     }

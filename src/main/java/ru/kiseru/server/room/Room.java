@@ -1,20 +1,19 @@
 package ru.kiseru.server.room;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Objects;
+import java.util.stream.IntStream;
 import ru.kiseru.logics.Game;
 import ru.kiseru.logics.Screen;
 import ru.kiseru.server.Server;
 import ru.kiseru.server.User;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Objects;
-import java.util.stream.IntStream;
-
-final public class Room extends Thread {
+public final class Room extends Thread {
 
     private final int MAX_USERS = 1;
 
-    private ArrayList<User> users;
+    private final ArrayList<User> users;
     private int usersCount;
     private RoomStatus roomStatus;
     private Game game;
@@ -41,7 +40,7 @@ final public class Room extends Thread {
 
         users.stream()
                 .filter(Objects::nonNull)
-                .forEach(roomUser -> roomUser.sendMessage(String.format("User %s has joined the room.", user.getUserName())));
+                .forEach(roomUser -> roomUser.sendMessage(String.format("User %s has joined the room.", user.getUsername())));
 
         users.set(emptyPlaceIndex, user);
         usersCount++;

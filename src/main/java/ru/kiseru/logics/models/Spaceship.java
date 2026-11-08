@@ -1,19 +1,15 @@
 package ru.kiseru.logics.models;
 
+import ru.kiseru.logics.CourseChecker;
 import ru.kiseru.logics.Screen;
 import ru.kiseru.logics.auxiliary.Coordinates;
 import ru.kiseru.logics.auxiliary.Direction;
 import ru.kiseru.logics.auxiliary.Type;
-import ru.kiseru.logics.CourseChecker;
 import ru.kiseru.server.User;
 
-/**
- * @author Bulat Giniyatullin
- * 08 Декабрь 2017
- */
-
 public class Spaceship extends Point implements Model{
-    private User owner;
+
+    private final User owner;
     private Direction direction;
     private CourseChecker courseChecker;
 
@@ -30,7 +26,7 @@ public class Spaceship extends Point implements Model{
     }
 
     /**
-     * делает шаг в текущем направлении
+     * Делает шаг в текущем направлении
      */
     public void go() {
         switch (direction) {
@@ -55,7 +51,7 @@ public class Spaceship extends Point implements Model{
     public void crash(Type type) {
         synchronized (owner.getRoom().getGame()) {
             if (type == Type.ASTEROID) {
-                owner.substractScore();
+                owner.subtractScore();
             } else if (type == Type.GARBAGE) {
                 owner.addScore();
                 int collected = owner.getRoom().getGame().incrementCollectedGarbageCount();
@@ -67,7 +63,7 @@ public class Spaceship extends Point implements Model{
             } else if (type == Type.WALL) {
                 // возвращаемся назад, чтобы не находится на стене
                 rollbackLastStep();
-                owner.substractScore();
+                owner.subtractScore();
             }
             if (!owner.isAlive()) {
                 this.destroy();
@@ -92,7 +88,7 @@ public class Spaceship extends Point implements Model{
     }
 
     /**
-     * разрушение корабля - прекращение его отображения
+     * Разрушение корабля - прекращение его отображения
      */
     private void destroy() {
         this.isVisible = false;

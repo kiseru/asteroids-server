@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -17,7 +16,6 @@ import ru.kiseru.logics.models.Asteroid
 import ru.kiseru.logics.models.Garbage
 import ru.kiseru.logics.models.Spaceship
 import ru.kiseru.server.User
-import java.util.NoSuchElementException
 
 class GameTest {
 
@@ -108,7 +106,7 @@ class GameTest {
 
         // then
         val captor = argumentCaptor<Spaceship>()
-        verify(user).setSpaceShip(captor.capture())
+        verify(user).setSpaceship(captor.capture())
         val spaceship = captor.firstValue
         assertEquals(Type.SPACESHIP, spaceship.type)
     }
@@ -124,7 +122,7 @@ class GameTest {
 
         // then
         val captor = argumentCaptor<Spaceship>()
-        verify(user).setSpaceShip(captor.capture())
+        verify(user).setSpaceship(captor.capture())
         assertTrue(game.pointsOnScreen.contains(captor.firstValue))
     }
 
@@ -152,7 +150,7 @@ class GameTest {
 
         // then
         val captor = argumentCaptor<Spaceship>()
-        verify(user).setSpaceShip(captor.capture())
+        verify(user).setSpaceship(captor.capture())
         assertNotNull(captor.firstValue.courseChecker)
     }
 
@@ -167,7 +165,7 @@ class GameTest {
 
         // then
         val captor = argumentCaptor<Spaceship>()
-        verify(user).setSpaceShip(captor.capture())
+        verify(user).setSpaceship(captor.capture())
         val spaceshipCoordinates = captor.firstValue.coordinates
         val otherCoordinates = game.pointsOnScreen
             .filter { it.type != Type.SPACESHIP }
@@ -273,12 +271,12 @@ class GameTest {
     }
 
     @Test
-    fun `given game without spaceships - when isAnyoneAlive called - then exception thrown`() {
+    fun `given game without spaceships - when isAnyoneAlive called - then false returned`() {
         // given
         val game = Game(Screen(10, 10), 1, 1)
 
         // when & then
-        assertThrows<NoSuchElementException>(game::isAnyoneAlive)
+        assertFalse(game::isAnyoneAlive)
     }
 
     @Test

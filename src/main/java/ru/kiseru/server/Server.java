@@ -1,14 +1,15 @@
 package ru.kiseru.server;
 
-import ru.kiseru.server.room.Room;
-
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Scanner;
+import ru.kiseru.server.room.Room;
 
 final public class Server {
 
-    private int port;
+    private final int port;
     private static final List<Room> rooms = new LinkedList<>();
     private static Room notFullRoom = new Room();
 

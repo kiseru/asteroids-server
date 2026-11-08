@@ -1,18 +1,13 @@
 package ru.kiseru.logics;
 
+import java.util.Arrays;
 import ru.kiseru.logics.auxiliary.Coordinates;
 
-import java.util.Arrays;
-
-/**
- * @author Bulat Giniyatullin
- * 09 Декабрь 2017
- */
-
 public class Screen {
-    private int width;
-    private int height;
-    private String[][] mainMatrix;
+
+    private final int width;
+    private final int height;
+    private final String[][] mainMatrix;
 
     public Screen(int width, int height) {
         this.width = width;
@@ -22,7 +17,7 @@ public class Screen {
     }
 
     /**
-     * рисует на экране точку
+     * Рисует на экране точку
      * @param coordinates - по какой координате
      * @param symbol - символ, которым отображается точка
      */
@@ -35,17 +30,17 @@ public class Screen {
     }
 
     /**
-     * обновляет экран
+     * Обновляет экран
      */
     public void update() {
         generateClearScreen();
     }
 
     /**
-     * отображает экран
+     * Отображает экран
      */
     public String display() {
-        StringBuilder result = new StringBuilder("");
+        StringBuilder result = new StringBuilder();
         for (int i = 1; i < height + 1; i++) {
             for (int j = 1; j < width + 1; j++) {
                 result.append(mainMatrix[i][j]);

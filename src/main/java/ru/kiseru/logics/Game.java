@@ -1,28 +1,23 @@
 package ru.kiseru.logics;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 import ru.kiseru.logics.auxiliary.Coordinates;
 import ru.kiseru.logics.auxiliary.Type;
 import ru.kiseru.logics.handlers.SpaceshipCrashHandler;
 import ru.kiseru.logics.models.*;
 import ru.kiseru.server.User;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
-
-/**
- * @author Bulat Giniyatullin
- * 08 Декабрь 2017
- */
-
 public class Game {
-    private List<Model> gameObjects;
-    private List<Point> pointsOnScreen;
-    private Screen screen;
-    private List<SpaceshipCrashHandler> crashHandlers;
-    private AtomicInteger collectedGarbageCount = new AtomicInteger(0);
-    private int garbageNumber;
+
+    private final List<Model> gameObjects;
+    private final List<Point> pointsOnScreen;
+    private final Screen screen;
+    private final List<SpaceshipCrashHandler> crashHandlers;
+    private final AtomicInteger collectedGarbageCount = new AtomicInteger(0);
+    private final int garbageNumber;
 
     /**
      * Конструктор создания игровой сессии
@@ -52,12 +47,12 @@ public class Game {
     }
 
     /**
-     * создает и регистрирует новый корабль
-     * @param user - юзер, для которого регистриуется корабль
+     * Создает и регистрирует новый корабль
+     * @param user - юзер, для которого регистрируется корабль
      */
     public void registerSpaceShipForUser(User user) {
         Spaceship spaceShip = new Spaceship(generateUniqueRandomCoordinates(), user);
-        user.setSpaceShip(spaceShip);
+        user.setSpaceship(spaceShip);
         this.pointsOnScreen.add(spaceShip);
         this.gameObjects.add(spaceShip);
         crashHandlers.add(new SpaceshipCrashHandler(this, spaceShip));
@@ -65,27 +60,24 @@ public class Game {
     }
 
     /**
-     * запускает и поддерживает жизненный цикл игры
+     * Запускает и поддерживает жизненный цикл игры
      */
     public void refresh() {
         screen.update();
         crashHandlers.forEach(SpaceshipCrashHandler::check);
         gameObjects.forEach(o -> o.render(screen));
-        //System.out.println(screen.display());
     }
 
     public boolean isAnyoneAlive() {
         return pointsOnScreen.stream()
-                .filter(p -> p.getType() == Type.SPACESHIP)
-                .map(s -> ((Spaceship)s).isOwnerAlive())
-                .reduce((b1, b2) -> b1 || b2)
-                .get();
+            .filter(point -> point.getType() == Type.SPACESHIP)
+            .anyMatch(point -> point instanceof Spaceship s && s.isOwnerAlive());
     }
 
     private Coordinates generateUniqueRandomCoordinates() {
         Random random = new Random();
         Coordinates randomCoordinates = null;
-        // если по случайно сгенерованным координатам уже что-то находится(или они ещё не сгенерированы)
+        // если по случайно созданным координатам уже что-то находится (или они ещё не сгенерированы)
         while (randomCoordinates == null || isGameObjectsContainsCoordinates(randomCoordinates))
             // генерируем новые координаты
             randomCoordinates = new Coordinates(random.nextInt(screen.getWidth()) + 1, random.nextInt(screen.getHeight()) + 1   );

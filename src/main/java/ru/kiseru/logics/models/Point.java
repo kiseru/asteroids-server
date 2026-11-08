@@ -3,12 +3,8 @@ package ru.kiseru.logics.models;
 import ru.kiseru.logics.auxiliary.Coordinates;
 import ru.kiseru.logics.auxiliary.Type;
 
-/**
- * @author Bulat Giniyatullin
- * 08 Декабрь 2017
- */
-
 public abstract class Point {
+
     protected Coordinates coordinates;
     protected boolean isVisible;
 

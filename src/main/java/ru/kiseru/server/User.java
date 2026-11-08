@@ -1,32 +1,31 @@
 package ru.kiseru.server;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import ru.kiseru.logics.auxiliary.Direction;
 import ru.kiseru.logics.models.Spaceship;
 import ru.kiseru.server.room.Room;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
-
 final public class User extends Thread {
 
-    private BufferedReader reader;
-    private PrintWriter writer;
-    private String userName;
-    private int score;
-    private int steps;
-    private boolean isAlive;
+    private final BufferedReader reader;
+    private final PrintWriter writer;
     private final Room room;
-    private Spaceship spaceShip;
 
-    User(Socket newConnection, Room room) throws IOException {
-        reader = new BufferedReader(new InputStreamReader(newConnection.getInputStream()));
-        writer = new PrintWriter(newConnection.getOutputStream(), true);
-        score = 100;
-        steps = 0;
-        isAlive = true;
+    private String username;
+    private int score = 100;
+    private int steps = 0;
+    private boolean isAlive = true;
+    private Spaceship spaceship;
+
+    public User(
+        BufferedReader reader,
+        PrintWriter writer,
+        Room room
+    ) {
+        this.reader = reader;
+        this.writer = writer;
         this.room = room;
     }
 
@@ -39,8 +38,8 @@ final public class User extends Thread {
         try {
             writer.println("Welcome To Asteroids Server");
             writer.println("Please, introduce yourself!");
-            userName = reader.readLine();
-            System.out.println(userName + " has joined the server!");
+            username = reader.readLine();
+            System.out.println(username + " has joined the server!");
             writer.println("You need to keep a space garbage.");
             writer.println("Your ID is " + getId());
             writer.println("Good luck, Commander!");
@@ -56,37 +55,39 @@ final public class User extends Thread {
                     e.printStackTrace();
                 }
             }
-            spaceShip.setDirection(Direction.UP);
+            spaceship.setDirection(Direction.UP);
             while (!room.isGameFinished() && isAlive) {
                 String userMessage = reader.readLine();
-                if (userMessage.equals("go")) {
-                    spaceShip.go();
-                    room.getGame().refresh();
-                    sendMessage(Integer.toString(score));
-                } else if (userMessage.equals("left")) {
-                    spaceShip.setDirection(Direction.LEFT);
-                    room.getGame().refresh();
-                    sendMessage("success");
-                } else if (userMessage.equals("right")) {
-                    spaceShip.setDirection(Direction.RIGHT);
-                    room.getGame().refresh();
-                    sendMessage("success");
-                } else if (userMessage.equals("up")) {
-                    spaceShip.setDirection(Direction.UP);
-                    room.getGame().refresh();
-                    sendMessage("success");
-                } else if (userMessage.equals("down")) {
-                    spaceShip.setDirection(Direction.DOWN);
-                    room.getGame().refresh();
-                    sendMessage("success");
-                } else if (userMessage.equals("isAsteroid")) {
-                    sendMessage(spaceShip.getCourseChecker().isAsteroid() ? "t" : "f");
-                } else if (userMessage.equals("isGarbage")) {
-                    sendMessage(spaceShip.getCourseChecker().isGarbage() ? "t" : "f");
-                } else if (userMessage.equals("isWall")) {
-                    sendMessage(spaceShip.getCourseChecker().isWall() ? "t" : "f");
-                } else {
-                    sendMessage("Unknown command");
+                switch (userMessage) {
+                    case "go" -> {
+                        spaceship.go();
+                        room.getGame().refresh();
+                        sendMessage(Integer.toString(score));
+                    }
+                    case "left" -> {
+                        spaceship.setDirection(Direction.LEFT);
+                        room.getGame().refresh();
+                        sendMessage("success");
+                    }
+                    case "right" -> {
+                        spaceship.setDirection(Direction.RIGHT);
+                        room.getGame().refresh();
+                        sendMessage("success");
+                    }
+                    case "up" -> {
+                        spaceship.setDirection(Direction.UP);
+                        room.getGame().refresh();
+                        sendMessage("success");
+                    }
+                    case "down" -> {
+                        spaceship.setDirection(Direction.DOWN);
+                        room.getGame().refresh();
+                        sendMessage("success");
+                    }
+                    case "isAsteroid" -> sendMessage(spaceship.getCourseChecker().isAsteroid() ? "t" : "f");
+                    case "isGarbage" -> sendMessage(spaceship.getCourseChecker().isGarbage() ? "t" : "f");
+                    case "isWall" -> sendMessage(spaceship.getCourseChecker().isWall() ? "t" : "f");
+                    default -> sendMessage("Unknown command");
                 }
                 steps++;
                 if (steps >= 1500) {
@@ -97,7 +98,7 @@ final public class User extends Thread {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Connection problems with user " + userName);
+            System.out.println("Connection problems with user " + username);
         } finally {
             isAlive = false;
             if (room.aliveCount() == 0) {
@@ -110,11 +111,11 @@ final public class User extends Thread {
 
     @Override
     public String toString() {
-        return String.format("%s %d", userName, score);
+        return String.format("%s %d", username, score);
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
     public void sendMessage(String message) {
@@ -125,7 +126,7 @@ final public class User extends Thread {
         if (room.isGameStarted()) score += 10;
     }
 
-    public void substractScore() {
+    public void subtractScore() {
         if (room.isGameStarted()) {
             score -= 50;
             if (score < 0) isAlive = false;
@@ -143,8 +144,8 @@ final public class User extends Thread {
         this.sendMessage(scoreMessage);
     }
 
-    public void setSpaceShip(Spaceship spaceShip) {
-        this.spaceShip = spaceShip;
+    public void setSpaceship(Spaceship spaceship) {
+        this.spaceship = spaceship;
     }
 
     public Room getRoom() {

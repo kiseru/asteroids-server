@@ -1,25 +1,20 @@
 package ru.kiseru.logics;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import ru.kiseru.logics.auxiliary.Coordinates;
 import ru.kiseru.logics.auxiliary.Type;
 import ru.kiseru.logics.models.Point;
 import ru.kiseru.logics.models.Spaceship;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-/**
- * @author Bulat Giniyatullin
- * 10 Декабрь 2017
- */
-
 public class CourseChecker {
-    private Spaceship spaceShip;
-    private List<Point> pointsOnMap;
-    private Screen screen;
 
-    public CourseChecker(Spaceship spaceShip, List<Point> pointsOnMap, Screen screen) {
-        this.spaceShip = spaceShip;
+    private final Spaceship spaceship;
+    private final List<Point> pointsOnMap;
+    private final Screen screen;
+
+    public CourseChecker(Spaceship spaceship, List<Point> pointsOnMap, Screen screen) {
+        this.spaceship = spaceship;
         this.pointsOnMap = pointsOnMap;
         this.screen = screen;
     }
@@ -41,39 +36,22 @@ public class CourseChecker {
     }
 
     public boolean isWall() {
-        switch (spaceShip.getDirection()) {
-            case UP:
-                return spaceShip.getY() == 1;
-            case RIGHT:
-                return spaceShip.getX() == screen.getWidth();
-            case DOWN:
-                return spaceShip.getY() == screen.getHeight();
-            case LEFT:
-                return spaceShip.getX() == 1;
-        }
-        return false;
+        return switch (spaceship.getDirection()) {
+            case UP -> spaceship.getY() == 1;
+            case RIGHT -> spaceship.getX() == screen.getWidth();
+            case DOWN -> spaceship.getY() == screen.getHeight();
+            case LEFT -> spaceship.getX() == 1;
+        };
     }
 
     private boolean checkContaining(List<Coordinates> container) {
-        boolean contains = false;
-        switch (spaceShip.getDirection()) {
-            case UP:
-                contains =  container
-                        .contains(new Coordinates(spaceShip.getX(), spaceShip.getY() - 1));
-                break;
-            case RIGHT:
-                contains =  container
-                        .contains(new Coordinates(spaceShip.getX() + 1, spaceShip.getY()));
-                break;
-            case DOWN:
-                contains =  container
-                        .contains(new Coordinates(spaceShip.getX(), spaceShip.getY() + 1));
-                break;
-            case LEFT:
-                contains =  container
-                        .contains(new Coordinates(spaceShip.getX() - 1, spaceShip.getY()));
-                break;
-        }
-        return contains;
+        var coordinates = switch (spaceship.getDirection()) {
+            case UP -> new Coordinates(spaceship.getX(), spaceship.getY() - 1);
+            case RIGHT -> new Coordinates(spaceship.getX() + 1, spaceship.getY());
+            case DOWN -> new Coordinates(spaceship.getX(), spaceship.getY() + 1);
+            case LEFT -> new Coordinates(spaceship.getX() - 1, spaceship.getY());
+        };
+
+        return container.contains(coordinates);
     }
 }

@@ -7,11 +7,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doAnswer
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import ru.kiseru.logics.Game
@@ -117,7 +113,7 @@ class SpaceshipTest {
         spaceship.crash(Type.ASTEROID)
 
         // then
-        verify(owner).substractScore()
+        verify(owner).subtractScore()
     }
 
     @Test
@@ -168,7 +164,7 @@ class SpaceshipTest {
 
         // then
         assertEquals(Coordinates(5, 5), spaceship.coordinates)
-        verify(owner).substractScore()
+        verify(owner).subtractScore()
     }
 
     @Test

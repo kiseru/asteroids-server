@@ -1,21 +1,16 @@
 package ru.kiseru.logics.handlers;
 
+import java.util.List;
 import ru.kiseru.logics.Game;
 import ru.kiseru.logics.auxiliary.Type;
 import ru.kiseru.logics.models.Crashable;
 import ru.kiseru.logics.models.Point;
 import ru.kiseru.logics.models.Spaceship;
 
-import java.util.List;
-
-/**
- * @author Bulat Giniyatullin
- * 08 Декабрь 2017
- */
-
 public class SpaceshipCrashHandler {
-    private Spaceship spaceShip;
-    private Game game;
+
+    private final Spaceship spaceShip;
+    private final Game game;
 
     public SpaceshipCrashHandler(Game game, Spaceship spaceShip) {
         this.spaceShip = spaceShip;

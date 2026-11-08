@@ -1,13 +1,9 @@
 package ru.kiseru.logics.auxiliary;
 
-/**
- * @author Bulat Giniyatullin
- * 09 Декабрь 2017
- */
-
 public class Coordinates {
-    private int x;
-    private int y;
+
+    private final int x;
+    private final int y;
 
     public Coordinates(int x, int y) {
         this.x = x;

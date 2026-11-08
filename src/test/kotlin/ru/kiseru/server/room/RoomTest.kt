@@ -89,7 +89,7 @@ class RoomTest {
         // given
         val room = Room()
         val user = mock<User>()
-        whenever(user.userName).thenReturn("alice")
+        whenever(user.username).thenReturn("alice")
 
         // when
         room.addUser(user)
@@ -103,9 +103,9 @@ class RoomTest {
         // given
         val room = Room()
         val firstUser = mock<User>()
-        whenever(firstUser.userName).thenReturn("alice")
+        whenever(firstUser.username).thenReturn("alice")
         val secondUser = mock<User>()
-        whenever(secondUser.userName).thenReturn("bob")
+        whenever(secondUser.username).thenReturn("bob")
         room.addUser(firstUser)
 
         // when
@@ -300,7 +300,7 @@ class RoomTest {
         room.join(5000)
 
         // then
-        verify(user).setSpaceShip(org.mockito.kotlin.any())
+        verify(user).setSpaceship(org.mockito.kotlin.any())
     }
 
     private fun setUsers(room: Room, users: ArrayList<User>) {
