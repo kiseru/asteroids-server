@@ -14,7 +14,7 @@ java {
 }
 
 application {
-    mainClass = "ru.kiseru.ApplicationRunner"
+    mainClass = "ru.kiseru.AppKt"
 }
 
 repositories {
