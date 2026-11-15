@@ -2,6 +2,7 @@ package ru.kiseru.server
 
 import java.net.ServerSocket
 import java.util.Scanner
+import java.util.concurrent.CopyOnWriteArrayList
 import ru.kiseru.server.room.Room
 
 class Server(private val port: Int) {
@@ -14,13 +15,13 @@ class Server(private val port: Int) {
         while (true) {
             when (sc.nextLine()) {
                 "rating" -> rooms.forEach { println(it.rating) }
-                "gamefield" -> rooms.forEach { println(it.game.screen.display()) }
+                "gamefield" -> rooms.forEach { println(it.game?.screen?.display() ?: "Game has not started yet") }
             }
         }
     }
 
     companion object {
-        private val rooms: MutableList<Room> = mutableListOf()
+        private val rooms: MutableList<Room> = CopyOnWriteArrayList()
         private var notFullRoom = Room()
 
         @Synchronized

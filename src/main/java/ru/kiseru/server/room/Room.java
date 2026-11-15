@@ -17,7 +17,7 @@ public final class Room {
 
     private volatile int usersCount = 0;
     private volatile Status status = Status.WAITING_CONNECTIONS;
-    private Game game;
+    private volatile Game game;
 
     public Room() {
         initUsers();
