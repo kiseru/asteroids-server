@@ -21,7 +21,7 @@ final public class ConnectionReceiver extends Thread {
         while (true) {
             try {
                 Socket newConnection = connectionReceiver.accept();
-                Room notFullRoom = Server.getNotFullRoom();
+                Room notFullRoom = Server.Companion.getNotFullRoom();
                 var reader = new BufferedReader(new InputStreamReader(newConnection.getInputStream()));
                 var writer = new PrintWriter(newConnection.getOutputStream(), true);
                 User user = new User(reader, writer, notFullRoom);

@@ -28,7 +28,7 @@ public final class Room extends Thread {
     }
 
     public synchronized void addUser(User user) {
-        if (usersCount >= MAX_USERS) Server.getNotFullRoom().addUser(user);
+        if (usersCount >= MAX_USERS) Server.Companion.getNotFullRoom().addUser(user);
 
         int emptyPlaceIndex = IntStream.iterate(0, index -> index + 1)
                 .limit(users.size())
