@@ -9,7 +9,7 @@ import ru.kiseru.logics.Screen;
 import ru.kiseru.server.Server;
 import ru.kiseru.server.User;
 
-public final class Room extends Thread {
+public final class Room {
 
     private final int MAX_USERS = 1;
 
@@ -88,7 +88,6 @@ public final class Room extends Thread {
         return roomStatus == RoomStatus.FINISHED;
     }
 
-    @Override
     public void run() {
         users.stream()
                 .filter(Objects::nonNull)

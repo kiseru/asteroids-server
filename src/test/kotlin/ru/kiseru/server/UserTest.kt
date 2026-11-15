@@ -10,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import ru.kiseru.logics.CourseChecker
@@ -221,7 +222,7 @@ class UserTest {
         runUserUntilFinished(user)
 
         // then
-        verify(room).start()
+        verify(room, timeout(5000)).run()
     }
 
     @Test

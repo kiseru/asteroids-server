@@ -50,7 +50,7 @@ public final class User {
                     room.addUser(this);
                     if (room.isFull()) {
                         Server.Companion.getNotFullRoom(); // Чтобы полная комната добавилась в список комнат
-                        room.start();
+                        new Thread(room::run).start();
                     }
                     Server.class.wait();
                 } catch (InterruptedException e) {

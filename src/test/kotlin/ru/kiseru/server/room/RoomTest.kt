@@ -263,14 +263,15 @@ class RoomTest {
         whenever(user.getIsAlive()).thenReturn(true)
         whenever(user.toString()).thenReturn("alice 100")
         room.addUser(user)
-        room.start()
-        waitUntilWaiting(room)
+        val thread = Thread(room::run)
+        thread.start()
+        waitUntilWaiting(thread)
 
         // when
         synchronized(room) {
             (room as Object).notify()
         }
-        room.join(5000)
+        thread.join(5000)
 
         // then
         assertTrue(room.isGameFinished)
@@ -290,14 +291,15 @@ class RoomTest {
         whenever(user.getIsAlive()).thenReturn(true)
         whenever(user.toString()).thenReturn("alice 100")
         room.addUser(user)
-        room.start()
-        waitUntilWaiting(room)
+        val thread = Thread(room::run)
+        thread.start()
+        waitUntilWaiting(thread)
 
         // when
         synchronized(room) {
             (room as Object).notify()
         }
-        room.join(5000)
+        thread.join(5000)
 
         // then
         verify(user).setSpaceship(org.mockito.kotlin.any())
@@ -309,9 +311,9 @@ class RoomTest {
         field.set(room, users)
     }
 
-    private fun waitUntilWaiting(room: Room) {
+    private fun waitUntilWaiting(thread: Thread) {
         val deadline = System.currentTimeMillis() + 5000
-        while (room.state != Thread.State.WAITING && System.currentTimeMillis() < deadline) {
+        while (thread.state != Thread.State.WAITING && System.currentTimeMillis() < deadline) {
             Thread.sleep(10)
         }
     }
