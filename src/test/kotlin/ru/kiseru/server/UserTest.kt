@@ -398,16 +398,7 @@ class UserTest {
     private fun runUserUntilFinished(user: User) {
         val thread = Thread { user.run() }
         thread.start()
-        waitUntilWaiting(thread)
-        thread.interrupt()
         thread.join(5000)
-    }
-
-    private fun waitUntilWaiting(thread: Thread) {
-        val deadline = System.currentTimeMillis() + 5000
-        while (thread.state != Thread.State.WAITING && System.currentTimeMillis() < deadline) {
-            Thread.sleep(10)
-        }
     }
 
     private fun setUsername(user: User, username: String) {

@@ -45,17 +45,17 @@ public final class User {
             writer.println("You need to keep a space garbage.");
             writer.println("Your ID is " + getId());
             writer.println("Good luck, Commander!");
-            synchronized (Server.class) {
-                try {
-                    room.addUser(this);
-                    if (room.isFull()) {
-                        Server.Companion.getNotFullRoom(); // Чтобы полная комната добавилась в список комнат
-                        new Thread(room::run).start();
-                    }
-                    Server.class.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            synchronized (room) {
+                room.addUser(this);
+                if (room.isFull()) {
+                    Server.Companion.getNotFullRoom(); // Чтобы полная комната добавилась в список комнат
+                    new Thread(room::run).start();
                 }
+            }
+            try {
+                room.awaitStart();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
             spaceship.setDirection(Direction.UP);
             while (!room.isGameFinished() && isAlive) {

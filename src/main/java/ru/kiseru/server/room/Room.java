@@ -15,7 +15,7 @@ public final class Room {
 
     private final ArrayList<User> users;
     private int usersCount;
-    private RoomStatus roomStatus;
+    private volatile RoomStatus roomStatus;
     private Game game;
 
     public Room() {
@@ -84,6 +84,12 @@ public final class Room {
         return roomStatus == RoomStatus.GAMING;
     }
 
+    public synchronized void awaitStart() throws InterruptedException {
+        while (!isGameStarted() && !isGameFinished()) {
+            wait();
+        }
+    }
+
     public boolean isGameFinished() {
         return roomStatus == RoomStatus.FINISHED;
     }
@@ -95,25 +101,21 @@ public final class Room {
     }
 
     public void run() {
-        users.stream()
-                .filter(Objects::nonNull)
-                .forEach(user -> user.sendMessage("start"));
-
-        roomStatus = RoomStatus.GAMING;
-
-        synchronized (Server.class) {
+        synchronized (this) {
+            roomStatus = RoomStatus.GAMING;
             game = new Game(new Screen(30, 30), 150, 50);
             users.stream()
                     .filter(Objects::nonNull)
                     .forEach(game::registerSpaceShipForUser);
-            Server.class.notifyAll();
-        }
+            users.stream()
+                    .filter(Objects::nonNull)
+                    .forEach(user -> user.sendMessage("start"));
+            notifyAll();
 
-        synchronized (this) {
             try {
                 game.refresh();
                 while (aliveCount() > 0) {
-                    this.wait();
+                    wait();
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
