@@ -3,6 +3,7 @@ package ru.kiseru.server;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.concurrent.atomic.AtomicInteger;
 import ru.kiseru.logics.auxiliary.Direction;
 import ru.kiseru.logics.models.Spaceship;
 import ru.kiseru.server.room.Room;
@@ -15,9 +16,9 @@ public final class User {
     private volatile Room room;
 
     private String username;
-    private int score = 100;
+    private final AtomicInteger score = new AtomicInteger(100);
     private int steps = 0;
-    private boolean isAlive = true;
+    private volatile boolean isAlive = true;
     private Spaceship spaceship;
 
     public User(
@@ -33,7 +34,7 @@ public final class User {
     }
 
     public int getScore() {
-        return score;
+        return score.get();
     }
 
     public void run() {
@@ -62,7 +63,7 @@ public final class User {
                     case "go" -> {
                         spaceship.go();
                         room.getGame().refresh();
-                        sendMessage(Integer.toString(score));
+                        sendMessage(Integer.toString(score.get()));
                     }
                     case "left" -> {
                         spaceship.setDirection(Direction.LEFT);
@@ -93,7 +94,7 @@ public final class User {
                 if (steps >= 1500) {
                     died();
                 }
-                if (score < 0) {
+                if (score.get() < 0) {
                     died();
                 }
             }
@@ -107,7 +108,7 @@ public final class User {
 
     @Override
     public String toString() {
-        return String.format("%s %d", username, score);
+        return String.format("%s %d", username, score.get());
     }
 
     public String getUsername() {
@@ -123,13 +124,14 @@ public final class User {
     }
 
     public void addScore() {
-        if (room.isGameStarted()) score += 10;
+        if (room.isGameStarted()) {
+            score.addAndGet(10);
+        }
     }
 
     public void subtractScore() {
-        if (room.isGameStarted()) {
-            score -= 50;
-            if (score < 0) isAlive = false;
+        if (room.isGameStarted() && score.addAndGet(-50) < 0) {
+            isAlive = false;
         }
     }
 
@@ -140,7 +142,7 @@ public final class User {
     public void died() {
         isAlive = false;
         this.sendMessage("died");
-        String scoreMessage = String.format("You have collected %d score", this.score);
+        String scoreMessage = String.format("You have collected %d score", this.score.get());
         this.sendMessage(scoreMessage);
     }
 
