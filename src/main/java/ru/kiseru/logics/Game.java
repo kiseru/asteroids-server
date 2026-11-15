@@ -62,7 +62,7 @@ public class Game {
     /**
      * Запускает и поддерживает жизненный цикл игры
      */
-    public void refresh() {
+    public synchronized void refresh() {
         screen.update();
         crashHandlers.forEach(SpaceshipCrashHandler::check);
         gameObjects.forEach(o -> o.render(screen));

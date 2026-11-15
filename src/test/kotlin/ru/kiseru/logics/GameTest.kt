@@ -1,5 +1,8 @@
 package ru.kiseru.logics
 
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -171,6 +174,36 @@ class GameTest {
             .filter { it.type != Type.SPACESHIP }
             .map { it.coordinates }
         assertFalse(otherCoordinates.contains(spaceshipCoordinates))
+    }
+
+    @Test
+    fun `given game - when refresh called concurrently - then refresh executions do not overlap`() {
+        // given
+        val activeRefreshes = AtomicInteger()
+        val overlapDetected = AtomicBoolean(false)
+        val screen = object : Screen(10, 10) {
+            override fun update() {
+                if (activeRefreshes.incrementAndGet() > 1) overlapDetected.set(true)
+                Thread.sleep(50)
+                activeRefreshes.decrementAndGet()
+            }
+        }
+        val game = Game(screen, 0, 0)
+        val start = CountDownLatch(1)
+        val threads = (1..4).map {
+            Thread {
+                start.await()
+                game.refresh()
+            }
+        }
+        threads.forEach(Thread::start)
+
+        // when
+        start.countDown()
+        threads.forEach { it.join(5000) }
+
+        // then
+        assertFalse(overlapDetected.get())
     }
 
     @Test

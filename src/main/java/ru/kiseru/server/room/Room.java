@@ -115,16 +115,21 @@ public final class Room {
                     .filter(Objects::nonNull)
                     .forEach(user -> user.sendMessage("start"));
             notifyAll();
+        }
 
-            try {
-                game.refresh();
+        try {
+            game.refresh();
+            synchronized (this) {
                 while (aliveCount() > 0) {
                     wait();
                 }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                e.printStackTrace();
             }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            e.printStackTrace();
+        }
+
+        synchronized (this) {
             status = Status.FINISHED;
         }
 

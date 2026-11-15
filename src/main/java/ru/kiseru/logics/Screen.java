@@ -21,7 +21,7 @@ public class Screen {
      * @param coordinates - по какой координате
      * @param symbol - символ, которым отображается точка
      */
-    public void draw(Coordinates coordinates, String symbol) {
+    public synchronized void draw(Coordinates coordinates, String symbol) {
         if (mainMatrix[coordinates.getY()][coordinates.getX()].equals("."))
             mainMatrix[coordinates.getY()][coordinates.getX()] = symbol;
         else
@@ -32,14 +32,14 @@ public class Screen {
     /**
      * Обновляет экран
      */
-    public void update() {
+    public synchronized void update() {
         generateClearScreen();
     }
 
     /**
      * Отображает экран
      */
-    public String display() {
+    public synchronized String display() {
         StringBuilder result = new StringBuilder();
         for (int i = 1; i < height + 1; i++) {
             for (int j = 1; j < width + 1; j++) {
