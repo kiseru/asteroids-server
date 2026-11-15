@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.util.concurrent.atomic.AtomicLong;
 import ru.kiseru.server.room.Room;
 
-final public class ConnectionReceiver extends Thread {
+public final class ConnectionReceiver {
 
     private static final AtomicLong ID_GENERATOR = new AtomicLong();
 
@@ -19,8 +19,7 @@ final public class ConnectionReceiver extends Thread {
         this.connectionReceiver = connectionReceiver;
     }
 
-    @Override
-    public void run() {
+    public void handle() {
         while (true) {
             try {
                 Socket newConnection = connectionReceiver.accept();

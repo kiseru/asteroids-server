@@ -9,7 +9,7 @@ class Server(private val port: Int) {
     fun up() {
         val server = ServerSocket(port)
         val connectionReceiver = ConnectionReceiver(server)
-        connectionReceiver.start()
+        Thread(connectionReceiver::handle).start()
         val sc = Scanner(System.`in`)
         while (true) {
             when (sc.nextLine()) {
