@@ -88,6 +88,12 @@ public final class Room {
         return roomStatus == RoomStatus.FINISHED;
     }
 
+    public synchronized void notifyIfNoAliveUsers() {
+        if (aliveCount() == 0) {
+            notifyAll();
+        }
+    }
+
     public void run() {
         users.stream()
                 .filter(Objects::nonNull)
@@ -106,8 +112,11 @@ public final class Room {
         synchronized (this) {
             try {
                 game.refresh();
-                this.wait();
+                while (aliveCount() > 0) {
+                    this.wait();
+                }
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 e.printStackTrace();
             }
             roomStatus = RoomStatus.FINISHED;

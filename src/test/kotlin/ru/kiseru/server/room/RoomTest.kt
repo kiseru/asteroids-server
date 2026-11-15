@@ -268,9 +268,8 @@ class RoomTest {
         waitUntilWaiting(thread)
 
         // when
-        synchronized(room) {
-            (room as Object).notify()
-        }
+        whenever(user.getIsAlive()).thenReturn(false)
+        room.notifyIfNoAliveUsers()
         thread.join(5000)
 
         // then
@@ -296,13 +295,52 @@ class RoomTest {
         waitUntilWaiting(thread)
 
         // when
-        synchronized(room) {
-            (room as Object).notify()
-        }
+        whenever(user.getIsAlive()).thenReturn(false)
+        room.notifyIfNoAliveUsers()
         thread.join(5000)
 
         // then
         verify(user).setSpaceship(org.mockito.kotlin.any())
+    }
+
+    @Test
+    fun `given room with user who left before game start - when room starts - then room finishes without waiting`() {
+        // given
+        val room = Room()
+        val user = mock<User>()
+        whenever(user.getIsAlive()).thenReturn(false)
+        whenever(user.toString()).thenReturn("alice 100")
+        room.addUser(user)
+
+        // when
+        val thread = Thread(room::run)
+        thread.start()
+        thread.join(5000)
+
+        // then
+        assertFalse(thread.isAlive)
+        assertTrue(room.isGameFinished)
+    }
+
+    @Test
+    fun `given room with alive user - when room starts - then room waits for the user to die`() {
+        // given
+        val room = Room()
+        val user = mock<User>()
+        whenever(user.getIsAlive()).thenReturn(true)
+        whenever(user.toString()).thenReturn("alice 100")
+        room.addUser(user)
+
+        // when
+        val thread = Thread(room::run)
+        thread.start()
+        waitUntilWaiting(thread)
+
+        // then
+        assertTrue(thread.isAlive)
+        assertFalse(room.isGameFinished)
+        thread.interrupt()
+        thread.join(5000)
     }
 
     private fun setUsers(room: Room, users: ArrayList<User>) {

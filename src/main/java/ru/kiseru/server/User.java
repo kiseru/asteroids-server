@@ -103,11 +103,7 @@ public final class User {
             System.out.println("Connection problems with user " + username);
         } finally {
             isAlive = false;
-            if (room.aliveCount() == 0) {
-                synchronized (room) {
-                    room.notify();
-                }
-            }
+            room.notifyIfNoAliveUsers();
         }
     }
 

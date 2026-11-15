@@ -226,6 +226,25 @@ class UserTest {
     }
 
     @Test
+    fun `given user - when run finishes - then room notified that no alive users left`() {
+        // given
+        val reader = mock<BufferedReader>()
+        val room = mock<Room>()
+        val spaceship = mock<Spaceship>()
+        whenever(room.isFull).thenReturn(false)
+        whenever(room.isGameFinished).thenReturn(false, true)
+        whenever(reader.readLine()).thenReturn("alice", "unknown")
+        val user = User(0, reader, mock(), room)
+        user.setSpaceship(spaceship)
+
+        // when
+        runUserUntilFinished(user)
+
+        // then
+        verify(room).notifyIfNoAliveUsers()
+    }
+
+    @Test
     fun `given user in game - when go command received - then spaceship moves and score sent`() {
         // given
         val reader = mock<BufferedReader>()
