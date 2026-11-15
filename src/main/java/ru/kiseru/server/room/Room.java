@@ -15,7 +15,7 @@ public final class Room {
 
     private final ArrayList<User> users = new ArrayList<>();
 
-    private int usersCount = 0;
+    private volatile int usersCount = 0;
     private volatile Status status = Status.WAITING_CONNECTIONS;
     private Game game;
 
@@ -29,8 +29,8 @@ public final class Room {
         }
     }
 
-    public synchronized void addUser(User user) {
-        if (usersCount >= MAX_USERS) Server.Companion.getNotFullRoom().addUser(user);
+    public synchronized Room addUser(User user) {
+        if (isFull()) return Server.Companion.getNotFullRoom().addUser(user);
 
         int emptyPlaceIndex = IntStream.iterate(0, index -> index + 1)
                 .limit(users.size())
@@ -38,7 +38,7 @@ public final class Room {
                 .findFirst()
                 .orElse(-1);
 
-        if (emptyPlaceIndex == -1) return;
+        if (emptyPlaceIndex == -1) return this;
 
         users.stream()
                 .filter(Objects::nonNull)
@@ -46,6 +46,8 @@ public final class Room {
 
         users.set(emptyPlaceIndex, user);
         usersCount++;
+
+        return this;
     }
 
     public synchronized void removeUser(User user) {

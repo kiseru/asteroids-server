@@ -23,6 +23,7 @@ class Server(private val port: Int) {
         private val rooms: MutableList<Room> = mutableListOf()
         private var notFullRoom = Room()
 
+        @Synchronized
         fun getNotFullRoom(): Room {
             if (!notFullRoom.isFull) return notFullRoom
 

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.timeout
@@ -189,7 +190,7 @@ class UserTest {
         whenever(room.isFull).thenReturn(false)
         whenever(room.isGameFinished).thenReturn(false, true)
         whenever(reader.readLine()).thenReturn("alice", "unknown")
-        val user = User(0, reader, writer, room)
+        val user = createUser(reader, writer, room)
         user.setSpaceship(spaceship)
 
         // when
@@ -206,6 +207,27 @@ class UserTest {
     }
 
     @Test
+    fun `given room that delegates user to another room - when run - then user room updated`() {
+        // given
+        val reader = mock<BufferedReader>()
+        val initialRoom = mock<Room>()
+        val actualRoom = mock<Room>()
+        val spaceship = mock<Spaceship>()
+        whenever(initialRoom.addUser(any())).thenReturn(actualRoom)
+        whenever(actualRoom.isFull).thenReturn(false)
+        whenever(actualRoom.isGameFinished).thenReturn(false, true)
+        whenever(reader.readLine()).thenReturn("alice", "unknown")
+        val user = User(0, reader, mock(), initialRoom)
+        user.setSpaceship(spaceship)
+
+        // when
+        runUserUntilFinished(user)
+
+        // then
+        assertSame(actualRoom, user.room)
+    }
+
+    @Test
     fun `given user and full room - when run - then room started`() {
         // given
         val reader = mock<BufferedReader>()
@@ -215,7 +237,7 @@ class UserTest {
         whenever(room.isFull).thenReturn(true)
         whenever(room.isGameFinished).thenReturn(false, true)
         whenever(reader.readLine()).thenReturn("alice", "unknown")
-        val user = User(0, reader, writer, room)
+        val user = createUser(reader, writer, room)
         user.setSpaceship(spaceship)
 
         // when
@@ -234,7 +256,7 @@ class UserTest {
         whenever(room.isFull).thenReturn(false)
         whenever(room.isGameFinished).thenReturn(false, true)
         whenever(reader.readLine()).thenReturn("alice", "unknown")
-        val user = User(0, reader, mock(), room)
+        val user = createUser(reader, mock(), room)
         user.setSpaceship(spaceship)
 
         // when
@@ -256,7 +278,7 @@ class UserTest {
         whenever(room.isGameFinished).thenReturn(false, true)
         whenever(room.getGame()).thenReturn(game)
         whenever(reader.readLine()).thenReturn("alice", "go")
-        val user = User(0, reader, writer, room)
+        val user = createUser(reader, writer, room)
         user.setSpaceship(spaceship)
 
         // when
@@ -284,7 +306,7 @@ class UserTest {
         whenever(room.isGameFinished).thenReturn(false, true)
         whenever(room.getGame()).thenReturn(game)
         whenever(reader.readLine()).thenReturn("alice", command)
-        val user = User(0, reader, writer, room)
+        val user = createUser(reader, writer, room)
         user.setSpaceship(spaceship)
 
         // when
@@ -309,7 +331,7 @@ class UserTest {
         whenever(spaceship.courseChecker).thenReturn(courseChecker)
         whenever(courseChecker.isAsteroid()).thenReturn(true)
         whenever(reader.readLine()).thenReturn("alice", "isAsteroid")
-        val user = User(0, reader, writer, room)
+        val user = createUser(reader, writer, room)
         user.setSpaceship(spaceship)
 
         // when
@@ -332,7 +354,7 @@ class UserTest {
         whenever(spaceship.courseChecker).thenReturn(courseChecker)
         whenever(courseChecker.isGarbage()).thenReturn(false)
         whenever(reader.readLine()).thenReturn("alice", "isGarbage")
-        val user = User(0, reader, writer, room)
+        val user = createUser(reader, writer, room)
         user.setSpaceship(spaceship)
 
         // when
@@ -355,7 +377,7 @@ class UserTest {
         whenever(spaceship.courseChecker).thenReturn(courseChecker)
         whenever(courseChecker.isWall()).thenReturn(true)
         whenever(reader.readLine()).thenReturn("alice", "isWall")
-        val user = User(0, reader, writer, room)
+        val user = createUser(reader, writer, room)
         user.setSpaceship(spaceship)
 
         // when
@@ -377,7 +399,7 @@ class UserTest {
         whenever(room.isGameFinished).thenReturn(false)
         whenever(room.getGame()).thenReturn(game)
         whenever(reader.readLine()).thenAnswer { "go" }
-        val user = User(0, reader, writer, room)
+        val user = createUser(reader, writer, room)
         user.setSpaceship(spaceship)
 
         // when
@@ -393,7 +415,10 @@ class UserTest {
         reader: BufferedReader = mock(),
         writer: PrintWriter = mock(),
         room: Room = mock(),
-    ): User = User(0, reader, writer, room)
+    ): User {
+        whenever(room.addUser(any())).thenReturn(room)
+        return User(0, reader, writer, room)
+    }
 
     private fun runUserUntilFinished(user: User) {
         val thread = Thread { user.run() }

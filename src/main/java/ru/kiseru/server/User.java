@@ -12,7 +12,7 @@ public final class User {
     private final long id;
     private final BufferedReader reader;
     private final PrintWriter writer;
-    private final Room room;
+    private volatile Room room;
 
     private String username;
     private int score = 100;
@@ -45,12 +45,10 @@ public final class User {
             writer.println("You need to keep a space garbage.");
             writer.println("Your ID is " + getId());
             writer.println("Good luck, Commander!");
-            synchronized (room) {
-                room.addUser(this);
-                if (room.isFull()) {
-                    Server.Companion.getNotFullRoom(); // Чтобы полная комната добавилась в список комнат
-                    new Thread(room::run).start();
-                }
+            room = room.addUser(this);
+            if (room.isFull()) {
+                Server.Companion.getNotFullRoom();
+                new Thread(room::run).start();
             }
             try {
                 room.awaitStart();

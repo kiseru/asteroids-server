@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.anyString
@@ -14,7 +15,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import ru.kiseru.server.Server
 import ru.kiseru.server.User
 
 class RoomTest {
@@ -85,6 +85,19 @@ class RoomTest {
     }
 
     @Test
+    fun `given not full room - when user added - then same room returned`() {
+        // given
+        val room = Room()
+        val user = mock<User>()
+
+        // when
+        val actual = room.addUser(user)
+
+        // then
+        assertSame(room, actual)
+    }
+
+    @Test
     fun `given room and user - when user added to empty room - then no join messages sent`() {
         // given
         val room = Room()
@@ -106,15 +119,17 @@ class RoomTest {
         whenever(firstUser.username).thenReturn("alice")
         val secondUser = mock<User>()
         whenever(secondUser.username).thenReturn("bob")
+        whenever(secondUser.score).thenReturn(100)
+        whenever(secondUser.toString()).thenReturn("bob 100")
         room.addUser(firstUser)
 
         // when
-        room.addUser(secondUser)
+        val actual = room.addUser(secondUser)
 
         // then
         verify(secondUser, never()).sendMessage(anyString())
-        val notFullRoomBefore = Server.getNotFullRoom()
-        assertNotEquals(room, notFullRoomBefore)
+        assertNotEquals(room, actual)
+        assertTrue(actual.rating.contains("bob 100\n"))
     }
 
     @Test
