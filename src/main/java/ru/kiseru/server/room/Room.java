@@ -13,18 +13,20 @@ public final class Room {
 
     private final int MAX_USERS = 1;
 
-    private final ArrayList<User> users;
-    private int usersCount;
-    private volatile RoomStatus roomStatus;
+    private final ArrayList<User> users = new ArrayList<>();
+
+    private int usersCount = 0;
+    private volatile Status status = Status.WAITING_CONNECTIONS;
     private Game game;
 
     public Room() {
-        users = new ArrayList<>();
-        IntStream.iterate(0, i -> i + 1)
-                .limit(MAX_USERS)
-                .forEach(i -> users.add(null));
-        usersCount = 0;
-        roomStatus = RoomStatus.WAITING_CONNECTIONS;
+        initUsers();
+    }
+
+    private void initUsers() {
+        for (int i = 0; i < MAX_USERS; i++) {
+            users.add(null);
+        }
     }
 
     public synchronized void addUser(User user) {
@@ -81,7 +83,7 @@ public final class Room {
     }
 
     public boolean isGameStarted() {
-        return roomStatus == RoomStatus.GAMING;
+        return status == Status.GAMING;
     }
 
     public synchronized void awaitStart() throws InterruptedException {
@@ -91,7 +93,7 @@ public final class Room {
     }
 
     public boolean isGameFinished() {
-        return roomStatus == RoomStatus.FINISHED;
+        return status == Status.FINISHED;
     }
 
     public synchronized void notifyIfNoAliveUsers() {
@@ -102,7 +104,7 @@ public final class Room {
 
     public void run() {
         synchronized (this) {
-            roomStatus = RoomStatus.GAMING;
+            status = Status.GAMING;
             game = new Game(new Screen(30, 30), 150, 50);
             users.stream()
                     .filter(Objects::nonNull)
@@ -121,7 +123,7 @@ public final class Room {
                 Thread.currentThread().interrupt();
                 e.printStackTrace();
             }
-            roomStatus = RoomStatus.FINISHED;
+            status = Status.FINISHED;
         }
 
         users.stream()
@@ -137,5 +139,11 @@ public final class Room {
 
     public Game getGame() {
         return game;
+    }
+
+    private enum Status {
+        WAITING_CONNECTIONS,
+        GAMING,
+        FINISHED
     }
 }
