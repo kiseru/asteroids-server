@@ -7,8 +7,9 @@ import ru.kiseru.logics.auxiliary.Direction;
 import ru.kiseru.logics.models.Spaceship;
 import ru.kiseru.server.room.Room;
 
-final public class User extends Thread {
+public final class User {
 
+    private final long id;
     private final BufferedReader reader;
     private final PrintWriter writer;
     private final Room room;
@@ -20,10 +21,12 @@ final public class User extends Thread {
     private Spaceship spaceship;
 
     public User(
+        long id,
         BufferedReader reader,
         PrintWriter writer,
         Room room
     ) {
+        this.id = id;
         this.reader = reader;
         this.writer = writer;
         this.room = room;
@@ -33,7 +36,6 @@ final public class User extends Thread {
         return score;
     }
 
-    @Override
     public void run() {
         try {
             writer.println("Welcome To Asteroids Server");
@@ -116,6 +118,10 @@ final public class User extends Thread {
 
     public String getUsername() {
         return username;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public void sendMessage(String message) {

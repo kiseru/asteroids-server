@@ -188,7 +188,7 @@ class UserTest {
         whenever(room.isFull).thenReturn(false)
         whenever(room.isGameFinished).thenReturn(false, true)
         whenever(reader.readLine()).thenReturn("alice", "unknown")
-        val user = User(reader, writer, room)
+        val user = User(0, reader, writer, room)
         user.setSpaceship(spaceship)
 
         // when
@@ -214,7 +214,7 @@ class UserTest {
         whenever(room.isFull).thenReturn(true)
         whenever(room.isGameFinished).thenReturn(false, true)
         whenever(reader.readLine()).thenReturn("alice", "unknown")
-        val user = User(reader, writer, room)
+        val user = User(0, reader, writer, room)
         user.setSpaceship(spaceship)
 
         // when
@@ -236,7 +236,7 @@ class UserTest {
         whenever(room.isGameFinished).thenReturn(false, true)
         whenever(room.getGame()).thenReturn(game)
         whenever(reader.readLine()).thenReturn("alice", "go")
-        val user = User(reader, writer, room)
+        val user = User(0, reader, writer, room)
         user.setSpaceship(spaceship)
 
         // when
@@ -264,7 +264,7 @@ class UserTest {
         whenever(room.isGameFinished).thenReturn(false, true)
         whenever(room.getGame()).thenReturn(game)
         whenever(reader.readLine()).thenReturn("alice", command)
-        val user = User(reader, writer, room)
+        val user = User(0, reader, writer, room)
         user.setSpaceship(spaceship)
 
         // when
@@ -289,7 +289,7 @@ class UserTest {
         whenever(spaceship.courseChecker).thenReturn(courseChecker)
         whenever(courseChecker.isAsteroid()).thenReturn(true)
         whenever(reader.readLine()).thenReturn("alice", "isAsteroid")
-        val user = User(reader, writer, room)
+        val user = User(0, reader, writer, room)
         user.setSpaceship(spaceship)
 
         // when
@@ -312,7 +312,7 @@ class UserTest {
         whenever(spaceship.courseChecker).thenReturn(courseChecker)
         whenever(courseChecker.isGarbage()).thenReturn(false)
         whenever(reader.readLine()).thenReturn("alice", "isGarbage")
-        val user = User(reader, writer, room)
+        val user = User(0, reader, writer, room)
         user.setSpaceship(spaceship)
 
         // when
@@ -335,7 +335,7 @@ class UserTest {
         whenever(spaceship.courseChecker).thenReturn(courseChecker)
         whenever(courseChecker.isWall()).thenReturn(true)
         whenever(reader.readLine()).thenReturn("alice", "isWall")
-        val user = User(reader, writer, room)
+        val user = User(0, reader, writer, room)
         user.setSpaceship(spaceship)
 
         // when
@@ -357,7 +357,7 @@ class UserTest {
         whenever(room.isGameFinished).thenReturn(false)
         whenever(room.getGame()).thenReturn(game)
         whenever(reader.readLine()).thenAnswer { "go" }
-        val user = User(reader, writer, room)
+        val user = User(0, reader, writer, room)
         user.setSpaceship(spaceship)
 
         // when
@@ -373,18 +373,19 @@ class UserTest {
         reader: BufferedReader = mock(),
         writer: PrintWriter = mock(),
         room: Room = mock(),
-    ): User = User(reader, writer, room)
+    ): User = User(0, reader, writer, room)
 
     private fun runUserUntilFinished(user: User) {
-        user.start()
-        waitUntilWaiting(user)
-        user.interrupt()
-        user.join(5000)
+        val thread = Thread { user.run() }
+        thread.start()
+        waitUntilWaiting(thread)
+        thread.interrupt()
+        thread.join(5000)
     }
 
-    private fun waitUntilWaiting(user: User) {
+    private fun waitUntilWaiting(thread: Thread) {
         val deadline = System.currentTimeMillis() + 5000
-        while (user.state != Thread.State.WAITING && System.currentTimeMillis() < deadline) {
+        while (thread.state != Thread.State.WAITING && System.currentTimeMillis() < deadline) {
             Thread.sleep(10)
         }
     }

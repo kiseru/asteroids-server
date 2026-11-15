@@ -65,7 +65,7 @@ public class Spaceship extends Point implements Model{
                 rollbackLastStep();
                 owner.subtractScore();
             }
-            if (!owner.isAlive()) {
+            if (!owner.getIsAlive()) {
                 this.destroy();
             }
         }
@@ -116,6 +116,6 @@ public class Spaceship extends Point implements Model{
     }
 
     public boolean isOwnerAlive() {
-        return owner.isAlive();
+        return owner.getIsAlive();
     }
 }

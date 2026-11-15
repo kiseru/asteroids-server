@@ -174,7 +174,7 @@ class SpaceshipTest {
         whenever(game.incrementCollectedGarbageCount()).thenReturn(1)
         whenever(game.garbageNumber).thenReturn(10)
         val owner = mockUser(mockRoom(game))
-        whenever(owner.isAlive()).thenReturn(false)
+        whenever(owner.getIsAlive()).thenReturn(false)
         val spaceship = Spaceship(Coordinates(5, 5), owner)
         assertTrue(spaceship.isVisible)
 
@@ -227,7 +227,7 @@ class SpaceshipTest {
     fun `given spaceship with dead owner - when isOwnerAlive called - then false returned`() {
         // given
         val owner = mockUser(mockRoom(mock<Game>()))
-        whenever(owner.isAlive()).thenReturn(false)
+        whenever(owner.getIsAlive()).thenReturn(false)
         val spaceship = Spaceship(Coordinates(5, 5), owner)
 
         // when & then
@@ -237,7 +237,7 @@ class SpaceshipTest {
     private fun mockUser(room: Room): User {
         val user = mock<User>()
         whenever(user.room).thenReturn(room)
-        whenever(user.isAlive()).thenReturn(true)
+        whenever(user.getIsAlive()).thenReturn(true)
         whenever(user.id).thenReturn(1L)
         return user
     }

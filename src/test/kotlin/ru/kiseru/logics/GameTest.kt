@@ -227,7 +227,7 @@ class GameTest {
         // given
         val game = Game(Screen(10, 10), 1, 1)
         val user = mock<User>()
-        whenever(user.isAlive()).thenReturn(true)
+        whenever(user.getIsAlive()).thenReturn(true)
         game.registerSpaceShipForUser(user)
 
         // when
@@ -242,7 +242,7 @@ class GameTest {
         // given
         val game = Game(Screen(10, 10), 1, 1)
         val user = mock<User>()
-        whenever(user.isAlive()).thenReturn(false)
+        whenever(user.getIsAlive()).thenReturn(false)
         game.registerSpaceShipForUser(user)
 
         // when
@@ -257,9 +257,9 @@ class GameTest {
         // given
         val game = Game(Screen(10, 10), 1, 1)
         val deadUser = mock<User>()
-        whenever(deadUser.isAlive()).thenReturn(false)
+        whenever(deadUser.getIsAlive()).thenReturn(false)
         val aliveUser = mock<User>()
-        whenever(aliveUser.isAlive()).thenReturn(true)
+        whenever(aliveUser.getIsAlive()).thenReturn(true)
         game.registerSpaceShipForUser(deadUser)
         game.registerSpaceShipForUser(aliveUser)
 
