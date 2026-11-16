@@ -23,7 +23,7 @@ public abstract class Point {
         return position.y();
     }
 
-    public Position getCoordinates() {
+    public Position getPosition() {
         return position;
     }
 

@@ -22,7 +22,7 @@ public class CourseChecker {
     public boolean isAsteroid() {
         List<Position> asteroidsCoordinates = pointsOnMap.stream()
                 .filter(p -> p.getType() == Type.ASTEROID)
-                .map(Point::getCoordinates)
+                .map(Point::getPosition)
                 .collect(Collectors.toList());
         return checkContaining(asteroidsCoordinates);
     }
@@ -30,7 +30,7 @@ public class CourseChecker {
     public boolean isGarbage() {
         List<Position> garbageCoordinates = pointsOnMap.stream()
                 .filter(p -> p.getType() == Type.GARBAGE)
-                .map(Point::getCoordinates)
+                .map(Point::getPosition)
                 .collect(Collectors.toList());
         return checkContaining(garbageCoordinates);
     }

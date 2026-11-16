@@ -86,7 +86,7 @@ public class Game {
 
     private boolean isGameObjectsContainsCoordinates(Position position) {
         return pointsOnScreen.stream()
-                .anyMatch(p -> p.getCoordinates().equals(position));
+                .anyMatch(p -> p.getPosition().equals(position));
     }
 
     public List<Model> getGameObjects() {

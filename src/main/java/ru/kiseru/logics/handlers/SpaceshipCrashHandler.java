@@ -24,7 +24,7 @@ public class SpaceshipCrashHandler {
         for (Point point: points) {
             if (point.getType() != Type.SPACESHIP &&
                     point.isVisible() &&
-                    point.getCoordinates().equals(spaceShip.getCoordinates())) {
+                    point.getPosition().equals(spaceShip.getPosition())) {
                 isCollision = true;
                 collisionPoint = point;
                 break;

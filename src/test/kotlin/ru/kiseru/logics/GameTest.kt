@@ -56,7 +56,7 @@ class GameTest {
         val game = Game(screen, 4, 3)
 
         // then
-        val coordinates = game.pointsOnScreen.map { it.coordinates }
+        val coordinates = game.pointsOnScreen.map { it.position }
         assertEquals(coordinates.size, coordinates.distinct().size)
         assertTrue(coordinates.all { it.x() in 1..screen.width && it.y() in 1..screen.height })
     }
@@ -169,10 +169,10 @@ class GameTest {
         // then
         val captor = argumentCaptor<Spaceship>()
         verify(user).setSpaceship(captor.capture())
-        val spaceshipCoordinates = captor.firstValue.coordinates
+        val spaceshipCoordinates = captor.firstValue.position
         val otherCoordinates = game.pointsOnScreen
             .filter { it.type != Type.SPACESHIP }
-            .map { it.coordinates }
+            .map { it.position }
         assertFalse(otherCoordinates.contains(spaceshipCoordinates))
     }
 

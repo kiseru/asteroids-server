@@ -128,7 +128,7 @@ class SpaceshipCrashHandlerTest {
 
     private fun mockSpaceship(position: Position): Spaceship {
         val spaceship = mock<Spaceship>()
-        whenever(spaceship.coordinates).thenReturn(position)
+        whenever(spaceship.position).thenReturn(position)
         whenever(spaceship.x).thenReturn(position.x())
         whenever(spaceship.y).thenReturn(position.y())
         return spaceship
@@ -137,7 +137,7 @@ class SpaceshipCrashHandlerTest {
     private fun mockPoint(type: Type, position: Position, isVisible: Boolean): Point {
         val point = mock<Point>()
         whenever(point.type).thenReturn(type)
-        whenever(point.coordinates).thenReturn(position)
+        whenever(point.position).thenReturn(position)
         whenever(point.isVisible()).thenReturn(isVisible)
         return point
     }

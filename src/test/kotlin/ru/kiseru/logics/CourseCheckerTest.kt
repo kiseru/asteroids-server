@@ -244,7 +244,7 @@ class CourseCheckerTest {
     private fun mockPoint(type: Type, position: Position): Point {
         val point = mock<Point>()
         whenever(point.type).thenReturn(type)
-        whenever(point.coordinates).thenReturn(position)
+        whenever(point.position).thenReturn(position)
         return point
     }
 
