@@ -50,28 +50,12 @@ public class Spaceship extends Point implements Model{
                 }
             } else if (type == Type.WALL) {
                 // возвращаемся назад, чтобы не находится на стене
-                rollbackLastStep();
+                position = position.aheadOf(direction.opposite());
                 owner.subtractScore();
             }
             if (!owner.getIsAlive()) {
                 this.destroy();
             }
-        }
-    }
-
-    private void rollbackLastStep() {
-        switch (direction) {
-            case UP:
-                position = new Position(this.getX(), this.getY() + 1);
-                break;
-            case RIGHT:
-                position = new Position(this.getX() - 1, this.getY());
-                break;
-            case DOWN:
-                position = new Position(this.getX(), this.getY() - 1);
-                break;
-            case LEFT:
-                position = new Position(this.getX() + 1, this.getY());
         }
     }
 
