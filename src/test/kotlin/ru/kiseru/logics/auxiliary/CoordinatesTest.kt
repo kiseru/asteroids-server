@@ -21,8 +21,8 @@ class CoordinatesTest {
         val coordinates = Coordinates(x, y)
 
         // when
-        val actualX = coordinates.x
-        val actualY = coordinates.y
+        val actualX = coordinates.x()
+        val actualY = coordinates.y()
 
         // then
         assertEquals(x, actualX)

@@ -129,8 +129,8 @@ class SpaceshipCrashHandlerTest {
     private fun mockSpaceship(coordinates: Coordinates): Spaceship {
         val spaceship = mock<Spaceship>()
         whenever(spaceship.coordinates).thenReturn(coordinates)
-        whenever(spaceship.x).thenReturn(coordinates.x)
-        whenever(spaceship.y).thenReturn(coordinates.y)
+        whenever(spaceship.x).thenReturn(coordinates.x())
+        whenever(spaceship.y).thenReturn(coordinates.y())
         return spaceship
     }
 

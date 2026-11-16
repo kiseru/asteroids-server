@@ -58,7 +58,7 @@ class GameTest {
         // then
         val coordinates = game.pointsOnScreen.map { it.coordinates }
         assertEquals(coordinates.size, coordinates.distinct().size)
-        assertTrue(coordinates.all { it.x in 1..screen.width && it.y in 1..screen.height })
+        assertTrue(coordinates.all { it.x() in 1..screen.width && it.y() in 1..screen.height })
     }
 
     @Test

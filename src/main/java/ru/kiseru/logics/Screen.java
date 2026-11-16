@@ -22,11 +22,12 @@ public class Screen {
      * @param symbol - символ, которым отображается точка
      */
     public synchronized void draw(Coordinates coordinates, String symbol) {
-        if (mainMatrix[coordinates.getY()][coordinates.getX()].equals("."))
-            mainMatrix[coordinates.getY()][coordinates.getX()] = symbol;
-        else
-            mainMatrix[coordinates.getY()][coordinates.getX()] =
-                    String.format("%s|%s", mainMatrix[coordinates.getY()][coordinates.getX()], symbol);
+        if (mainMatrix[coordinates.y()][coordinates.x()].equals(".")) {
+            mainMatrix[coordinates.y()][coordinates.x()] = symbol;
+        } else {
+            mainMatrix[coordinates.y()][coordinates.x()] =
+                String.format("%s|%s", mainMatrix[coordinates.y()][coordinates.x()], symbol);
+        }
     }
 
     /**
