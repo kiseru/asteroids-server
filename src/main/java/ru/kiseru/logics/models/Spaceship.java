@@ -29,19 +29,7 @@ public class Spaceship extends Point implements Model{
      * Делает шаг в текущем направлении
      */
     public void go() {
-        switch (direction) {
-            case UP:
-                position = new Position(this.getX(), this.getY() - 1);
-                break;
-            case RIGHT:
-                position = new Position(this.getX() + 1, this.getY());
-                break;
-            case DOWN:
-                position = new Position(this.getX(), this.getY() + 1);
-                break;
-            case LEFT:
-                position = new Position(this.getX() - 1, this.getY());
-        }
+        position = position.aheadOf(direction);
     }
 
     /**

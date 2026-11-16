@@ -93,4 +93,28 @@ class PositionTest {
         // then
         assertFalse(result)
     }
+
+    @ParameterizedTest
+    @CsvSource(
+        "UP, 5, 5, 5, 4",
+        "RIGHT, 5, 5, 6, 5",
+        "DOWN, 5, 5, 5, 6",
+        "LEFT, 5, 5, 4, 5",
+    )
+    fun `given position - when called aheadOf - then return new position ahead of current`(
+        direction: Direction,
+        initialX: Int,
+        initialY: Int,
+        expectedX: Int,
+        expectedY: Int,
+    ) {
+        // given
+        val position = Position(initialX, initialY)
+
+        // when
+        val actual = position.aheadOf(direction)
+
+        // then
+        assertEquals(Position(expectedX, expectedY), actual)
+    }
 }

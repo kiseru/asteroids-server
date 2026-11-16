@@ -13,4 +13,19 @@ public record Position(int x, int y) {
             throw new IllegalArgumentException("y must be greater or equal than %d".formatted(MIN_VALUE));
         }
     }
+
+    /**
+     * Возвращает следующую позицию по переданному направлению.
+     *
+     * @param direction направление движения
+     * @return следующая позиция
+     */
+    public Position aheadOf(Direction direction) {
+        return switch (direction) {
+            case UP -> new Position(x, y - 1);
+            case DOWN -> new Position(x, y + 1);
+            case LEFT -> new Position(x - 1, y);
+            case RIGHT -> new Position(x + 1, y);
+        };
+    }
 }
