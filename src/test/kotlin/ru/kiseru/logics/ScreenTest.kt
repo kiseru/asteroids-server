@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import ru.kiseru.logics.auxiliary.Coordinates
+import ru.kiseru.logics.auxiliary.Position
 
 class ScreenTest {
 
@@ -51,10 +51,10 @@ class ScreenTest {
     fun `given clear screen - when symbol drawn on empty cell - then cell contains symbol`() {
         // given
         val screen = Screen(3, 3)
-        val coordinates = Coordinates(2, 1)
+        val position = Position(2, 1)
 
         // when
-        screen.draw(coordinates, "A")
+        screen.draw(position, "A")
 
         // then
         val expected = """
@@ -69,11 +69,11 @@ class ScreenTest {
     fun `given screen with symbol on cell - when another symbol drawn on same cell - then symbols joined with separator`() {
         // given
         val screen = Screen(3, 3)
-        val coordinates = Coordinates(1, 2)
-        screen.draw(coordinates, "A")
+        val position = Position(1, 2)
+        screen.draw(position, "A")
 
         // when
-        screen.draw(coordinates, "B")
+        screen.draw(position, "B")
 
         // then
         val expected = """
@@ -88,8 +88,8 @@ class ScreenTest {
     fun `given clear screen - when symbols drawn on cells with same x and different y - then symbols rendered in different rows`() {
         // given
         val screen = Screen(3, 3)
-        val first = Coordinates(1, 1)
-        val second = Coordinates(1, 3)
+        val first = Position(1, 1)
+        val second = Position(1, 3)
 
         // when
         screen.draw(first, "A")
@@ -108,7 +108,7 @@ class ScreenTest {
     fun `given screen with drawn symbol - when updated - then screen cleared`() {
         // given
         val screen = Screen(3, 3)
-        screen.draw(Coordinates(2, 1), "A")
+        screen.draw(Position(2, 1), "A")
 
         // when
         screen.update()
@@ -132,9 +132,9 @@ class ScreenTest {
     fun `given screen - when drawn out of bounds - then exception thrown`(width: Int, height: Int, x: Int, y: Int) {
         // given
         val screen = Screen(width, height)
-        val coordinates = Coordinates(x, y)
+        val position = Position(x, y)
 
         // when & then
-        assertThrows<IndexOutOfBoundsException> { screen.draw(coordinates, "A") }
+        assertThrows<IndexOutOfBoundsException> { screen.draw(position, "A") }
     }
 }

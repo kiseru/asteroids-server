@@ -11,7 +11,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import ru.kiseru.logics.Game
 import ru.kiseru.logics.Screen
-import ru.kiseru.logics.auxiliary.Coordinates
+import ru.kiseru.logics.auxiliary.Position
 import ru.kiseru.logics.auxiliary.Type
 import ru.kiseru.logics.models.Asteroid
 import ru.kiseru.logics.models.Garbage
@@ -23,9 +23,9 @@ class SpaceshipCrashHandlerTest {
     @Test
     fun `given garbage on spaceship coordinates - when check called - then spaceship and garbage crashed`() {
         // given
-        val coordinates = Coordinates(5, 5)
-        val spaceship = mockSpaceship(coordinates)
-        val garbage = Garbage(coordinates)
+        val position = Position(5, 5)
+        val spaceship = mockSpaceship(position)
+        val garbage = Garbage(position)
         val game = mockGame(spaceship, garbage)
         val handler = SpaceshipCrashHandler(game, spaceship)
 
@@ -40,9 +40,9 @@ class SpaceshipCrashHandlerTest {
     @Test
     fun `given asteroid on spaceship coordinates - when check called - then spaceship and asteroid crashed`() {
         // given
-        val coordinates = Coordinates(5, 5)
-        val spaceship = mockSpaceship(coordinates)
-        val asteroid = Asteroid(coordinates)
+        val position = Position(5, 5)
+        val spaceship = mockSpaceship(position)
+        val asteroid = Asteroid(position)
         val game = mockGame(spaceship, asteroid)
         val handler = SpaceshipCrashHandler(game, spaceship)
 
@@ -57,9 +57,9 @@ class SpaceshipCrashHandlerTest {
     @Test
     fun `given another spaceship on same coordinates - when check called - then no one crashed`() {
         // given
-        val coordinates = Coordinates(5, 5)
-        val spaceship = mockSpaceship(coordinates)
-        val anotherSpaceship = mockPoint(Type.SPACESHIP, coordinates, isVisible = true)
+        val position = Position(5, 5)
+        val spaceship = mockSpaceship(position)
+        val anotherSpaceship = mockPoint(Type.SPACESHIP, position, isVisible = true)
         val game = mockGame(spaceship, anotherSpaceship)
         val handler = SpaceshipCrashHandler(game, spaceship)
 
@@ -73,9 +73,9 @@ class SpaceshipCrashHandlerTest {
     @Test
     fun `given invisible point on spaceship coordinates - when check called - then spaceship not crashed`() {
         // given
-        val coordinates = Coordinates(5, 5)
-        val spaceship = mockSpaceship(coordinates)
-        val invisibleGarbage = Garbage(coordinates)
+        val position = Position(5, 5)
+        val spaceship = mockSpaceship(position)
+        val invisibleGarbage = Garbage(position)
         invisibleGarbage.crash()
         val game = mockGame(spaceship, invisibleGarbage)
         val handler = SpaceshipCrashHandler(game, spaceship)
@@ -91,8 +91,8 @@ class SpaceshipCrashHandlerTest {
     @Test
     fun `given spaceship inside screen and no other points - when check called - then spaceship not crashed`() {
         // given
-        val coordinates = Coordinates(5, 5)
-        val spaceship = mockSpaceship(coordinates)
+        val position = Position(5, 5)
+        val spaceship = mockSpaceship(position)
         val game = mockGame(spaceship)
         val handler = SpaceshipCrashHandler(game, spaceship)
 
@@ -115,7 +115,7 @@ class SpaceshipCrashHandlerTest {
         y: Int,
     ) {
         // given
-        val spaceship = mockSpaceship(Coordinates(x, y))
+        val spaceship = mockSpaceship(Position(x, y))
         val game = mockGame(spaceship, screen = Screen(10, 10))
         val handler = SpaceshipCrashHandler(game, spaceship)
 
@@ -126,18 +126,18 @@ class SpaceshipCrashHandlerTest {
         verify(spaceship).crash(Type.WALL)
     }
 
-    private fun mockSpaceship(coordinates: Coordinates): Spaceship {
+    private fun mockSpaceship(position: Position): Spaceship {
         val spaceship = mock<Spaceship>()
-        whenever(spaceship.coordinates).thenReturn(coordinates)
-        whenever(spaceship.x).thenReturn(coordinates.x())
-        whenever(spaceship.y).thenReturn(coordinates.y())
+        whenever(spaceship.coordinates).thenReturn(position)
+        whenever(spaceship.x).thenReturn(position.x())
+        whenever(spaceship.y).thenReturn(position.y())
         return spaceship
     }
 
-    private fun mockPoint(type: Type, coordinates: Coordinates, isVisible: Boolean): Point {
+    private fun mockPoint(type: Type, position: Position, isVisible: Boolean): Point {
         val point = mock<Point>()
         whenever(point.type).thenReturn(type)
-        whenever(point.coordinates).thenReturn(coordinates)
+        whenever(point.coordinates).thenReturn(position)
         whenever(point.isVisible()).thenReturn(isVisible)
         return point
     }

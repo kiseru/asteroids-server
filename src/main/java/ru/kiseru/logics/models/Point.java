@@ -1,30 +1,30 @@
 package ru.kiseru.logics.models;
 
-import ru.kiseru.logics.auxiliary.Coordinates;
+import ru.kiseru.logics.auxiliary.Position;
 import ru.kiseru.logics.auxiliary.Type;
 
 public abstract class Point {
 
-    protected Coordinates coordinates;
+    protected Position position;
     protected boolean isVisible;
 
-    public Point(Coordinates coordinates) {
-        this.coordinates = coordinates;
+    public Point(Position position) {
+        this.position = position;
         isVisible = true;
     }
 
     abstract public Type getType();
 
     public int getX() {
-        return coordinates.x();
+        return position.x();
     }
 
     public int getY() {
-        return coordinates.y();
+        return position.y();
     }
 
-    public Coordinates getCoordinates() {
-        return coordinates;
+    public Position getCoordinates() {
+        return position;
     }
 
     public boolean isVisible() {

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
-import ru.kiseru.logics.auxiliary.Coordinates;
+import ru.kiseru.logics.auxiliary.Position;
 import ru.kiseru.logics.auxiliary.Type;
 import ru.kiseru.logics.handlers.SpaceshipCrashHandler;
 import ru.kiseru.logics.models.*;
@@ -74,19 +74,19 @@ public class Game {
             .anyMatch(point -> point instanceof Spaceship s && s.isOwnerAlive());
     }
 
-    private Coordinates generateUniqueRandomCoordinates() {
+    private Position generateUniqueRandomCoordinates() {
         Random random = new Random();
-        Coordinates randomCoordinates = null;
+        Position randomPosition = null;
         // если по случайно созданным координатам уже что-то находится (или они ещё не сгенерированы)
-        while (randomCoordinates == null || isGameObjectsContainsCoordinates(randomCoordinates))
+        while (randomPosition == null || isGameObjectsContainsCoordinates(randomPosition))
             // генерируем новые координаты
-            randomCoordinates = new Coordinates(random.nextInt(screen.getWidth()) + 1, random.nextInt(screen.getHeight()) + 1   );
-        return randomCoordinates;
+            randomPosition = new Position(random.nextInt(screen.getWidth()) + 1, random.nextInt(screen.getHeight()) + 1   );
+        return randomPosition;
     }
 
-    private boolean isGameObjectsContainsCoordinates(Coordinates coordinates) {
+    private boolean isGameObjectsContainsCoordinates(Position position) {
         return pointsOnScreen.stream()
-                .anyMatch(p -> p.getCoordinates().equals(coordinates));
+                .anyMatch(p -> p.getCoordinates().equals(position));
     }
 
     public List<Model> getGameObjects() {

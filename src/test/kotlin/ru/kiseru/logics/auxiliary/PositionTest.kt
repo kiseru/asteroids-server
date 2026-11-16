@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 
-class CoordinatesTest {
+class PositionTest {
 
     @ParameterizedTest
     @CsvSource(
@@ -18,11 +18,11 @@ class CoordinatesTest {
     )
     fun `given coordinates with x and y - when getX and getY called - then stored values returned`(x: Int, y: Int) {
         // given
-        val coordinates = Coordinates(x, y)
+        val position = Position(x, y)
 
         // when
-        val actualX = coordinates.x()
-        val actualY = coordinates.y()
+        val actualX = position.x()
+        val actualY = position.y()
 
         // then
         assertEquals(x, actualX)
@@ -32,8 +32,8 @@ class CoordinatesTest {
     @Test
     fun `given two coordinates with same x and y - when compared - then they are equal`() {
         // given
-        val first = Coordinates(1, 2)
-        val second = Coordinates(1, 2)
+        val first = Position(1, 2)
+        val second = Position(1, 2)
 
         // when
         val result = first == second
@@ -45,8 +45,8 @@ class CoordinatesTest {
     @Test
     fun `given two coordinates with different x - when compared - then they are not equal`() {
         // given
-        val first = Coordinates(1, 2)
-        val second = Coordinates(3, 2)
+        val first = Position(1, 2)
+        val second = Position(3, 2)
 
         // when
         val result = first == second
@@ -58,8 +58,8 @@ class CoordinatesTest {
     @Test
     fun `given two coordinates with different y - when compared - then they are not equal`() {
         // given
-        val first = Coordinates(1, 2)
-        val second = Coordinates(1, -2)
+        val first = Position(1, 2)
+        val second = Position(1, -2)
 
         // when
         val result = first == second
@@ -71,11 +71,11 @@ class CoordinatesTest {
     @Test
     fun `given coordinates and object of other type - when compared - then they are not equal`() {
         // given
-        val coordinates = Coordinates(1, 2)
+        val position = Position(1, 2)
         val other: Any = "not coordinates"
 
         // when
-        val result = coordinates == other
+        val result = position == other
 
         // then
         assertFalse(result)

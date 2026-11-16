@@ -1,7 +1,7 @@
 package ru.kiseru.logics;
 
 import java.util.Arrays;
-import ru.kiseru.logics.auxiliary.Coordinates;
+import ru.kiseru.logics.auxiliary.Position;
 
 public class Screen {
 
@@ -18,15 +18,15 @@ public class Screen {
 
     /**
      * Рисует на экране точку
-     * @param coordinates - по какой координате
+     * @param position - по какой координате
      * @param symbol - символ, которым отображается точка
      */
-    public synchronized void draw(Coordinates coordinates, String symbol) {
-        if (mainMatrix[coordinates.y()][coordinates.x()].equals(".")) {
-            mainMatrix[coordinates.y()][coordinates.x()] = symbol;
+    public synchronized void draw(Position position, String symbol) {
+        if (mainMatrix[position.y()][position.x()].equals(".")) {
+            mainMatrix[position.y()][position.x()] = symbol;
         } else {
-            mainMatrix[coordinates.y()][coordinates.x()] =
-                String.format("%s|%s", mainMatrix[coordinates.y()][coordinates.x()], symbol);
+            mainMatrix[position.y()][position.x()] =
+                String.format("%s|%s", mainMatrix[position.y()][position.x()], symbol);
         }
     }
 

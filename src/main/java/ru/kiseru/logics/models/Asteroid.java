@@ -1,13 +1,13 @@
 package ru.kiseru.logics.models;
 
 import ru.kiseru.logics.Screen;
-import ru.kiseru.logics.auxiliary.Coordinates;
+import ru.kiseru.logics.auxiliary.Position;
 import ru.kiseru.logics.auxiliary.Type;
 
 public class Asteroid extends Point implements Model, Crashable {
 
-    public Asteroid(Coordinates coordinates) {
-        super(coordinates);
+    public Asteroid(Position position) {
+        super(position);
     }
 
     public void crash() {
@@ -17,7 +17,7 @@ public class Asteroid extends Point implements Model, Crashable {
     @Override
     public void render(Screen screen) {
         if (isVisible) {
-            screen.draw(coordinates, "A");
+            screen.draw(position, "A");
         }
     }
 

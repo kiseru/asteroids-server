@@ -2,7 +2,7 @@ package ru.kiseru.logics;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import ru.kiseru.logics.auxiliary.Coordinates;
+import ru.kiseru.logics.auxiliary.Position;
 import ru.kiseru.logics.auxiliary.Type;
 import ru.kiseru.logics.models.Point;
 import ru.kiseru.logics.models.Spaceship;
@@ -20,7 +20,7 @@ public class CourseChecker {
     }
 
     public boolean isAsteroid() {
-        List<Coordinates> asteroidsCoordinates = pointsOnMap.stream()
+        List<Position> asteroidsCoordinates = pointsOnMap.stream()
                 .filter(p -> p.getType() == Type.ASTEROID)
                 .map(Point::getCoordinates)
                 .collect(Collectors.toList());
@@ -28,7 +28,7 @@ public class CourseChecker {
     }
 
     public boolean isGarbage() {
-        List<Coordinates> garbageCoordinates = pointsOnMap.stream()
+        List<Position> garbageCoordinates = pointsOnMap.stream()
                 .filter(p -> p.getType() == Type.GARBAGE)
                 .map(Point::getCoordinates)
                 .collect(Collectors.toList());
@@ -44,12 +44,12 @@ public class CourseChecker {
         };
     }
 
-    private boolean checkContaining(List<Coordinates> container) {
+    private boolean checkContaining(List<Position> container) {
         var coordinates = switch (spaceship.getDirection()) {
-            case UP -> new Coordinates(spaceship.getX(), spaceship.getY() - 1);
-            case RIGHT -> new Coordinates(spaceship.getX() + 1, spaceship.getY());
-            case DOWN -> new Coordinates(spaceship.getX(), spaceship.getY() + 1);
-            case LEFT -> new Coordinates(spaceship.getX() - 1, spaceship.getY());
+            case UP -> new Position(spaceship.getX(), spaceship.getY() - 1);
+            case RIGHT -> new Position(spaceship.getX() + 1, spaceship.getY());
+            case DOWN -> new Position(spaceship.getX(), spaceship.getY() + 1);
+            case LEFT -> new Position(spaceship.getX() - 1, spaceship.getY());
         };
 
         return container.contains(coordinates);

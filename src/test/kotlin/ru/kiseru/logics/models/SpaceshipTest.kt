@@ -12,7 +12,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import ru.kiseru.logics.Game
 import ru.kiseru.logics.Screen
-import ru.kiseru.logics.auxiliary.Coordinates
+import ru.kiseru.logics.auxiliary.Position
 import ru.kiseru.logics.auxiliary.Direction
 import ru.kiseru.logics.auxiliary.Type
 import ru.kiseru.logics.CourseChecker
@@ -24,21 +24,21 @@ class SpaceshipTest {
     @Test
     fun `given coordinates and user - when spaceship created - then it is visible and stores coordinates`() {
         // given
-        val coordinates = Coordinates(3, 7)
+        val position = Position(3, 7)
         val owner = mockUser(mockRoom(mock<Game>()))
 
         // when
-        val spaceship = Spaceship(coordinates, owner)
+        val spaceship = Spaceship(position, owner)
 
         // then
-        assertEquals(coordinates, spaceship.coordinates)
+        assertEquals(position, spaceship.position)
         assertTrue(spaceship.isVisible)
     }
 
     @Test
     fun `given spaceship - when getType called - then SPACESHIP type returned`() {
         // given
-        val spaceship = Spaceship(Coordinates(1, 2), mockUser(mockRoom(mock<Game>())))
+        val spaceship = Spaceship(Position(1, 2), mockUser(mockRoom(mock<Game>())))
 
         // when
         val actual = spaceship.type
@@ -52,7 +52,7 @@ class SpaceshipTest {
         // given
         val screen = Screen(5, 5)
         val owner = mockUser(mockRoom(mock<Game>()))
-        val spaceship = Spaceship(Coordinates(2, 3), owner)
+        val spaceship = Spaceship(Position(2, 3), owner)
 
         // when
         spaceship.render(screen)
@@ -66,7 +66,7 @@ class SpaceshipTest {
     fun `given invisible spaceship - when render called - then nothing drawn on screen`() {
         // given
         val screen = Screen(5, 5)
-        val spaceship = Spaceship(Coordinates(2, 3), mockUser(mockRoom(mock<Game>())))
+        val spaceship = Spaceship(Position(2, 3), mockUser(mockRoom(mock<Game>())))
         spaceship.isVisible = false
 
         // when
@@ -92,14 +92,14 @@ class SpaceshipTest {
         expectedY: Int,
     ) {
         // given
-        val spaceship = Spaceship(Coordinates(initialX, initialY), mockUser(mockRoom(mock<Game>())))
+        val spaceship = Spaceship(Position(initialX, initialY), mockUser(mockRoom(mock<Game>())))
         spaceship.direction = direction
 
         // when
         spaceship.go()
 
         // then
-        assertEquals(Coordinates(expectedX, expectedY), spaceship.coordinates)
+        assertEquals(Position(expectedX, expectedY), spaceship.position)
     }
 
     @Test
@@ -107,7 +107,7 @@ class SpaceshipTest {
         // given
         val game = mock<Game>()
         val owner = mockUser(mockRoom(game))
-        val spaceship = Spaceship(Coordinates(5, 5), owner)
+        val spaceship = Spaceship(Position(5, 5), owner)
 
         // when
         spaceship.crash(Type.ASTEROID)
@@ -123,7 +123,7 @@ class SpaceshipTest {
         whenever(game.incrementCollectedGarbageCount()).thenReturn(1)
         whenever(game.garbageNumber).thenReturn(10)
         val owner = mockUser(mockRoom(game))
-        val spaceship = Spaceship(Coordinates(5, 5), owner)
+        val spaceship = Spaceship(Position(5, 5), owner)
 
         // when
         spaceship.crash(Type.GARBAGE)
@@ -140,7 +140,7 @@ class SpaceshipTest {
         whenever(game.incrementCollectedGarbageCount()).thenReturn(5)
         whenever(game.garbageNumber).thenReturn(5)
         val owner = mockUser(mockRoom(game))
-        val spaceship = Spaceship(Coordinates(5, 5), owner)
+        val spaceship = Spaceship(Position(5, 5), owner)
 
         // when
         spaceship.crash(Type.GARBAGE)
@@ -155,7 +155,7 @@ class SpaceshipTest {
         // given
         val game = mock<Game>()
         val owner = mockUser(mockRoom(game))
-        val spaceship = Spaceship(Coordinates(5, 5), owner)
+        val spaceship = Spaceship(Position(5, 5), owner)
         spaceship.direction = Direction.UP
         spaceship.go()
 
@@ -163,7 +163,7 @@ class SpaceshipTest {
         spaceship.crash(Type.WALL)
 
         // then
-        assertEquals(Coordinates(5, 5), spaceship.coordinates)
+        assertEquals(Position(5, 5), spaceship.position)
         verify(owner).subtractScore()
     }
 
@@ -175,7 +175,7 @@ class SpaceshipTest {
         whenever(game.garbageNumber).thenReturn(10)
         val owner = mockUser(mockRoom(game))
         whenever(owner.getIsAlive()).thenReturn(false)
-        val spaceship = Spaceship(Coordinates(5, 5), owner)
+        val spaceship = Spaceship(Position(5, 5), owner)
         assertTrue(spaceship.isVisible)
 
         // when
@@ -188,7 +188,7 @@ class SpaceshipTest {
     @Test
     fun `given spaceship - when setDirection called - then direction stored`() {
         // given
-        val spaceship = Spaceship(Coordinates(5, 5), mockUser(mockRoom(mock<Game>())))
+        val spaceship = Spaceship(Position(5, 5), mockUser(mockRoom(mock<Game>())))
 
         // when
         spaceship.direction = Direction.LEFT
@@ -200,7 +200,7 @@ class SpaceshipTest {
     @Test
     fun `given spaceship - when setCourseChecker called - then course checker stored`() {
         // given
-        val spaceship = Spaceship(Coordinates(5, 5), mockUser(mockRoom(mock<Game>())))
+        val spaceship = Spaceship(Position(5, 5), mockUser(mockRoom(mock<Game>())))
         val courseChecker = CourseChecker(spaceship, emptyList(), Screen(5, 5))
 
         // when
@@ -214,7 +214,7 @@ class SpaceshipTest {
     fun `given spaceship with alive owner - when isOwnerAlive called - then owner liveness returned`() {
         // given
         val owner = mockUser(mockRoom(mock<Game>()))
-        val spaceship = Spaceship(Coordinates(5, 5), owner)
+        val spaceship = Spaceship(Position(5, 5), owner)
 
         // when
         val actual = spaceship.isOwnerAlive
@@ -228,7 +228,7 @@ class SpaceshipTest {
         // given
         val owner = mockUser(mockRoom(mock<Game>()))
         whenever(owner.getIsAlive()).thenReturn(false)
-        val spaceship = Spaceship(Coordinates(5, 5), owner)
+        val spaceship = Spaceship(Position(5, 5), owner)
 
         // when & then
         assertFalse(spaceship.isOwnerAlive)

@@ -2,7 +2,7 @@ package ru.kiseru.logics.models;
 
 import ru.kiseru.logics.CourseChecker;
 import ru.kiseru.logics.Screen;
-import ru.kiseru.logics.auxiliary.Coordinates;
+import ru.kiseru.logics.auxiliary.Position;
 import ru.kiseru.logics.auxiliary.Direction;
 import ru.kiseru.logics.auxiliary.Type;
 import ru.kiseru.server.User;
@@ -13,15 +13,15 @@ public class Spaceship extends Point implements Model{
     private Direction direction;
     private CourseChecker courseChecker;
 
-    public Spaceship(Coordinates coordinates, User owner) {
-        super(coordinates);
+    public Spaceship(Position position, User owner) {
+        super(position);
         this.owner = owner;
     }
 
     @Override
     public void render(Screen screen) {
         if (isVisible) {
-            screen.draw(coordinates, String.valueOf(owner.getId()));
+            screen.draw(position, String.valueOf(owner.getId()));
         }
     }
 
@@ -31,16 +31,16 @@ public class Spaceship extends Point implements Model{
     public void go() {
         switch (direction) {
             case UP:
-                coordinates = new Coordinates(this.getX(), this.getY() - 1);
+                position = new Position(this.getX(), this.getY() - 1);
                 break;
             case RIGHT:
-                coordinates = new Coordinates(this.getX() + 1, this.getY());
+                position = new Position(this.getX() + 1, this.getY());
                 break;
             case DOWN:
-                coordinates = new Coordinates(this.getX(), this.getY() + 1);
+                position = new Position(this.getX(), this.getY() + 1);
                 break;
             case LEFT:
-                coordinates = new Coordinates(this.getX() - 1, this.getY());
+                position = new Position(this.getX() - 1, this.getY());
         }
     }
 
@@ -74,16 +74,16 @@ public class Spaceship extends Point implements Model{
     private void rollbackLastStep() {
         switch (direction) {
             case UP:
-                coordinates = new Coordinates(this.getX(), this.getY() + 1);
+                position = new Position(this.getX(), this.getY() + 1);
                 break;
             case RIGHT:
-                coordinates = new Coordinates(this.getX() - 1, this.getY());
+                position = new Position(this.getX() - 1, this.getY());
                 break;
             case DOWN:
-                coordinates = new Coordinates(this.getX(), this.getY() - 1);
+                position = new Position(this.getX(), this.getY() - 1);
                 break;
             case LEFT:
-                coordinates = new Coordinates(this.getX() + 1, this.getY());
+                position = new Position(this.getX() + 1, this.getY());
         }
     }
 
