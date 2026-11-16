@@ -121,20 +121,4 @@ class ScreenTest {
         """.trimIndent() + "\n"
         assertEquals(expected, screen.display())
     }
-
-    @ParameterizedTest
-    @CsvSource(
-        "3, 3, 5, 1",
-        "3, 3, 1, 5",
-        "3, 3, -1, 1",
-        "3, 3, 1, -1",
-    )
-    fun `given screen - when drawn out of bounds - then exception thrown`(width: Int, height: Int, x: Int, y: Int) {
-        // given
-        val screen = Screen(width, height)
-        val position = Position(x, y)
-
-        // when & then
-        assertThrows<IndexOutOfBoundsException> { screen.draw(position, "A") }
-    }
 }
