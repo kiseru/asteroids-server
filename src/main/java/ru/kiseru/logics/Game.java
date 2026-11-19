@@ -80,7 +80,7 @@ public class Game {
         // если по случайно созданным координатам уже что-то находится (или они ещё не сгенерированы)
         while (randomPosition == null || isGameObjectsContainsCoordinates(randomPosition))
             // генерируем новые координаты
-            randomPosition = new Position(random.nextInt(screen.getWidth()) + 1, random.nextInt(screen.getHeight()) + 1   );
+            randomPosition = new Position(random.nextInt(screen.getSize().width()) + 1, random.nextInt(screen.getSize().height()) + 1);
         return randomPosition;
     }
 

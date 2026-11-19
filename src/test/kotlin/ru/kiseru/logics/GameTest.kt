@@ -13,6 +13,7 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import ru.kiseru.logics.auxiliary.ScreenSize
 import ru.kiseru.logics.auxiliary.Type
 import ru.kiseru.logics.handlers.SpaceshipCrashHandler
 import ru.kiseru.logics.models.Asteroid
@@ -25,7 +26,7 @@ class GameTest {
     @Test
     fun `given screen and counts - when game created - then garbage and asteroids generated`() {
         // given
-        val screen = Screen(10, 10)
+        val screen = Screen(ScreenSize(10, 10))
 
         // when
         val game = Game(screen, 3, 2)
@@ -38,7 +39,7 @@ class GameTest {
     @Test
     fun `given screen and counts - when game created - then game objects contain the same points as screen`() {
         // given
-        val screen = Screen(10, 10)
+        val screen = Screen(ScreenSize(10, 10))
 
         // when
         val game = Game(screen, 2, 2)
@@ -50,7 +51,7 @@ class GameTest {
     @Test
     fun `given screen and counts - when game created - then all coordinates unique and within screen bounds`() {
         // given
-        val screen = Screen(10, 10)
+        val screen = Screen(ScreenSize(10, 10))
 
         // when
         val game = Game(screen, 4, 3)
@@ -58,13 +59,13 @@ class GameTest {
         // then
         val coordinates = game.pointsOnScreen.map { it.position }
         assertEquals(coordinates.size, coordinates.distinct().size)
-        assertTrue(coordinates.all { it.x() in 1..screen.width && it.y() in 1..screen.height })
+        assertTrue(coordinates.all { it.x() in 1..screen.size.width() && it.y() in 1..screen.size.height() })
     }
 
     @Test
     fun `given screen and counts - when game created - then garbage number stored`() {
         // given
-        val screen = Screen(10, 10)
+        val screen = Screen(ScreenSize(10, 10))
 
         // when
         val game = Game(screen, 7, 1)
@@ -76,7 +77,7 @@ class GameTest {
     @Test
     fun `given screen - when game created without garbage and asteroids - then points list is empty`() {
         // given
-        val screen = Screen(10, 10)
+        val screen = Screen(ScreenSize(10, 10))
 
         // when
         val game = Game(screen, 0, 0)
@@ -89,7 +90,7 @@ class GameTest {
     @Test
     fun `given screen - when game created - then screen stored`() {
         // given
-        val screen = Screen(10, 10)
+        val screen = Screen(ScreenSize(10, 10))
 
         // when
         val game = Game(screen, 1, 1)
@@ -101,7 +102,7 @@ class GameTest {
     @Test
     fun `given user - when spaceship registered - then spaceship passed to user`() {
         // given
-        val game = Game(Screen(10, 10), 1, 1)
+        val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
         val user = mock<User>()
 
         // when
@@ -117,7 +118,7 @@ class GameTest {
     @Test
     fun `given user - when spaceship registered - then spaceship added to points on screen`() {
         // given
-        val game = Game(Screen(10, 10), 2, 2)
+        val game = Game(Screen(ScreenSize(10, 10)), 2, 2)
         val user = mock<User>()
 
         // when
@@ -132,7 +133,7 @@ class GameTest {
     @Test
     fun `given user - when spaceship registered - then crash handler created`() {
         // given
-        val game = Game(Screen(10, 10), 1, 1)
+        val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
         val user = mock<User>()
 
         // when
@@ -145,7 +146,7 @@ class GameTest {
     @Test
     fun `given user - when spaceship registered - then course checker set to spaceship`() {
         // given
-        val game = Game(Screen(10, 10), 1, 1)
+        val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
         val user = mock<User>()
 
         // when
@@ -160,7 +161,7 @@ class GameTest {
     @Test
     fun `given user - when spaceship registered - then spaceship not collide with other points`() {
         // given
-        val game = Game(Screen(10, 10), 4, 4)
+        val game = Game(Screen(ScreenSize(10, 10)), 4, 4)
         val user = mock<User>()
 
         // when
@@ -181,7 +182,7 @@ class GameTest {
         // given
         val activeRefreshes = AtomicInteger()
         val overlapDetected = AtomicBoolean(false)
-        val screen = object : Screen(10, 10) {
+        val screen = object : Screen(ScreenSize(10, 10)) {
             override fun update() {
                 if (activeRefreshes.incrementAndGet() > 1) overlapDetected.set(true)
                 Thread.sleep(50)
@@ -210,8 +211,7 @@ class GameTest {
     fun `given game - when refresh called - then screen updated`() {
         // given
         val screen = mock<Screen>()
-        whenever(screen.width).thenReturn(10)
-        whenever(screen.height).thenReturn(10)
+        whenever(screen.size).thenReturn(ScreenSize(10, 10))
         val game = Game(screen, 1, 1)
 
         // when
@@ -225,8 +225,7 @@ class GameTest {
     fun `given game with crash handlers - when refresh called - then all crash handlers checked`() {
         // given
         val screen = mock<Screen>()
-        whenever(screen.width).thenReturn(10)
-        whenever(screen.height).thenReturn(10)
+        whenever(screen.size).thenReturn(ScreenSize(10, 10))
         val game = Game(screen, 1, 1)
         val crashHandler = mock<SpaceshipCrashHandler>()
         game.crashHandlers.add(crashHandler)
@@ -241,7 +240,7 @@ class GameTest {
     @Test
     fun `given game with garbage and asteroid - when refresh called - then objects rendered on screen`() {
         // given
-        val screen = Screen(10, 10)
+        val screen = Screen(ScreenSize(10, 10))
         val game = Game(screen, 1, 1)
         val garbage = game.gameObjects.filterIsInstance<Garbage>().first()
         val asteroid = game.gameObjects.filterIsInstance<Asteroid>().first()
@@ -258,7 +257,7 @@ class GameTest {
     @Test
     fun `given spaceship with alive owner - when isAnyoneAlive called - then true returned`() {
         // given
-        val game = Game(Screen(10, 10), 1, 1)
+        val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
         val user = mock<User>()
         whenever(user.getIsAlive()).thenReturn(true)
         game.registerSpaceShipForUser(user)
@@ -273,7 +272,7 @@ class GameTest {
     @Test
     fun `given spaceship with dead owner - when isAnyoneAlive called - then false returned`() {
         // given
-        val game = Game(Screen(10, 10), 1, 1)
+        val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
         val user = mock<User>()
         whenever(user.getIsAlive()).thenReturn(false)
         game.registerSpaceShipForUser(user)
@@ -288,7 +287,7 @@ class GameTest {
     @Test
     fun `given two users one alive - when isAnyoneAlive called - then true returned`() {
         // given
-        val game = Game(Screen(10, 10), 1, 1)
+        val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
         val deadUser = mock<User>()
         whenever(deadUser.getIsAlive()).thenReturn(false)
         val aliveUser = mock<User>()
@@ -306,7 +305,7 @@ class GameTest {
     @Test
     fun `given game without spaceships - when isAnyoneAlive called - then false returned`() {
         // given
-        val game = Game(Screen(10, 10), 1, 1)
+        val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
 
         // when & then
         assertFalse(game::isAnyoneAlive)
@@ -315,7 +314,7 @@ class GameTest {
     @Test
     fun `given game - when increment called first time - then one returned`() {
         // given
-        val game = Game(Screen(10, 10), 1, 1)
+        val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
 
         // when
         val actual = game.incrementCollectedGarbageCount()
@@ -327,7 +326,7 @@ class GameTest {
     @Test
     fun `given game - when increment called twice - then counters incremented sequentially`() {
         // given
-        val game = Game(Screen(10, 10), 1, 1)
+        val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
 
         // when
         val first = game.incrementCollectedGarbageCount()

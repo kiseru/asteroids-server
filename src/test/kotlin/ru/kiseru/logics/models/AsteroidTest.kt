@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import ru.kiseru.logics.Screen
 import ru.kiseru.logics.auxiliary.Position
+import ru.kiseru.logics.auxiliary.ScreenSize
 import ru.kiseru.logics.auxiliary.Type
 
 class AsteroidTest {
@@ -38,7 +39,7 @@ class AsteroidTest {
     @Test
     fun `given visible asteroid - when render called - then symbol A drawn on screen`() {
         // given
-        val screen = Screen(5, 5)
+        val screen = Screen(ScreenSize(5, 5))
         val asteroid = Asteroid(Position(2, 3))
 
         // when
@@ -52,7 +53,7 @@ class AsteroidTest {
     @Test
     fun `given crashed asteroid - when render called - then nothing drawn on screen`() {
         // given
-        val screen = Screen(5, 5)
+        val screen = Screen(ScreenSize(5, 5))
         val asteroid = Asteroid(Position(2, 3))
         asteroid.crash()
         assertFalse(asteroid.isVisible)

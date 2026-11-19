@@ -36,8 +36,8 @@ public class SpaceshipCrashHandler {
         } else {
             // проверка на столкновение со стеной
             if (spaceShip.getX() == 0 || spaceShip.getY() == 0 ||
-                    spaceShip.getX() > game.getScreen().getWidth() ||
-                    spaceShip.getY() > game.getScreen().getHeight()) {
+                    spaceShip.getX() > game.getScreen().getSize().width() ||
+                    spaceShip.getY() > game.getScreen().getSize().height()) {
                 spaceShip.crash(Type.WALL);
             }
         }

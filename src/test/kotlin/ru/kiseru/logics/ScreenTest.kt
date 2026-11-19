@@ -2,10 +2,10 @@ package ru.kiseru.logics
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import ru.kiseru.logics.auxiliary.Position
+import ru.kiseru.logics.auxiliary.ScreenSize
 
 class ScreenTest {
 
@@ -17,15 +17,14 @@ class ScreenTest {
     )
     fun `given width and height - when screen created - then dimensions returned`(width: Int, height: Int) {
         // given
-        val screen = Screen(width, height)
+        val screen = Screen(ScreenSize(width, height))
 
         // when
-        val actualWidth = screen.width
-        val actualHeight = screen.height
+        val actualSize = screen.size
 
         // then
-        assertEquals(width, actualWidth)
-        assertEquals(height, actualHeight)
+        assertEquals(width, actualSize.width())
+        assertEquals(height, actualSize.height())
     }
 
     @ParameterizedTest
@@ -36,7 +35,7 @@ class ScreenTest {
     )
     fun `given clear screen - when displayed - then interior cells filled with dots`(width: Int, height: Int) {
         // given
-        val screen = Screen(width, height)
+        val screen = Screen(ScreenSize(width, height))
 
         // when
         val result = screen.display()
@@ -50,7 +49,7 @@ class ScreenTest {
     @Test
     fun `given clear screen - when symbol drawn on empty cell - then cell contains symbol`() {
         // given
-        val screen = Screen(3, 3)
+        val screen = Screen(ScreenSize(3, 3))
         val position = Position(2, 1)
 
         // when
@@ -68,7 +67,7 @@ class ScreenTest {
     @Test
     fun `given screen with symbol on cell - when another symbol drawn on same cell - then symbols joined with separator`() {
         // given
-        val screen = Screen(3, 3)
+        val screen = Screen(ScreenSize(3, 3))
         val position = Position(1, 2)
         screen.draw(position, "A")
 
@@ -87,7 +86,7 @@ class ScreenTest {
     @Test
     fun `given clear screen - when symbols drawn on cells with same x and different y - then symbols rendered in different rows`() {
         // given
-        val screen = Screen(3, 3)
+        val screen = Screen(ScreenSize(3, 3))
         val first = Position(1, 1)
         val second = Position(1, 3)
 
@@ -107,7 +106,7 @@ class ScreenTest {
     @Test
     fun `given screen with drawn symbol - when updated - then screen cleared`() {
         // given
-        val screen = Screen(3, 3)
+        val screen = Screen(ScreenSize(3, 3))
         screen.draw(Position(2, 1), "A")
 
         // when

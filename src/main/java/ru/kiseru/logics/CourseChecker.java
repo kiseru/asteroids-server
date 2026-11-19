@@ -38,8 +38,8 @@ public class CourseChecker {
     public boolean isWall() {
         return switch (spaceship.getDirection()) {
             case UP -> spaceship.getY() == 1;
-            case RIGHT -> spaceship.getX() == screen.getWidth();
-            case DOWN -> spaceship.getY() == screen.getHeight();
+            case RIGHT -> spaceship.getX() == screen.getSize().width();
+            case DOWN -> spaceship.getY() == screen.getSize().height();
             case LEFT -> spaceship.getX() == 1;
         };
     }

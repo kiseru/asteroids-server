@@ -12,6 +12,7 @@ import org.mockito.kotlin.whenever
 import ru.kiseru.logics.Game
 import ru.kiseru.logics.Screen
 import ru.kiseru.logics.auxiliary.Position
+import ru.kiseru.logics.auxiliary.ScreenSize
 import ru.kiseru.logics.auxiliary.Type
 import ru.kiseru.logics.models.Asteroid
 import ru.kiseru.logics.models.Garbage
@@ -116,7 +117,7 @@ class SpaceshipCrashHandlerTest {
     ) {
         // given
         val spaceship = mockSpaceship(Position(x, y))
-        val game = mockGame(spaceship, screen = Screen(10, 10))
+        val game = mockGame(spaceship, screen = Screen(ScreenSize(10, 10)))
         val handler = SpaceshipCrashHandler(game, spaceship)
 
         // when
@@ -142,7 +143,7 @@ class SpaceshipCrashHandlerTest {
         return point
     }
 
-    private fun mockGame(vararg points: Point, screen: Screen = Screen(10, 10)): Game {
+    private fun mockGame(vararg points: Point, screen: Screen = Screen(ScreenSize(10, 10))): Game {
         val game = mock<Game>()
         whenever(game.pointsOnScreen).thenReturn(points.toList())
         whenever(game.screen).thenReturn(screen)

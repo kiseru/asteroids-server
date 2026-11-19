@@ -13,6 +13,7 @@ import org.mockito.kotlin.whenever
 import ru.kiseru.logics.Game
 import ru.kiseru.logics.Screen
 import ru.kiseru.logics.auxiliary.Position
+import ru.kiseru.logics.auxiliary.ScreenSize
 import ru.kiseru.logics.auxiliary.Direction
 import ru.kiseru.logics.auxiliary.Type
 import ru.kiseru.logics.CourseChecker
@@ -50,7 +51,7 @@ class SpaceshipTest {
     @Test
     fun `given visible spaceship - when render called - then owner id drawn on screen`() {
         // given
-        val screen = Screen(5, 5)
+        val screen = Screen(ScreenSize(5, 5))
         val owner = mockUser(mockRoom(mock<Game>()))
         val spaceship = Spaceship(Position(2, 3), owner)
 
@@ -65,7 +66,7 @@ class SpaceshipTest {
     @Test
     fun `given invisible spaceship - when render called - then nothing drawn on screen`() {
         // given
-        val screen = Screen(5, 5)
+        val screen = Screen(ScreenSize(5, 5))
         val spaceship = Spaceship(Position(2, 3), mockUser(mockRoom(mock<Game>())))
         spaceship.isVisible = false
 
@@ -201,7 +202,7 @@ class SpaceshipTest {
     fun `given spaceship - when setCourseChecker called - then course checker stored`() {
         // given
         val spaceship = Spaceship(Position(5, 5), mockUser(mockRoom(mock<Game>())))
-        val courseChecker = CourseChecker(spaceship, emptyList(), Screen(5, 5))
+        val courseChecker = CourseChecker(spaceship, emptyList(), Screen(ScreenSize(5, 5)))
 
         // when
         spaceship.courseChecker = courseChecker

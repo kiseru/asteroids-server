@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.stream.IntStream;
 import ru.kiseru.logics.Game;
 import ru.kiseru.logics.Screen;
+import ru.kiseru.logics.auxiliary.ScreenSize;
 import ru.kiseru.server.Server;
 import ru.kiseru.server.User;
 
@@ -107,7 +108,7 @@ public final class Room {
     public void run() {
         synchronized (this) {
             status = Status.GAMING;
-            game = new Game(new Screen(30, 30), 150, 50);
+            game = new Game(new Screen(new ScreenSize(30, 30)), 150, 50);
             users.stream()
                     .filter(Objects::nonNull)
                     .forEach(game::registerSpaceShipForUser);

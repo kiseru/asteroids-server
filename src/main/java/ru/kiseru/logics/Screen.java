@@ -2,17 +2,16 @@ package ru.kiseru.logics;
 
 import java.util.Arrays;
 import ru.kiseru.logics.auxiliary.Position;
+import ru.kiseru.logics.auxiliary.ScreenSize;
 
 public class Screen {
 
-    private final int width;
-    private final int height;
+    private final ScreenSize size;
     private final String[][] mainMatrix;
 
-    public Screen(int width, int height) {
-        this.width = width;
-        this.height = height;
-        mainMatrix = new String[height + 2][width + 2];
+    public Screen(ScreenSize size) {
+        this.size = size;
+        mainMatrix = new String[size.height() + 2][size.width() + 2];
         generateClearScreen();
     }
 
@@ -42,8 +41,8 @@ public class Screen {
      */
     public synchronized String display() {
         StringBuilder result = new StringBuilder();
-        for (int i = 1; i < height + 1; i++) {
-            for (int j = 1; j < width + 1; j++) {
+        for (int i = 1; i < size.height() + 1; i++) {
+            for (int j = 1; j < size.width() + 1; j++) {
                 result.append(mainMatrix[i][j]);
                 result.append("\t");
             }
@@ -53,22 +52,18 @@ public class Screen {
     }
 
     private void generateClearScreen() {
-        for (int i = 0; i < height + 2; i++) {
-            if (i == 0 || i == height + 1) {
+        for (int i = 0; i < size.height() + 2; i++) {
+            if (i == 0 || i == size.height() + 1) {
                 Arrays.fill(mainMatrix[i], "*");
             } else {
                 Arrays.fill(mainMatrix[i], ".");
                 mainMatrix[i][0] = "*";
-                mainMatrix[i][width + 1] = "*";
+                mainMatrix[i][size.width() + 1] = "*";
             }
         }
     }
 
-    public int getHeight() {
-        return height;
-    }
-
-    public int getWidth() {
-        return width;
+    public ScreenSize getSize() {
+        return size;
     }
 }
