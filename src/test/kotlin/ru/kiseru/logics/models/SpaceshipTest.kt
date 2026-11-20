@@ -12,6 +12,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import ru.kiseru.logics.Game
 import ru.kiseru.logics.Screen
+import ru.kiseru.logics.User
 import ru.kiseru.logics.auxiliary.Position
 import ru.kiseru.logics.auxiliary.ScreenSize
 import ru.kiseru.logics.auxiliary.Direction
@@ -239,7 +240,7 @@ class SpaceshipTest {
         val userHandler = mock<UserHandler>()
         whenever(userHandler.room).thenReturn(room)
         whenever(userHandler.isAlive).thenReturn(true)
-        whenever(userHandler.id).thenReturn(1L)
+        whenever(userHandler.user).thenReturn(User(1, "alice"))
         return userHandler
     }
 

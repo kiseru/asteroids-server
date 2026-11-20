@@ -15,6 +15,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import ru.kiseru.logics.User
 import ru.kiseru.server.UserHandler
 
 class RoomTest {
@@ -273,6 +274,7 @@ class RoomTest {
         val room = Room()
         val userHandler = mock<UserHandler>()
         whenever(userHandler.getIsAlive()).thenReturn(true)
+        whenever(userHandler.user).thenReturn(User(1, "alice"))
         whenever(userHandler.toString()).thenReturn("alice 100")
         room.addUser(userHandler)
         val thread = Thread(room::run)
@@ -300,6 +302,7 @@ class RoomTest {
         val room = Room()
         val userHandler = mock<UserHandler>()
         whenever(userHandler.getIsAlive()).thenReturn(true)
+        whenever(userHandler.user).thenReturn(User(1, "alice"))
         whenever(userHandler.toString()).thenReturn("alice 100")
         room.addUser(userHandler)
         val thread = Thread(room::run)
@@ -321,6 +324,7 @@ class RoomTest {
         val room = Room()
         val userHandler = mock<UserHandler>()
         whenever(userHandler.getIsAlive()).thenReturn(false)
+        whenever(userHandler.user).thenReturn(User(1, "alice"))
         whenever(userHandler.toString()).thenReturn("alice 100")
         room.addUser(userHandler)
 
@@ -340,6 +344,7 @@ class RoomTest {
         val room = Room()
         val userHandler = mock<UserHandler>()
         whenever(userHandler.getIsAlive()).thenReturn(true)
+        whenever(userHandler.user).thenReturn(User(1, "alice"))
         whenever(userHandler.toString()).thenReturn("alice 100")
         room.addUser(userHandler)
 

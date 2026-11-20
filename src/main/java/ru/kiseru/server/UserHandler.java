@@ -42,10 +42,10 @@ public final class UserHandler {
         try {
             writer.println("Welcome To Asteroids Server");
             writer.println("Please, introduce yourself!");
-            user = new User(reader.readLine());
+            user = new User(id, reader.readLine());
             System.out.println(user.username() + " has joined the server!");
             writer.println("You need to keep a space garbage.");
-            writer.println("Your ID is " + getId());
+            writer.println("Your ID is " + getUser().id());
             writer.println("Good luck, Commander!");
             room = room.addUser(this);
             if (room.isFull()) {
@@ -112,12 +112,8 @@ public final class UserHandler {
         return String.format("%s %d", user.username(), score.get());
     }
 
-    public String getUsername() {
-        return user.username();
-    }
-
-    public long getId() {
-        return id;
+    public User getUser() {
+        return user;
     }
 
     public void sendMessage(String message) {

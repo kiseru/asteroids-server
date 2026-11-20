@@ -43,7 +43,7 @@ public final class Room {
 
         userHandlers.stream()
                 .filter(Objects::nonNull)
-                .forEach(roomUserHandler -> roomUserHandler.sendMessage(String.format("User %s has joined the room.", userHandler.getUsername())));
+                .forEach(roomUserHandler -> roomUserHandler.sendMessage(String.format("User %s has joined the room.", userHandler.getUser().username())));
 
         userHandlers.set(emptyPlaceIndex, userHandler);
         userHandlersCount++;

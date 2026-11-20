@@ -1,6 +1,6 @@
 package ru.kiseru.logics;
 
-public record User(String username) {
+public record User(long id, String username) {
 
     public User {
         if (username == null || username.isBlank()) {

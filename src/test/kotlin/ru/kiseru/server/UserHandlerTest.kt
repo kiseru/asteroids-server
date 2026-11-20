@@ -199,7 +199,7 @@ class UserHandlerTest {
         runUserHandlerUntilFinished(userHandler)
 
         // then
-        assertEquals(User("alice"), getUser(userHandler))
+        assertEquals(User(0, "alice"), userHandler.user)
     }
 
     @Test
@@ -420,11 +420,5 @@ class UserHandlerTest {
         val thread = Thread { userHandler.run() }
         thread.start()
         thread.join(5000)
-    }
-
-    private fun getUser(userHandler: UserHandler): User {
-        val field = UserHandler::class.java.getDeclaredField("user")
-        field.isAccessible = true
-        return field.get(userHandler) as User
     }
 }

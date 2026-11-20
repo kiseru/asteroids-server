@@ -21,7 +21,7 @@ public class Spaceship extends Point implements Model{
     @Override
     public void render(Screen screen) {
         if (isVisible) {
-            screen.draw(position, String.valueOf(owner.getId()));
+            screen.draw(position, String.valueOf(owner.getUser().id()));
         }
     }
 
