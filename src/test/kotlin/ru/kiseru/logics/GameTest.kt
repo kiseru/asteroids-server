@@ -19,7 +19,7 @@ import ru.kiseru.logics.handlers.SpaceshipCrashHandler
 import ru.kiseru.logics.models.Asteroid
 import ru.kiseru.logics.models.Garbage
 import ru.kiseru.logics.models.Spaceship
-import ru.kiseru.server.User
+import ru.kiseru.server.UserHandler
 
 class GameTest {
 
@@ -100,76 +100,76 @@ class GameTest {
     }
 
     @Test
-    fun `given user - when spaceship registered - then spaceship passed to user`() {
+    fun `given userHandler - when spaceship registered - then spaceship passed to userHandler`() {
         // given
         val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
-        val user = mock<User>()
+        val userHandler = mock<UserHandler>()
 
         // when
-        game.registerSpaceShipForUser(user)
+        game.registerSpaceShipForUser(userHandler)
 
         // then
         val captor = argumentCaptor<Spaceship>()
-        verify(user).setSpaceship(captor.capture())
+        verify(userHandler).setSpaceship(captor.capture())
         val spaceship = captor.firstValue
         assertEquals(Type.SPACESHIP, spaceship.type)
     }
 
     @Test
-    fun `given user - when spaceship registered - then spaceship added to points on screen`() {
+    fun `given userHandler - when spaceship registered - then spaceship added to points on screen`() {
         // given
         val game = Game(Screen(ScreenSize(10, 10)), 2, 2)
-        val user = mock<User>()
+        val userHandler = mock<UserHandler>()
 
         // when
-        game.registerSpaceShipForUser(user)
+        game.registerSpaceShipForUser(userHandler)
 
         // then
         val captor = argumentCaptor<Spaceship>()
-        verify(user).setSpaceship(captor.capture())
+        verify(userHandler).setSpaceship(captor.capture())
         assertTrue(game.pointsOnScreen.contains(captor.firstValue))
     }
 
     @Test
-    fun `given user - when spaceship registered - then crash handler created`() {
+    fun `given userHandler - when spaceship registered - then crash handler created`() {
         // given
         val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
-        val user = mock<User>()
+        val userHandler = mock<UserHandler>()
 
         // when
-        game.registerSpaceShipForUser(user)
+        game.registerSpaceShipForUser(userHandler)
 
         // then
         assertEquals(1, game.crashHandlers.size)
     }
 
     @Test
-    fun `given user - when spaceship registered - then course checker set to spaceship`() {
+    fun `given userHandler - when spaceship registered - then course checker set to spaceship`() {
         // given
         val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
-        val user = mock<User>()
+        val userHandler = mock<UserHandler>()
 
         // when
-        game.registerSpaceShipForUser(user)
+        game.registerSpaceShipForUser(userHandler)
 
         // then
         val captor = argumentCaptor<Spaceship>()
-        verify(user).setSpaceship(captor.capture())
+        verify(userHandler).setSpaceship(captor.capture())
         assertNotNull(captor.firstValue.courseChecker)
     }
 
     @Test
-    fun `given user - when spaceship registered - then spaceship not collide with other points`() {
+    fun `given userHandler - when spaceship registered - then spaceship not collide with other points`() {
         // given
         val game = Game(Screen(ScreenSize(10, 10)), 4, 4)
-        val user = mock<User>()
+        val userHandler = mock<UserHandler>()
 
         // when
-        game.registerSpaceShipForUser(user)
+        game.registerSpaceShipForUser(userHandler)
 
         // then
         val captor = argumentCaptor<Spaceship>()
-        verify(user).setSpaceship(captor.capture())
+        verify(userHandler).setSpaceship(captor.capture())
         val spaceshipCoordinates = captor.firstValue.position
         val otherCoordinates = game.pointsOnScreen
             .filter { it.type != Type.SPACESHIP }
@@ -258,9 +258,9 @@ class GameTest {
     fun `given spaceship with alive owner - when isAnyoneAlive called - then true returned`() {
         // given
         val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
-        val user = mock<User>()
-        whenever(user.getIsAlive()).thenReturn(true)
-        game.registerSpaceShipForUser(user)
+        val userHandler = mock<UserHandler>()
+        whenever(userHandler.getIsAlive()).thenReturn(true)
+        game.registerSpaceShipForUser(userHandler)
 
         // when
         val actual = game.isAnyoneAlive()
@@ -273,9 +273,9 @@ class GameTest {
     fun `given spaceship with dead owner - when isAnyoneAlive called - then false returned`() {
         // given
         val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
-        val user = mock<User>()
-        whenever(user.getIsAlive()).thenReturn(false)
-        game.registerSpaceShipForUser(user)
+        val userHandler = mock<UserHandler>()
+        whenever(userHandler.getIsAlive()).thenReturn(false)
+        game.registerSpaceShipForUser(userHandler)
 
         // when
         val actual = game.isAnyoneAlive()
@@ -288,12 +288,12 @@ class GameTest {
     fun `given two users one alive - when isAnyoneAlive called - then true returned`() {
         // given
         val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
-        val deadUser = mock<User>()
-        whenever(deadUser.getIsAlive()).thenReturn(false)
-        val aliveUser = mock<User>()
-        whenever(aliveUser.getIsAlive()).thenReturn(true)
-        game.registerSpaceShipForUser(deadUser)
-        game.registerSpaceShipForUser(aliveUser)
+        val deadUserHandler = mock<UserHandler>()
+        whenever(deadUserHandler.getIsAlive()).thenReturn(false)
+        val aliveUserHandler = mock<UserHandler>()
+        whenever(aliveUserHandler.getIsAlive()).thenReturn(true)
+        game.registerSpaceShipForUser(deadUserHandler)
+        game.registerSpaceShipForUser(aliveUserHandler)
 
         // when
         val actual = game.isAnyoneAlive()

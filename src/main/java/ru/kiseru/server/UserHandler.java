@@ -4,24 +4,25 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.atomic.AtomicInteger;
+import ru.kiseru.logics.User;
 import ru.kiseru.logics.auxiliary.Direction;
 import ru.kiseru.logics.models.Spaceship;
 import ru.kiseru.server.room.Room;
 
-public final class User {
+public final class UserHandler {
 
     private final long id;
     private final BufferedReader reader;
     private final PrintWriter writer;
     private volatile Room room;
 
-    private String username;
+    private User user;
     private final AtomicInteger score = new AtomicInteger(100);
     private int steps = 0;
     private volatile boolean isAlive = true;
     private Spaceship spaceship;
 
-    public User(
+    public UserHandler(
         long id,
         BufferedReader reader,
         PrintWriter writer,
@@ -41,8 +42,8 @@ public final class User {
         try {
             writer.println("Welcome To Asteroids Server");
             writer.println("Please, introduce yourself!");
-            username = reader.readLine();
-            System.out.println(username + " has joined the server!");
+            user = new User(reader.readLine());
+            System.out.println(user.username() + " has joined the server!");
             writer.println("You need to keep a space garbage.");
             writer.println("Your ID is " + getId());
             writer.println("Good luck, Commander!");
@@ -99,7 +100,7 @@ public final class User {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Connection problems with user " + username);
+            System.out.println("Connection problems with user " + user.username());
         } finally {
             isAlive = false;
             room.notifyIfNoAliveUsers();
@@ -108,11 +109,11 @@ public final class User {
 
     @Override
     public String toString() {
-        return String.format("%s %d", username, score.get());
+        return String.format("%s %d", user.username(), score.get());
     }
 
     public String getUsername() {
-        return username;
+        return user.username();
     }
 
     public long getId() {

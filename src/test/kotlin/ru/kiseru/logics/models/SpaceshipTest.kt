@@ -17,16 +17,16 @@ import ru.kiseru.logics.auxiliary.ScreenSize
 import ru.kiseru.logics.auxiliary.Direction
 import ru.kiseru.logics.auxiliary.Type
 import ru.kiseru.logics.CourseChecker
-import ru.kiseru.server.User
+import ru.kiseru.server.UserHandler
 import ru.kiseru.server.room.Room
 
 class SpaceshipTest {
 
     @Test
-    fun `given coordinates and user - when spaceship created - then it is visible and stores coordinates`() {
+    fun `given coordinates and userHandler - when spaceship created - then it is visible and stores coordinates`() {
         // given
         val position = Position(3, 7)
-        val owner = mockUser(mockRoom(mock<Game>()))
+        val owner = mockUserHandler(mockRoom(mock<Game>()))
 
         // when
         val spaceship = Spaceship(position, owner)
@@ -39,7 +39,7 @@ class SpaceshipTest {
     @Test
     fun `given spaceship - when getType called - then SPACESHIP type returned`() {
         // given
-        val spaceship = Spaceship(Position(1, 2), mockUser(mockRoom(mock<Game>())))
+        val spaceship = Spaceship(Position(1, 2), mockUserHandler(mockRoom(mock<Game>())))
 
         // when
         val actual = spaceship.type
@@ -52,7 +52,7 @@ class SpaceshipTest {
     fun `given visible spaceship - when render called - then owner id drawn on screen`() {
         // given
         val screen = Screen(ScreenSize(5, 5))
-        val owner = mockUser(mockRoom(mock<Game>()))
+        val owner = mockUserHandler(mockRoom(mock<Game>()))
         val spaceship = Spaceship(Position(2, 3), owner)
 
         // when
@@ -67,7 +67,7 @@ class SpaceshipTest {
     fun `given invisible spaceship - when render called - then nothing drawn on screen`() {
         // given
         val screen = Screen(ScreenSize(5, 5))
-        val spaceship = Spaceship(Position(2, 3), mockUser(mockRoom(mock<Game>())))
+        val spaceship = Spaceship(Position(2, 3), mockUserHandler(mockRoom(mock<Game>())))
         spaceship.isVisible = false
 
         // when
@@ -93,7 +93,7 @@ class SpaceshipTest {
         expectedY: Int,
     ) {
         // given
-        val spaceship = Spaceship(Position(initialX, initialY), mockUser(mockRoom(mock<Game>())))
+        val spaceship = Spaceship(Position(initialX, initialY), mockUserHandler(mockRoom(mock<Game>())))
         spaceship.direction = direction
 
         // when
@@ -107,7 +107,7 @@ class SpaceshipTest {
     fun `given spaceship crashed into asteroid - when crash called - then owner score subtracted`() {
         // given
         val game = mock<Game>()
-        val owner = mockUser(mockRoom(game))
+        val owner = mockUserHandler(mockRoom(game))
         val spaceship = Spaceship(Position(5, 5), owner)
 
         // when
@@ -123,7 +123,7 @@ class SpaceshipTest {
         val game = mock<Game>()
         whenever(game.incrementCollectedGarbageCount()).thenReturn(1)
         whenever(game.garbageNumber).thenReturn(10)
-        val owner = mockUser(mockRoom(game))
+        val owner = mockUserHandler(mockRoom(game))
         val spaceship = Spaceship(Position(5, 5), owner)
 
         // when
@@ -140,7 +140,7 @@ class SpaceshipTest {
         val game = mock<Game>()
         whenever(game.incrementCollectedGarbageCount()).thenReturn(5)
         whenever(game.garbageNumber).thenReturn(5)
-        val owner = mockUser(mockRoom(game))
+        val owner = mockUserHandler(mockRoom(game))
         val spaceship = Spaceship(Position(5, 5), owner)
 
         // when
@@ -155,7 +155,7 @@ class SpaceshipTest {
     fun `given spaceship crashed into wall - when crash called - then coordinates rolled back and owner score subtracted`() {
         // given
         val game = mock<Game>()
-        val owner = mockUser(mockRoom(game))
+        val owner = mockUserHandler(mockRoom(game))
         val spaceship = Spaceship(Position(5, 5), owner)
         spaceship.direction = Direction.UP
         spaceship.go()
@@ -174,7 +174,7 @@ class SpaceshipTest {
         val game = mock<Game>()
         whenever(game.incrementCollectedGarbageCount()).thenReturn(1)
         whenever(game.garbageNumber).thenReturn(10)
-        val owner = mockUser(mockRoom(game))
+        val owner = mockUserHandler(mockRoom(game))
         whenever(owner.getIsAlive()).thenReturn(false)
         val spaceship = Spaceship(Position(5, 5), owner)
         assertTrue(spaceship.isVisible)
@@ -189,7 +189,7 @@ class SpaceshipTest {
     @Test
     fun `given spaceship - when setDirection called - then direction stored`() {
         // given
-        val spaceship = Spaceship(Position(5, 5), mockUser(mockRoom(mock<Game>())))
+        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
 
         // when
         spaceship.direction = Direction.LEFT
@@ -201,7 +201,7 @@ class SpaceshipTest {
     @Test
     fun `given spaceship - when setCourseChecker called - then course checker stored`() {
         // given
-        val spaceship = Spaceship(Position(5, 5), mockUser(mockRoom(mock<Game>())))
+        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
         val courseChecker = CourseChecker(spaceship, emptyList(), Screen(ScreenSize(5, 5)))
 
         // when
@@ -214,7 +214,7 @@ class SpaceshipTest {
     @Test
     fun `given spaceship with alive owner - when isOwnerAlive called - then owner liveness returned`() {
         // given
-        val owner = mockUser(mockRoom(mock<Game>()))
+        val owner = mockUserHandler(mockRoom(mock<Game>()))
         val spaceship = Spaceship(Position(5, 5), owner)
 
         // when
@@ -227,7 +227,7 @@ class SpaceshipTest {
     @Test
     fun `given spaceship with dead owner - when isOwnerAlive called - then false returned`() {
         // given
-        val owner = mockUser(mockRoom(mock<Game>()))
+        val owner = mockUserHandler(mockRoom(mock<Game>()))
         whenever(owner.getIsAlive()).thenReturn(false)
         val spaceship = Spaceship(Position(5, 5), owner)
 
@@ -235,12 +235,12 @@ class SpaceshipTest {
         assertFalse(spaceship.isOwnerAlive)
     }
 
-    private fun mockUser(room: Room): User {
-        val user = mock<User>()
-        whenever(user.room).thenReturn(room)
-        whenever(user.getIsAlive()).thenReturn(true)
-        whenever(user.id).thenReturn(1L)
-        return user
+    private fun mockUserHandler(room: Room): UserHandler {
+        val userHandler = mock<UserHandler>()
+        whenever(userHandler.room).thenReturn(room)
+        whenever(userHandler.isAlive).thenReturn(true)
+        whenever(userHandler.id).thenReturn(1L)
+        return userHandler
     }
 
     private fun mockRoom(game: Game): Room {

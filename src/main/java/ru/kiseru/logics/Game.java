@@ -8,7 +8,7 @@ import ru.kiseru.logics.auxiliary.Position;
 import ru.kiseru.logics.auxiliary.Type;
 import ru.kiseru.logics.handlers.SpaceshipCrashHandler;
 import ru.kiseru.logics.models.*;
-import ru.kiseru.server.User;
+import ru.kiseru.server.UserHandler;
 
 public class Game {
 
@@ -48,11 +48,11 @@ public class Game {
 
     /**
      * Создает и регистрирует новый корабль
-     * @param user - юзер, для которого регистрируется корабль
+     * @param userHandler - юзер, для которого регистрируется корабль
      */
-    public void registerSpaceShipForUser(User user) {
-        Spaceship spaceShip = new Spaceship(generateUniqueRandomCoordinates(), user);
-        user.setSpaceship(spaceShip);
+    public void registerSpaceShipForUser(UserHandler userHandler) {
+        Spaceship spaceShip = new Spaceship(generateUniqueRandomCoordinates(), userHandler);
+        userHandler.setSpaceship(spaceShip);
         this.pointsOnScreen.add(spaceShip);
         this.gameObjects.add(spaceShip);
         crashHandlers.add(new SpaceshipCrashHandler(this, spaceShip));

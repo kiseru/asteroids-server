@@ -2,7 +2,6 @@ package ru.kiseru.server
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -16,172 +15,151 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import ru.kiseru.logics.CourseChecker
 import ru.kiseru.logics.Game
+import ru.kiseru.logics.User
 import ru.kiseru.logics.auxiliary.Direction
 import ru.kiseru.logics.models.Spaceship
 import ru.kiseru.server.room.Room
 import java.io.BufferedReader
 import java.io.PrintWriter
 
-class UserTest {
+class UserHandlerTest {
 
     @Test
-    fun `given new user - when created - then score is 100`() {
+    fun `given new userHandler - when created - then score is 100`() {
         // given
-        val user = createUser()
+        val userHandler = createUserHandler()
 
         // when & then
-        assertEquals(100, user.score)
+        assertEquals(100, userHandler.score)
     }
 
     @Test
-    fun `given new user - when created - then user is alive`() {
+    fun `given new userHandler - when created - then userHandler is alive`() {
         // given
-        val user = createUser()
+        val userHandler = createUserHandler()
 
         // when & then
-        assertTrue(user.getIsAlive())
+        assertTrue(userHandler.isAlive)
     }
 
     @Test
-    fun `given new user - when created - then username is null`() {
-        // given
-        val user = createUser()
-
-        // when & then
-        assertNull(user.username)
-    }
-
-    @Test
-    fun `given user and room - when room requested - then same room returned`() {
+    fun `given userHandler and room - when room requested - then same room returned`() {
         // given
         val room = mock<Room>()
-        val user = createUser(room = room)
+        val userHandler = createUserHandler(room = room)
 
         // when
-        val actual = user.room
+        val actual = userHandler.room
 
         // then
         assertSame(room, actual)
     }
 
     @Test
-    fun `given user - when message sent - then writer receives message`() {
+    fun `given userHandler - when message sent - then writer receives message`() {
         // given
         val writer = mock<PrintWriter>()
-        val user = createUser(writer = writer)
+        val userHandler = createUserHandler(writer = writer)
 
         // when
-        user.sendMessage("hello")
+        userHandler.sendMessage("hello")
 
         // then
         verify(writer).println("hello")
     }
 
     @Test
-    fun `given user in started room - when score added - then score increased by 10`() {
+    fun `given userHandler in started room - when score added - then score increased by 10`() {
         // given
         val room = mock<Room>()
         whenever(room.isGameStarted).thenReturn(true)
-        val user = createUser(room = room)
+        val userHandler = createUserHandler(room = room)
 
         // when
-        user.addScore()
+        userHandler.addScore()
 
         // then
-        assertEquals(110, user.score)
+        assertEquals(110, userHandler.score)
     }
 
     @Test
-    fun `given user in not started room - when score added - then score unchanged`() {
+    fun `given userHandler in not started room - when score added - then score unchanged`() {
         // given
         val room = mock<Room>()
         whenever(room.isGameStarted).thenReturn(false)
-        val user = createUser(room = room)
+        val userHandler = createUserHandler(room = room)
 
         // when
-        user.addScore()
+        userHandler.addScore()
 
         // then
-        assertEquals(100, user.score)
+        assertEquals(100, userHandler.score)
     }
 
     @Test
-    fun `given user in started room - when score subtracted once - then score decreased by 50 and user alive`() {
+    fun `given userHandler in started room - when score subtracted once - then score decreased by 50 and userHandler alive`() {
         // given
         val room = mock<Room>()
         whenever(room.isGameStarted).thenReturn(true)
-        val user = createUser(room = room)
+        val userHandler = createUserHandler(room = room)
 
         // when
-        user.subtractScore()
+        userHandler.subtractScore()
 
         // then
-        assertEquals(50, user.score)
-        assertTrue(user.getIsAlive())
+        assertEquals(50, userHandler.score)
+        assertTrue(userHandler.isAlive)
     }
 
     @Test
-    fun `given user in started room - when score subtracted below zero - then user dies`() {
+    fun `given userHandler in started room - when score subtracted below zero - then userHandler dies`() {
         // given
         val room = mock<Room>()
         whenever(room.isGameStarted).thenReturn(true)
-        val user = createUser(room = room)
+        val userHandler = createUserHandler(room = room)
 
         // when
-        user.subtractScore()
-        user.subtractScore()
-        user.subtractScore()
+        userHandler.subtractScore()
+        userHandler.subtractScore()
+        userHandler.subtractScore()
 
         // then
-        assertEquals(-50, user.score)
-        assertFalse(user.getIsAlive())
+        assertEquals(-50, userHandler.score)
+        assertFalse(userHandler.isAlive)
     }
 
     @Test
-    fun `given user in not started room - when score subtracted - then score unchanged and user alive`() {
+    fun `given userHandler in not started room - when score subtracted - then score unchanged and userHandler alive`() {
         // given
         val room = mock<Room>()
         whenever(room.isGameStarted).thenReturn(false)
-        val user = createUser(room = room)
+        val userHandler = createUserHandler(room = room)
 
         // when
-        user.subtractScore()
+        userHandler.subtractScore()
 
         // then
-        assertEquals(100, user.score)
-        assertTrue(user.getIsAlive())
+        assertEquals(100, userHandler.score)
+        assertTrue(userHandler.isAlive)
     }
 
     @Test
-    fun `given alive user - when died - then user is not alive and death messages sent`() {
+    fun `given alive userHandler - when died - then userHandler is not alive and death messages sent`() {
         // given
         val writer = mock<PrintWriter>()
-        val user = createUser(writer = writer)
+        val userHandler = createUserHandler(writer = writer)
 
         // when
-        user.died()
+        userHandler.died()
 
         // then
-        assertFalse(user.getIsAlive())
+        assertFalse(userHandler.isAlive)
         verify(writer).println("died")
         verify(writer).println("You have collected 100 score")
     }
 
     @Test
-    fun `given user with username - when converted to string - then username and score returned`() {
-        // given
-        val user = createUser()
-        setUsername(user, "alice")
-
-        // when
-        val actual = user.toString()
-
-        // then
-        assertEquals("alice 100", actual)
-    }
-
-    @Test
-    fun `given user and not full room - when run - then user added to room and intro messages sent`() {
+    fun `given userHandler and not full room - when run - then userHandler added to room and intro messages sent`() {
         // given
         val reader = mock<BufferedReader>()
         val writer = mock<PrintWriter>()
@@ -190,24 +168,42 @@ class UserTest {
         whenever(room.isFull).thenReturn(false)
         whenever(room.isGameFinished).thenReturn(false, true)
         whenever(reader.readLine()).thenReturn("alice", "unknown")
-        val user = createUser(reader, writer, room)
-        user.setSpaceship(spaceship)
+        val userHandler = createUserHandler(reader, writer, room)
+        userHandler.setSpaceship(spaceship)
 
         // when
-        runUserUntilFinished(user)
+        runUserHandlerUntilFinished(userHandler)
 
         // then
-        verify(room).addUser(user)
+        verify(room).addUser(userHandler)
         verify(writer).println("Welcome To Asteroids Server")
         verify(writer).println("Please, introduce yourself!")
         verify(writer).println("Good luck, Commander!")
         verify(writer).println("Unknown command")
-        verify(spaceship).setDirection(Direction.UP)
-        assertEquals("alice", user.username)
+        verify(spaceship).direction = Direction.UP
     }
 
     @Test
-    fun `given room that delegates user to another room - when run - then user room updated`() {
+    fun `given userHandler and username - when run - then user filled`() {
+        // given
+        val reader = mock<BufferedReader>()
+        val room = mock<Room>()
+        val spaceship = mock<Spaceship>()
+        whenever(room.isFull).thenReturn(false)
+        whenever(room.isGameFinished).thenReturn(false, true)
+        whenever(reader.readLine()).thenReturn("alice", "unknown")
+        val userHandler = createUserHandler(reader, room = room)
+        userHandler.setSpaceship(spaceship)
+
+        // when
+        runUserHandlerUntilFinished(userHandler)
+
+        // then
+        assertEquals(User("alice"), getUser(userHandler))
+    }
+
+    @Test
+    fun `given room that delegates userHandler to another room - when run - then userHandler room updated`() {
         // given
         val reader = mock<BufferedReader>()
         val initialRoom = mock<Room>()
@@ -217,18 +213,18 @@ class UserTest {
         whenever(actualRoom.isFull).thenReturn(false)
         whenever(actualRoom.isGameFinished).thenReturn(false, true)
         whenever(reader.readLine()).thenReturn("alice", "unknown")
-        val user = User(0, reader, mock(), initialRoom)
-        user.setSpaceship(spaceship)
+        val userHandler = UserHandler(0, reader, mock(), initialRoom)
+        userHandler.setSpaceship(spaceship)
 
         // when
-        runUserUntilFinished(user)
+        runUserHandlerUntilFinished(userHandler)
 
         // then
-        assertSame(actualRoom, user.room)
+        assertSame(actualRoom, userHandler.room)
     }
 
     @Test
-    fun `given user and full room - when run - then room started`() {
+    fun `given userHandler and full room - when run - then room started`() {
         // given
         val reader = mock<BufferedReader>()
         val writer = mock<PrintWriter>()
@@ -237,18 +233,18 @@ class UserTest {
         whenever(room.isFull).thenReturn(true)
         whenever(room.isGameFinished).thenReturn(false, true)
         whenever(reader.readLine()).thenReturn("alice", "unknown")
-        val user = createUser(reader, writer, room)
-        user.setSpaceship(spaceship)
+        val userHandler = createUserHandler(reader, writer, room)
+        userHandler.setSpaceship(spaceship)
 
         // when
-        runUserUntilFinished(user)
+        runUserHandlerUntilFinished(userHandler)
 
         // then
         verify(room, timeout(5000)).run()
     }
 
     @Test
-    fun `given user - when run finishes - then room notified that no alive users left`() {
+    fun `given userHandler - when run finishes - then room notified that no alive users left`() {
         // given
         val reader = mock<BufferedReader>()
         val room = mock<Room>()
@@ -256,18 +252,18 @@ class UserTest {
         whenever(room.isFull).thenReturn(false)
         whenever(room.isGameFinished).thenReturn(false, true)
         whenever(reader.readLine()).thenReturn("alice", "unknown")
-        val user = createUser(reader, mock(), room)
-        user.setSpaceship(spaceship)
+        val userHandler = createUserHandler(reader, mock(), room)
+        userHandler.setSpaceship(spaceship)
 
         // when
-        runUserUntilFinished(user)
+        runUserHandlerUntilFinished(userHandler)
 
         // then
         verify(room).notifyIfNoAliveUsers()
     }
 
     @Test
-    fun `given user in game - when go command received - then spaceship moves and score sent`() {
+    fun `given userHandler in game - when go command received - then spaceship moves and score sent`() {
         // given
         val reader = mock<BufferedReader>()
         val writer = mock<PrintWriter>()
@@ -276,13 +272,13 @@ class UserTest {
         val spaceship = mock<Spaceship>()
         whenever(room.isFull).thenReturn(false)
         whenever(room.isGameFinished).thenReturn(false, true)
-        whenever(room.getGame()).thenReturn(game)
+        whenever(room.game).thenReturn(game)
         whenever(reader.readLine()).thenReturn("alice", "go")
-        val user = createUser(reader, writer, room)
-        user.setSpaceship(spaceship)
+        val userHandler = createUserHandler(reader, writer, room)
+        userHandler.setSpaceship(spaceship)
 
         // when
-        runUserUntilFinished(user)
+        runUserHandlerUntilFinished(userHandler)
 
         // then
         verify(spaceship).go()
@@ -292,7 +288,7 @@ class UserTest {
 
     @ParameterizedTest
     @CsvSource("left,LEFT", "right,RIGHT", "up,UP", "down,DOWN")
-    fun `given user in game - when direction command received - then spaceship direction changed and success sent`(
+    fun `given userHandler in game - when direction command received - then spaceship direction changed and success sent`(
         command: String,
         direction: Direction,
     ) {
@@ -304,22 +300,22 @@ class UserTest {
         val spaceship = mock<Spaceship>()
         whenever(room.isFull).thenReturn(false)
         whenever(room.isGameFinished).thenReturn(false, true)
-        whenever(room.getGame()).thenReturn(game)
+        whenever(room.game).thenReturn(game)
         whenever(reader.readLine()).thenReturn("alice", command)
-        val user = createUser(reader, writer, room)
-        user.setSpaceship(spaceship)
+        val userHandler = createUserHandler(reader, writer, room)
+        userHandler.setSpaceship(spaceship)
 
         // when
-        runUserUntilFinished(user)
+        runUserHandlerUntilFinished(userHandler)
 
         // then
-        verify(spaceship, atLeastOnce()).setDirection(direction)
+        verify(spaceship, atLeastOnce()).direction = direction
         verify(game).refresh()
         verify(writer).println("success")
     }
 
     @Test
-    fun `given user in game - when isAsteroid command received and asteroid ahead - then t sent`() {
+    fun `given userHandler in game - when isAsteroid command received and asteroid ahead - then t sent`() {
         // given
         val reader = mock<BufferedReader>()
         val writer = mock<PrintWriter>()
@@ -331,18 +327,18 @@ class UserTest {
         whenever(spaceship.courseChecker).thenReturn(courseChecker)
         whenever(courseChecker.isAsteroid()).thenReturn(true)
         whenever(reader.readLine()).thenReturn("alice", "isAsteroid")
-        val user = createUser(reader, writer, room)
-        user.setSpaceship(spaceship)
+        val userHandler = createUserHandler(reader, writer, room)
+        userHandler.setSpaceship(spaceship)
 
         // when
-        runUserUntilFinished(user)
+        runUserHandlerUntilFinished(userHandler)
 
         // then
         verify(writer).println("t")
     }
 
     @Test
-    fun `given user in game - when isGarbage command received and no garbage ahead - then f sent`() {
+    fun `given userHandler in game - when isGarbage command received and no garbage ahead - then f sent`() {
         // given
         val reader = mock<BufferedReader>()
         val writer = mock<PrintWriter>()
@@ -354,18 +350,18 @@ class UserTest {
         whenever(spaceship.courseChecker).thenReturn(courseChecker)
         whenever(courseChecker.isGarbage()).thenReturn(false)
         whenever(reader.readLine()).thenReturn("alice", "isGarbage")
-        val user = createUser(reader, writer, room)
-        user.setSpaceship(spaceship)
+        val userHandler = createUserHandler(reader, writer, room)
+        userHandler.setSpaceship(spaceship)
 
         // when
-        runUserUntilFinished(user)
+        runUserHandlerUntilFinished(userHandler)
 
         // then
         verify(writer).println("f")
     }
 
     @Test
-    fun `given user in game - when isWall command received and wall ahead - then t sent`() {
+    fun `given userHandler in game - when isWall command received and wall ahead - then t sent`() {
         // given
         val reader = mock<BufferedReader>()
         val writer = mock<PrintWriter>()
@@ -375,20 +371,20 @@ class UserTest {
         whenever(room.isFull).thenReturn(false)
         whenever(room.isGameFinished).thenReturn(false, true)
         whenever(spaceship.courseChecker).thenReturn(courseChecker)
-        whenever(courseChecker.isWall()).thenReturn(true)
+        whenever(courseChecker.isWall).thenReturn(true)
         whenever(reader.readLine()).thenReturn("alice", "isWall")
-        val user = createUser(reader, writer, room)
-        user.setSpaceship(spaceship)
+        val userHandler = createUserHandler(reader, writer, room)
+        userHandler.setSpaceship(spaceship)
 
         // when
-        runUserUntilFinished(user)
+        runUserHandlerUntilFinished(userHandler)
 
         // then
         verify(writer).println("t")
     }
 
     @Test
-    fun `given user in game - when 1500 steps performed - then user died`() {
+    fun `given userHandler in game - when 1500 steps performed - then userHandler died`() {
         // given
         val reader = mock<BufferedReader>()
         val writer = mock<PrintWriter>()
@@ -397,38 +393,38 @@ class UserTest {
         val spaceship = mock<Spaceship>()
         whenever(room.isFull).thenReturn(false)
         whenever(room.isGameFinished).thenReturn(false)
-        whenever(room.getGame()).thenReturn(game)
+        whenever(room.game).thenReturn(game)
         whenever(reader.readLine()).thenAnswer { "go" }
-        val user = createUser(reader, writer, room)
-        user.setSpaceship(spaceship)
+        val userHandler = createUserHandler(reader, writer, room)
+        userHandler.setSpaceship(spaceship)
 
         // when
-        runUserUntilFinished(user)
+        runUserHandlerUntilFinished(userHandler)
 
         // then
-        assertFalse(user.getIsAlive())
+        assertFalse(userHandler.isAlive)
         verify(writer).println("died")
         verify(writer).println("You have collected 100 score")
     }
 
-    private fun createUser(
+    private fun createUserHandler(
         reader: BufferedReader = mock(),
         writer: PrintWriter = mock(),
         room: Room = mock(),
-    ): User {
+    ): UserHandler {
         whenever(room.addUser(any())).thenReturn(room)
-        return User(0, reader, writer, room)
+        return UserHandler(0, reader, writer, room)
     }
 
-    private fun runUserUntilFinished(user: User) {
-        val thread = Thread { user.run() }
+    private fun runUserHandlerUntilFinished(userHandler: UserHandler) {
+        val thread = Thread { userHandler.run() }
         thread.start()
         thread.join(5000)
     }
 
-    private fun setUsername(user: User, username: String) {
-        val field = User::class.java.getDeclaredField("username")
+    private fun getUser(userHandler: UserHandler): User {
+        val field = UserHandler::class.java.getDeclaredField("user")
         field.isAccessible = true
-        field.set(user, username)
+        return field.get(userHandler) as User
     }
 }

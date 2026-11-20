@@ -8,81 +8,81 @@ import ru.kiseru.logics.Game;
 import ru.kiseru.logics.Screen;
 import ru.kiseru.logics.auxiliary.ScreenSize;
 import ru.kiseru.server.Server;
-import ru.kiseru.server.User;
+import ru.kiseru.server.UserHandler;
 
 public final class Room {
 
     private final int MAX_USERS = 1;
 
-    private final ArrayList<User> users = new ArrayList<>();
+    private final ArrayList<UserHandler> userHandlers = new ArrayList<>();
 
-    private volatile int usersCount = 0;
+    private volatile int userHandlersCount = 0;
     private volatile Status status = Status.WAITING_CONNECTIONS;
     private volatile Game game;
 
     public Room() {
-        initUsers();
+        initUserHandlers();
     }
 
-    private void initUsers() {
+    private void initUserHandlers() {
         for (int i = 0; i < MAX_USERS; i++) {
-            users.add(null);
+            userHandlers.add(null);
         }
     }
 
-    public synchronized Room addUser(User user) {
-        if (isFull()) return Server.Companion.getNotFullRoom().addUser(user);
+    public synchronized Room addUser(UserHandler userHandler) {
+        if (isFull()) return Server.Companion.getNotFullRoom().addUser(userHandler);
 
         int emptyPlaceIndex = IntStream.iterate(0, index -> index + 1)
-                .limit(users.size())
-                .filter(index -> users.get(index) == null)
+                .limit(userHandlers.size())
+                .filter(index -> userHandlers.get(index) == null)
                 .findFirst()
                 .orElse(-1);
 
         if (emptyPlaceIndex == -1) return this;
 
-        users.stream()
+        userHandlers.stream()
                 .filter(Objects::nonNull)
-                .forEach(roomUser -> roomUser.sendMessage(String.format("User %s has joined the room.", user.getUsername())));
+                .forEach(roomUserHandler -> roomUserHandler.sendMessage(String.format("User %s has joined the room.", userHandler.getUsername())));
 
-        users.set(emptyPlaceIndex, user);
-        usersCount++;
+        userHandlers.set(emptyPlaceIndex, userHandler);
+        userHandlersCount++;
 
         return this;
     }
 
-    public synchronized void removeUser(User user) {
-        if (usersCount == 0) return;
+    public synchronized void removeUser(UserHandler userHandler) {
+        if (userHandlersCount == 0) return;
 
-        User removingUser = users.stream()
-                .filter(user::equals)
+        UserHandler removingUserHandler = userHandlers.stream()
+                .filter(userHandler::equals)
                 .findFirst()
                 .orElse(null);
 
-        if (removingUser == null) return;
+        if (removingUserHandler == null) return;
 
-        users.remove(removingUser);
+        userHandlers.remove(removingUserHandler);
 
-        usersCount--;
+        userHandlersCount--;
     }
 
     public String getRating() {
-        return users.stream()
+        return userHandlers.stream()
                 .filter(Objects::nonNull)
-                .sorted(Comparator.comparingInt(User::getScore))
-                .map(User::toString)
-                .reduce("", (acc, userRow) -> acc + userRow + "\n");
+                .sorted(Comparator.comparingInt(UserHandler::getScore))
+                .map(UserHandler::toString)
+                .reduce("", (acc, userHandlerRow) -> acc + userHandlerRow + "\n");
     }
 
     public long aliveCount() {
-        return users.stream()
+        return userHandlers.stream()
                 .filter(Objects::nonNull)
-                .filter(User::getIsAlive)
+                .filter(UserHandler::getIsAlive)
                 .count();
     }
 
     public boolean isFull() {
-        return usersCount == MAX_USERS;
+        return userHandlersCount == MAX_USERS;
     }
 
     public boolean isGameStarted() {
@@ -109,12 +109,12 @@ public final class Room {
         synchronized (this) {
             status = Status.GAMING;
             game = new Game(new Screen(new ScreenSize(30, 30)), 150, 50);
-            users.stream()
+            userHandlers.stream()
                     .filter(Objects::nonNull)
                     .forEach(game::registerSpaceShipForUser);
-            users.stream()
+            userHandlers.stream()
                     .filter(Objects::nonNull)
-                    .forEach(user -> user.sendMessage("start"));
+                    .forEach(userHandler -> userHandler.sendMessage("start"));
             notifyAll();
         }
 
@@ -134,12 +134,12 @@ public final class Room {
             status = Status.FINISHED;
         }
 
-        users.stream()
+        userHandlers.stream()
                 .filter(Objects::nonNull)
-                .forEach(user -> user.sendMessage("finish"));
-        users.stream()
+                .forEach(userHandler -> userHandler.sendMessage("finish"));
+        userHandlers.stream()
                 .filter(Objects::nonNull)
-                .forEach(user -> user.sendMessage(this.getRating()));
+                .forEach(userHandler -> userHandler.sendMessage(this.getRating()));
         System.out.println("Room released!");
         System.out.println(getRating());
         System.out.println();

@@ -5,15 +5,15 @@ import ru.kiseru.logics.Screen;
 import ru.kiseru.logics.auxiliary.Position;
 import ru.kiseru.logics.auxiliary.Direction;
 import ru.kiseru.logics.auxiliary.Type;
-import ru.kiseru.server.User;
+import ru.kiseru.server.UserHandler;
 
 public class Spaceship extends Point implements Model{
 
-    private final User owner;
+    private final UserHandler owner;
     private Direction direction;
     private CourseChecker courseChecker;
 
-    public Spaceship(Position position, User owner) {
+    public Spaceship(Position position, UserHandler owner) {
         super(position);
         this.owner = owner;
     }

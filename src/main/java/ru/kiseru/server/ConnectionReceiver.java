@@ -26,8 +26,8 @@ public final class ConnectionReceiver {
                 Room notFullRoom = Server.Companion.getNotFullRoom();
                 var reader = new BufferedReader(new InputStreamReader(newConnection.getInputStream()));
                 var writer = new PrintWriter(newConnection.getOutputStream(), true);
-                User user = new User(ID_GENERATOR.incrementAndGet(), reader, writer, notFullRoom);
-                new Thread(user::run).start();
+                var userHandler = new UserHandler(ID_GENERATOR.incrementAndGet(), reader, writer, notFullRoom);
+                new Thread(userHandler::run).start();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
