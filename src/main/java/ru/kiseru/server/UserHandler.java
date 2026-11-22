@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.atomic.AtomicInteger;
+import ru.kiseru.logics.Steps;
 import ru.kiseru.logics.User;
 import ru.kiseru.logics.auxiliary.Direction;
 import ru.kiseru.logics.models.Spaceship;
@@ -17,7 +18,6 @@ public final class UserHandler {
 
     private final User user;
     private final AtomicInteger score = new AtomicInteger(100);
-    private int steps = 0;
     private volatile boolean isAlive = true;
     private Spaceship spaceship;
 
@@ -87,8 +87,9 @@ public final class UserHandler {
                     case "isWall" -> sendMessage(spaceship.getCourseChecker().isWall() ? "t" : "f");
                     default -> sendMessage("Unknown command");
                 }
-                steps++;
-                if (steps >= 1500) {
+                Steps nextSteps = spaceship.getSteps().increment();
+                spaceship.setSteps(nextSteps);
+                if (nextSteps.getValue() >= 1500) {
                     died();
                 }
                 if (score.get() < 0) {

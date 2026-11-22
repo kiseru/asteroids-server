@@ -2,6 +2,7 @@ package ru.kiseru.logics.models;
 
 import ru.kiseru.logics.CourseChecker;
 import ru.kiseru.logics.Screen;
+import ru.kiseru.logics.Steps;
 import ru.kiseru.logics.auxiliary.Position;
 import ru.kiseru.logics.auxiliary.Direction;
 import ru.kiseru.logics.auxiliary.Type;
@@ -10,6 +11,8 @@ import ru.kiseru.server.UserHandler;
 public class Spaceship extends Point implements Model{
 
     private final UserHandler owner;
+
+    private Steps steps = new Steps();
     private Direction direction;
     private CourseChecker courseChecker;
 
@@ -64,6 +67,14 @@ public class Spaceship extends Point implements Model{
      */
     private void destroy() {
         this.isVisible = false;
+    }
+
+    public Steps getSteps() {
+        return steps;
+    }
+
+    public void setSteps(Steps steps) {
+        this.steps = steps;
     }
 
     public Direction getDirection() {
