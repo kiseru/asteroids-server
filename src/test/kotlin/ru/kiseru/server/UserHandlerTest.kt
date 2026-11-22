@@ -159,7 +159,7 @@ class UserHandlerTest {
     }
 
     @Test
-    fun `given userHandler and not full room - when run - then userHandler added to room and intro messages sent`() {
+    fun `given userHandler and not full room - when run - then userHandler added to room and messages sent`() {
         // given
         val reader = mock<BufferedReader>()
         val writer = mock<PrintWriter>()
@@ -167,7 +167,7 @@ class UserHandlerTest {
         val spaceship = mock<Spaceship>()
         whenever(room.isFull).thenReturn(false)
         whenever(room.isGameFinished).thenReturn(false, true)
-        whenever(reader.readLine()).thenReturn("alice", "unknown")
+        whenever(reader.readLine()).thenReturn("unknown")
         val userHandler = createUserHandler(reader, writer, room)
         userHandler.setSpaceship(spaceship)
 
@@ -176,30 +176,23 @@ class UserHandlerTest {
 
         // then
         verify(room).addUser(userHandler)
-        verify(writer).println("Welcome To Asteroids Server")
-        verify(writer).println("Please, introduce yourself!")
+        verify(writer).println("You need to keep a space garbage.")
+        verify(writer).println("Your ID is 1")
         verify(writer).println("Good luck, Commander!")
         verify(writer).println("Unknown command")
         verify(spaceship).direction = Direction.UP
     }
 
     @Test
-    fun `given userHandler and username - when run - then user filled`() {
+    fun `given user - when userHandler created - then same user returned`() {
         // given
-        val reader = mock<BufferedReader>()
-        val room = mock<Room>()
-        val spaceship = mock<Spaceship>()
-        whenever(room.isFull).thenReturn(false)
-        whenever(room.isGameFinished).thenReturn(false, true)
-        whenever(reader.readLine()).thenReturn("alice", "unknown")
-        val userHandler = createUserHandler(reader, room = room)
-        userHandler.setSpaceship(spaceship)
+        val user = User(7, "alice")
 
         // when
-        runUserHandlerUntilFinished(userHandler)
+        val userHandler = createUserHandler(user = user)
 
         // then
-        assertEquals(User(0, "alice"), userHandler.user)
+        assertSame(user, userHandler.user)
     }
 
     @Test
@@ -212,8 +205,8 @@ class UserHandlerTest {
         whenever(initialRoom.addUser(any())).thenReturn(actualRoom)
         whenever(actualRoom.isFull).thenReturn(false)
         whenever(actualRoom.isGameFinished).thenReturn(false, true)
-        whenever(reader.readLine()).thenReturn("alice", "unknown")
-        val userHandler = UserHandler(0, reader, mock(), initialRoom)
+        whenever(reader.readLine()).thenReturn("unknown")
+        val userHandler = UserHandler(reader, mock(), initialRoom, User(1, "alice"))
         userHandler.setSpaceship(spaceship)
 
         // when
@@ -232,7 +225,7 @@ class UserHandlerTest {
         val spaceship = mock<Spaceship>()
         whenever(room.isFull).thenReturn(true)
         whenever(room.isGameFinished).thenReturn(false, true)
-        whenever(reader.readLine()).thenReturn("alice", "unknown")
+        whenever(reader.readLine()).thenReturn("unknown")
         val userHandler = createUserHandler(reader, writer, room)
         userHandler.setSpaceship(spaceship)
 
@@ -251,7 +244,7 @@ class UserHandlerTest {
         val spaceship = mock<Spaceship>()
         whenever(room.isFull).thenReturn(false)
         whenever(room.isGameFinished).thenReturn(false, true)
-        whenever(reader.readLine()).thenReturn("alice", "unknown")
+        whenever(reader.readLine()).thenReturn("unknown")
         val userHandler = createUserHandler(reader, mock(), room)
         userHandler.setSpaceship(spaceship)
 
@@ -273,7 +266,7 @@ class UserHandlerTest {
         whenever(room.isFull).thenReturn(false)
         whenever(room.isGameFinished).thenReturn(false, true)
         whenever(room.game).thenReturn(game)
-        whenever(reader.readLine()).thenReturn("alice", "go")
+        whenever(reader.readLine()).thenReturn("go")
         val userHandler = createUserHandler(reader, writer, room)
         userHandler.setSpaceship(spaceship)
 
@@ -301,7 +294,7 @@ class UserHandlerTest {
         whenever(room.isFull).thenReturn(false)
         whenever(room.isGameFinished).thenReturn(false, true)
         whenever(room.game).thenReturn(game)
-        whenever(reader.readLine()).thenReturn("alice", command)
+        whenever(reader.readLine()).thenReturn(command)
         val userHandler = createUserHandler(reader, writer, room)
         userHandler.setSpaceship(spaceship)
 
@@ -326,7 +319,7 @@ class UserHandlerTest {
         whenever(room.isGameFinished).thenReturn(false, true)
         whenever(spaceship.courseChecker).thenReturn(courseChecker)
         whenever(courseChecker.isAsteroid()).thenReturn(true)
-        whenever(reader.readLine()).thenReturn("alice", "isAsteroid")
+        whenever(reader.readLine()).thenReturn("isAsteroid")
         val userHandler = createUserHandler(reader, writer, room)
         userHandler.setSpaceship(spaceship)
 
@@ -349,7 +342,7 @@ class UserHandlerTest {
         whenever(room.isGameFinished).thenReturn(false, true)
         whenever(spaceship.courseChecker).thenReturn(courseChecker)
         whenever(courseChecker.isGarbage()).thenReturn(false)
-        whenever(reader.readLine()).thenReturn("alice", "isGarbage")
+        whenever(reader.readLine()).thenReturn("isGarbage")
         val userHandler = createUserHandler(reader, writer, room)
         userHandler.setSpaceship(spaceship)
 
@@ -372,7 +365,7 @@ class UserHandlerTest {
         whenever(room.isGameFinished).thenReturn(false, true)
         whenever(spaceship.courseChecker).thenReturn(courseChecker)
         whenever(courseChecker.isWall).thenReturn(true)
-        whenever(reader.readLine()).thenReturn("alice", "isWall")
+        whenever(reader.readLine()).thenReturn("isWall")
         val userHandler = createUserHandler(reader, writer, room)
         userHandler.setSpaceship(spaceship)
 
@@ -411,9 +404,10 @@ class UserHandlerTest {
         reader: BufferedReader = mock(),
         writer: PrintWriter = mock(),
         room: Room = mock(),
+        user: User = User(1, "alice"),
     ): UserHandler {
         whenever(room.addUser(any())).thenReturn(room)
-        return UserHandler(0, reader, writer, room)
+        return UserHandler(reader, writer, room, user)
     }
 
     private fun runUserHandlerUntilFinished(userHandler: UserHandler) {

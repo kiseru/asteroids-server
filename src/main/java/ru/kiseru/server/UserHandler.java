@@ -11,27 +11,26 @@ import ru.kiseru.server.room.Room;
 
 public final class UserHandler {
 
-    private final long id;
     private final BufferedReader reader;
     private final PrintWriter writer;
     private volatile Room room;
 
-    private User user;
+    private final User user;
     private final AtomicInteger score = new AtomicInteger(100);
     private int steps = 0;
     private volatile boolean isAlive = true;
     private Spaceship spaceship;
 
     public UserHandler(
-        long id,
         BufferedReader reader,
         PrintWriter writer,
-        Room room
+        Room room,
+        User user
     ) {
-        this.id = id;
         this.reader = reader;
         this.writer = writer;
         this.room = room;
+        this.user = user;
     }
 
     public int getScore() {
@@ -40,9 +39,6 @@ public final class UserHandler {
 
     public void run() {
         try {
-            writer.println("Welcome To Asteroids Server");
-            writer.println("Please, introduce yourself!");
-            user = new User(id, reader.readLine());
             System.out.println(user.username() + " has joined the server!");
             writer.println("You need to keep a space garbage.");
             writer.println("Your ID is " + getUser().id());
