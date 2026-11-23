@@ -15,7 +15,7 @@ public class Spaceship extends Point implements Model{
 
     private Steps steps = new Steps();
     private Score score = new Score();
-    private boolean isAlive = true;
+    private Status status = Status.ALIVE;
     private Direction direction;
     private CourseChecker courseChecker;
 
@@ -81,7 +81,7 @@ public class Spaceship extends Point implements Model{
             return;
         }
         score = score.decreaseBy(50);
-        if (score.value() < 0 && isAlive) {
+        if (score.value() < 0 && status == Status.ALIVE) {
             destroy();
         }
     }
@@ -92,15 +92,15 @@ public class Spaceship extends Point implements Model{
      * @throws IllegalStateException если корабль уже разрушен
      */
     public void destroy() {
-        if (!isAlive) {
+        if (status == Status.DESTROYED) {
             throw new IllegalStateException("spaceship is already destroyed");
         }
-        isAlive = false;
+        status = Status.DESTROYED;
         isVisible = false;
     }
 
-    public boolean isAlive() {
-        return isAlive;
+    public Status getStatus() {
+        return status;
     }
 
     public Steps getSteps() {
@@ -138,5 +138,10 @@ public class Spaceship extends Point implements Model{
 
     public void setCourseChecker(CourseChecker courseChecker) {
         this.courseChecker = courseChecker;
+    }
+
+    public enum Status {
+        ALIVE,
+        DESTROYED
     }
 }

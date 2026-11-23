@@ -170,7 +170,7 @@ class RoomTest {
     fun `given room with userHandler with alive spaceship - when alive count requested - then one returned`() {
         // given
         val room = Room()
-        val userHandler = mockUserHandlerWithSpaceship(isAlive = true)
+        val userHandler = mockUserHandlerWithSpaceship(Spaceship.Status.ALIVE)
         room.addUser(userHandler)
 
         // when
@@ -184,7 +184,7 @@ class RoomTest {
     fun `given room with userHandler with destroyed spaceship - when alive count requested - then zero returned`() {
         // given
         val room = Room()
-        val userHandler = mockUserHandlerWithSpaceship(isAlive = false)
+        val userHandler = mockUserHandlerWithSpaceship(Spaceship.Status.DESTROYED)
         room.addUser(userHandler)
 
         // when
@@ -227,7 +227,7 @@ class RoomTest {
     fun `given room with userHandler - when alive count requested after removal - then zero returned`() {
         // given
         val room = Room()
-        val userHandler = mockUserHandlerWithSpaceship(isAlive = true)
+        val userHandler = mockUserHandlerWithSpaceship(Spaceship.Status.ALIVE)
         room.addUser(userHandler)
         room.removeUser(userHandler)
 
@@ -272,7 +272,7 @@ class RoomTest {
         val room = Room()
         val userHandler = mock<UserHandler>()
         val spaceship = mock<Spaceship>()
-        whenever(spaceship.isAlive).thenReturn(true)
+        whenever(spaceship.status).thenReturn(Spaceship.Status.ALIVE)
         whenever(userHandler.spaceship).thenReturn(spaceship)
         whenever(userHandler.user).thenReturn(User(1, "alice"))
         whenever(userHandler.toString()).thenReturn("alice 100")
@@ -282,7 +282,7 @@ class RoomTest {
         waitUntilWaiting(thread)
 
         // when
-        whenever(spaceship.isAlive).thenReturn(false)
+        whenever(spaceship.status).thenReturn(Spaceship.Status.DESTROYED)
         room.notifyIfNoAliveUsers()
         thread.join(5000)
 
@@ -302,7 +302,7 @@ class RoomTest {
         val room = Room()
         val userHandler = mock<UserHandler>()
         val spaceship = mock<Spaceship>()
-        whenever(spaceship.isAlive).thenReturn(true)
+        whenever(spaceship.status).thenReturn(Spaceship.Status.ALIVE)
         whenever(userHandler.spaceship).thenReturn(spaceship)
         whenever(userHandler.user).thenReturn(User(1, "alice"))
         whenever(userHandler.toString()).thenReturn("alice 100")
@@ -312,7 +312,7 @@ class RoomTest {
         waitUntilWaiting(thread)
 
         // when
-        whenever(spaceship.isAlive).thenReturn(false)
+        whenever(spaceship.status).thenReturn(Spaceship.Status.DESTROYED)
         room.notifyIfNoAliveUsers()
         thread.join(5000)
 
@@ -324,7 +324,7 @@ class RoomTest {
     fun `given room with userHandler who left before game start - when room starts - then room finishes without waiting`() {
         // given
         val room = Room()
-        val userHandler = mockUserHandlerWithSpaceship(isAlive = false)
+        val userHandler = mockUserHandlerWithSpaceship(Spaceship.Status.DESTROYED)
         whenever(userHandler.user).thenReturn(User(1, "alice"))
         whenever(userHandler.toString()).thenReturn("alice 100")
         room.addUser(userHandler)
@@ -343,7 +343,7 @@ class RoomTest {
     fun `given room with userHandler with alive spaceship - when room starts - then room waits for the spaceship to be destroyed`() {
         // given
         val room = Room()
-        val userHandler = mockUserHandlerWithSpaceship(isAlive = true)
+        val userHandler = mockUserHandlerWithSpaceship(Spaceship.Status.ALIVE)
         whenever(userHandler.user).thenReturn(User(1, "alice"))
         whenever(userHandler.toString()).thenReturn("alice 100")
         room.addUser(userHandler)
@@ -360,10 +360,10 @@ class RoomTest {
         thread.join(5000)
     }
 
-    private fun mockUserHandlerWithSpaceship(isAlive: Boolean): UserHandler {
+    private fun mockUserHandlerWithSpaceship(status: Spaceship.Status): UserHandler {
         val userHandler = mock<UserHandler>()
         val spaceship = mock<Spaceship>()
-        whenever(spaceship.isAlive).thenReturn(isAlive)
+        whenever(spaceship.status).thenReturn(status)
         whenever(userHandler.spaceship).thenReturn(spaceship)
         return userHandler
     }

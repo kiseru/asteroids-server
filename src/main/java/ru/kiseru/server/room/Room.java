@@ -80,7 +80,7 @@ public final class Room {
                 .filter(Objects::nonNull)
                 .map(UserHandler::getSpaceship)
                 .filter(Objects::nonNull)
-                .filter(Spaceship::isAlive)
+                .filter(spaceship -> spaceship.getStatus() == Spaceship.Status.ALIVE)
                 .count();
     }
 

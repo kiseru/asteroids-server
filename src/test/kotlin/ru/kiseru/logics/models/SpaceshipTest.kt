@@ -145,7 +145,7 @@ class SpaceshipTest {
 
         // then
         assertEquals(-50, spaceship.score.value())
-        assertFalse(spaceship.isAlive)
+        assertEquals(Spaceship.Status.DESTROYED, spaceship.status)
         assertFalse(spaceship.isVisible)
     }
 
@@ -202,19 +202,19 @@ class SpaceshipTest {
     }
 
     @Test
-    fun `given new spaceship - when isAlive called - then true returned`() {
+    fun `given new spaceship - when status requested - then alive status returned`() {
         // given
         val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
 
         // when
-        val actual = spaceship.isAlive
+        val actual = spaceship.status
 
         // then
-        assertTrue(actual)
+        assertEquals(Spaceship.Status.ALIVE, actual)
     }
 
     @Test
-    fun `given alive spaceship - when destroy called - then spaceship is not alive and invisible`() {
+    fun `given alive spaceship - when destroy called - then spaceship is destroyed and invisible`() {
         // given
         val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
 
@@ -222,7 +222,7 @@ class SpaceshipTest {
         spaceship.destroy()
 
         // then
-        assertFalse(spaceship.isAlive)
+        assertEquals(Spaceship.Status.DESTROYED, spaceship.status)
         assertFalse(spaceship.isVisible)
     }
 

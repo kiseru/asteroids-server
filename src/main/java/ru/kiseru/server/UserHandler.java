@@ -54,7 +54,7 @@ public final class UserHandler {
                 e.printStackTrace();
             }
             spaceship.setDirection(Direction.UP);
-            while (!room.isGameFinished() && spaceship.isAlive()) {
+            while (!room.isGameFinished() && spaceship.getStatus() == Spaceship.Status.ALIVE) {
                 String userMessage = reader.readLine();
                 switch (userMessage) {
                     case "go" -> {
@@ -97,7 +97,7 @@ public final class UserHandler {
             System.out.println("Connection problems with user " + user.username());
         } finally {
             synchronized (spaceship) {
-                if (spaceship != null && spaceship.isAlive()) {
+                if (spaceship != null && spaceship.getStatus() == Spaceship.Status.ALIVE) {
                     spaceship.destroy();
                 }
             }
@@ -120,7 +120,7 @@ public final class UserHandler {
 
     public void died() {
         synchronized (spaceship) {
-            if (spaceship.isAlive()) {
+            if (spaceship.getStatus() == Spaceship.Status.ALIVE) {
                 spaceship.destroy();
             }
         }

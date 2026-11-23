@@ -1,7 +1,6 @@
 package ru.kiseru.server
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -334,7 +333,7 @@ class UserHandlerTest {
         runUserHandlerUntilFinished(userHandler)
 
         // then
-        assertFalse(spaceship.isAlive)
+        assertEquals(Spaceship.Status.DESTROYED, spaceship.status)
         verify(writer).println("died")
         verify(writer).println("You have collected 0 score")
     }
@@ -353,7 +352,7 @@ class UserHandlerTest {
         val spaceship = mock<Spaceship>()
         whenever(spaceship.steps).thenReturn(Steps())
         whenever(spaceship.score).thenReturn(Score(100))
-        whenever(spaceship.isAlive).thenReturn(true)
+        whenever(spaceship.status).thenReturn(Spaceship.Status.ALIVE)
         return spaceship
     }
 
