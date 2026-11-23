@@ -239,6 +239,7 @@ class CourseCheckerTest {
         whenever(spaceship.direction).thenReturn(direction)
         whenever(spaceship.x).thenReturn(x)
         whenever(spaceship.y).thenReturn(y)
+        whenever(spaceship.position).thenReturn(Position(x, y))
         return spaceship
     }
 

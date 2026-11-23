@@ -45,13 +45,7 @@ public class CourseChecker {
     }
 
     private boolean checkContaining(List<Position> container) {
-        var coordinates = switch (spaceship.getDirection()) {
-            case UP -> new Position(spaceship.getX(), spaceship.getY() - 1);
-            case RIGHT -> new Position(spaceship.getX() + 1, spaceship.getY());
-            case DOWN -> new Position(spaceship.getX(), spaceship.getY() + 1);
-            case LEFT -> new Position(spaceship.getX() - 1, spaceship.getY());
-        };
-
-        return container.contains(coordinates);
+        var position = spaceship.getPosition().aheadOf(spaceship.getDirection());
+        return container.contains(position);
     }
 }
