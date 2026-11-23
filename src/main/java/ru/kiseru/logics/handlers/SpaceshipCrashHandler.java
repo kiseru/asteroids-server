@@ -9,11 +9,11 @@ import ru.kiseru.logics.models.Spaceship;
 
 public class SpaceshipCrashHandler {
 
-    private final Spaceship spaceShip;
+    private final Spaceship spaceship;
     private final Game game;
 
     public SpaceshipCrashHandler(Game game, Spaceship spaceShip) {
-        this.spaceShip = spaceShip;
+        this.spaceship = spaceShip;
         this.game = game;
     }
 
@@ -24,21 +24,22 @@ public class SpaceshipCrashHandler {
         for (Point point: points) {
             if (point.getType() != Type.SPACESHIP &&
                     point.isVisible() &&
-                    point.getPosition().equals(spaceShip.getPosition())) {
+                    point.getPosition().equals(spaceship.getPosition())) {
                 isCollision = true;
                 collisionPoint = point;
                 break;
             }
         }
         if (isCollision) {
-            spaceShip.crash(collisionPoint.getType());
+            spaceship.crash(collisionPoint.getType());
             ((Crashable)collisionPoint).crash();
         } else {
             // проверка на столкновение со стеной
-            if (spaceShip.getX() == 0 || spaceShip.getY() == 0 ||
-                    spaceShip.getX() > game.getScreen().getSize().width() ||
-                    spaceShip.getY() > game.getScreen().getSize().height()) {
-                spaceShip.crash(Type.WALL);
+            if (spaceship.getX() == 0
+                    || spaceship.getY() == 0
+                    || spaceship.getX() > game.getScreen().getSize().width()
+                    || spaceship.getY() > game.getScreen().getSize().height()) {
+                spaceship.crash(Type.WALL);
             }
         }
     }
