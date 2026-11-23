@@ -234,6 +234,80 @@ class SpaceshipTest {
     }
 
     @Test
+    fun `given alive spaceship with score - when subtractScore called - then score decreased by 50 and spaceship stays alive`() {
+        // given
+        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        spaceship.score = Score(100)
+
+        // when
+        spaceship.subtractScore()
+
+        // then
+        assertEquals(50, spaceship.score.value())
+        assertEquals(Spaceship.Status.ALIVE, spaceship.status)
+        assertTrue(spaceship.isVisible)
+    }
+
+    @Test
+    fun `given alive spaceship with score equal to penalty - when subtractScore called - then score is zero and spaceship stays alive`() {
+        // given
+        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        spaceship.score = Score(50)
+
+        // when
+        spaceship.subtractScore()
+
+        // then
+        assertEquals(0, spaceship.score.value())
+        assertEquals(Spaceship.Status.ALIVE, spaceship.status)
+        assertTrue(spaceship.isVisible)
+    }
+
+    @Test
+    fun `given alive spaceship with score less than penalty - when subtractScore called - then score is negative and spaceship destroyed`() {
+        // given
+        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        spaceship.score = Score(30)
+
+        // when
+        spaceship.subtractScore()
+
+        // then
+        assertEquals(-20, spaceship.score.value())
+        assertEquals(Spaceship.Status.DESTROYED, spaceship.status)
+        assertFalse(spaceship.isVisible)
+    }
+
+    @Test
+    fun `given alive spaceship with zero score - when subtractScore called - then score decreased by 50 and spaceship destroyed`() {
+        // given
+        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+
+        // when
+        spaceship.subtractScore()
+
+        // then
+        assertEquals(-50, spaceship.score.value())
+        assertEquals(Spaceship.Status.DESTROYED, spaceship.status)
+        assertFalse(spaceship.isVisible)
+    }
+
+    @Test
+    fun `given alive spaceship with negative score - when subtractScore called - then score unchanged`() {
+        // given
+        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        spaceship.score = Score(-10)
+
+        // when
+        spaceship.subtractScore()
+
+        // then
+        assertEquals(-10, spaceship.score.value())
+        assertEquals(Spaceship.Status.ALIVE, spaceship.status)
+        assertTrue(spaceship.isVisible)
+    }
+
+    @Test
     fun `given new spaceship - when status requested - then alive status returned`() {
         // given
         val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
