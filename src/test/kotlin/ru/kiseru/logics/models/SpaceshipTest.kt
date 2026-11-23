@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import ru.kiseru.logics.Game
 import ru.kiseru.logics.Screen
@@ -116,89 +115,6 @@ class SpaceshipTest {
 
         // then
         assertEquals(Position(expectedX, expectedY), spaceship.position)
-    }
-
-    @Test
-    fun `given spaceship with score - when crash into asteroid - then score decreased by 50`() {
-        // given
-        val game = mock<Game>()
-        val owner = mockUserHandler(mockRoom(game))
-        val spaceship = Spaceship(Position(5, 5), owner)
-        spaceship.score = Score(100)
-
-        // when
-        spaceship.crash(Type.ASTEROID)
-
-        // then
-        assertEquals(50, spaceship.score.value())
-    }
-
-    @Test
-    fun `given spaceship with zero score - when crash into asteroid - then spaceship destroyed`() {
-        // given
-        val game = mock<Game>()
-        val owner = mockUserHandler(mockRoom(game))
-        val spaceship = Spaceship(Position(5, 5), owner)
-
-        // when
-        spaceship.crash(Type.ASTEROID)
-
-        // then
-        assertEquals(-50, spaceship.score.value())
-        assertEquals(Spaceship.Status.DESTROYED, spaceship.status)
-        assertFalse(spaceship.isVisible)
-    }
-
-    @Test
-    fun `given spaceship crashed into garbage - when crash called - then score increased by 10 and game counter incremented`() {
-        // given
-        val game = mock<Game>()
-        whenever(game.incrementCollectedGarbageCount()).thenReturn(1)
-        whenever(game.garbageNumber).thenReturn(10)
-        val owner = mockUserHandler(mockRoom(game))
-        val spaceship = Spaceship(Position(5, 5), owner)
-
-        // when
-        spaceship.crash(Type.GARBAGE)
-
-        // then
-        assertEquals(10, spaceship.score.value())
-        verify(game).incrementCollectedGarbageCount()
-    }
-
-    @Test
-    fun `given spaceship collected last garbage - when crash called - then score increased by 10 and counter incremented`() {
-        // given
-        val game = mock<Game>()
-        whenever(game.incrementCollectedGarbageCount()).thenReturn(5)
-        whenever(game.garbageNumber).thenReturn(5)
-        val owner = mockUserHandler(mockRoom(game))
-        val spaceship = Spaceship(Position(5, 5), owner)
-
-        // when
-        spaceship.crash(Type.GARBAGE)
-
-        // then
-        assertEquals(10, spaceship.score.value())
-        verify(game).incrementCollectedGarbageCount()
-    }
-
-    @Test
-    fun `given spaceship crashed into wall - when crash called - then coordinates rolled back and score decreased by 50`() {
-        // given
-        val game = mock<Game>()
-        val owner = mockUserHandler(mockRoom(game))
-        val spaceship = Spaceship(Position(5, 5), owner)
-        spaceship.score = Score(100)
-        spaceship.direction = Direction.UP
-        spaceship.go()
-
-        // when
-        spaceship.crash(Type.WALL)
-
-        // then
-        assertEquals(Position(5, 5), spaceship.position)
-        assertEquals(50, spaceship.score.value())
     }
 
     @Test

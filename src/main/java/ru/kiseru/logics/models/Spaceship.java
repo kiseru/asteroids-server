@@ -39,34 +39,6 @@ public class Spaceship extends Point implements Model{
     }
 
     /**
-     * Вызывается при выявлении столкновения корабля с чем-либо
-     * @param type: тип объекта, с которым произошло столкновение
-     */
-    public void crash(Type type) {
-        synchronized (owner.getRoom().getGame()) {
-            if (type == Type.ASTEROID) {
-                synchronized (this) {
-                    subtractScore();
-                }
-            } else if (type == Type.GARBAGE) {
-                addScore();
-                int collected = owner.getRoom().getGame().incrementCollectedGarbageCount();
-                if (collected >= owner.getRoom().getGame().getGarbageNumber()) {
-                    synchronized (owner.getRoom()) {
-                        owner.getRoom().notify();
-                    }
-                }
-            } else if (type == Type.WALL) {
-                // возвращаемся назад, чтобы не находится на стене
-                position = position.aheadOf(direction.opposite());
-                synchronized (this) {
-                    subtractScore();
-                }
-            }
-        }
-    }
-
-    /**
      * Увеличивает очки корабля за собранный мусор
      *
      * @throws IllegalStateException если корабль разрушен
@@ -153,6 +125,10 @@ public class Spaceship extends Point implements Model{
 
     public void setCourseChecker(CourseChecker courseChecker) {
         this.courseChecker = courseChecker;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
     }
 
     public enum Status {

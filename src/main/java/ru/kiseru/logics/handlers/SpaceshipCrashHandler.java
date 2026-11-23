@@ -6,14 +6,17 @@ import ru.kiseru.logics.auxiliary.Type;
 import ru.kiseru.logics.models.Crashable;
 import ru.kiseru.logics.models.Point;
 import ru.kiseru.logics.models.Spaceship;
+import ru.kiseru.server.UserHandler;
 
 public class SpaceshipCrashHandler {
 
     private final Spaceship spaceship;
+    private final UserHandler userHandler;
     private final Game game;
 
-    public SpaceshipCrashHandler(Game game, Spaceship spaceShip) {
-        this.spaceship = spaceShip;
+    public SpaceshipCrashHandler(Game game, UserHandler userHandler, Spaceship spaceship) {
+        this.spaceship = spaceship;
+        this.userHandler = userHandler;
         this.game = game;
     }
 
@@ -31,7 +34,7 @@ public class SpaceshipCrashHandler {
             }
         }
         if (isCollision) {
-            spaceship.crash(collisionPoint.getType());
+            userHandler.crash(collisionPoint.getType());
             ((Crashable)collisionPoint).crash();
         } else {
             // проверка на столкновение со стеной
@@ -39,7 +42,7 @@ public class SpaceshipCrashHandler {
                     || spaceship.getY() == 0
                     || spaceship.getX() > game.getScreen().getSize().width()
                     || spaceship.getY() > game.getScreen().getSize().height()) {
-                spaceship.crash(Type.WALL);
+                userHandler.crash(Type.WALL);
             }
         }
     }

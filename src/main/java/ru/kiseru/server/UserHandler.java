@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import ru.kiseru.logics.Steps;
 import ru.kiseru.logics.User;
 import ru.kiseru.logics.auxiliary.Direction;
+import ru.kiseru.logics.auxiliary.Type;
 import ru.kiseru.logics.models.Spaceship;
 import ru.kiseru.server.room.Room;
 
@@ -127,6 +128,35 @@ public final class UserHandler {
         this.sendMessage("died");
         String scoreMessage = String.format("You have collected %d score", getScore());
         this.sendMessage(scoreMessage);
+    }
+
+    /**
+     * Вызывается при выявлении столкновения корабля с чем-либо
+     * @param type: тип объекта, с которым произошло столкновение
+     */
+    public void crash(Type type) {
+        synchronized (room.getGame()) {
+            if (type == Type.ASTEROID) {
+                synchronized (spaceship) {
+                    spaceship.subtractScore();
+                }
+            } else if (type == Type.GARBAGE) {
+                spaceship.addScore();
+                int collected = room.getGame().incrementCollectedGarbageCount();
+                if (collected >= room.getGame().getGarbageNumber()) {
+                    synchronized (room) {
+                        room.notify();
+                    }
+                }
+            } else if (type == Type.WALL) {
+                // возвращаемся назад, чтобы не находится на стене
+                var position = spaceship.getPosition();
+                spaceship.setPosition(position.aheadOf(spaceship.getDirection().opposite()));
+                synchronized (spaceship) {
+                    spaceship.subtractScore();
+                }
+            }
+        }
     }
 
     public void setSpaceship(Spaceship spaceship) {

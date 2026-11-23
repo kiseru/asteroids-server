@@ -51,12 +51,12 @@ public class Game {
      * @param userHandler - юзер, для которого регистрируется корабль
      */
     public void registerSpaceShipForUser(UserHandler userHandler) {
-        Spaceship spaceShip = new Spaceship(generateUniqueRandomCoordinates(), userHandler);
-        userHandler.setSpaceship(spaceShip);
-        this.pointsOnScreen.add(spaceShip);
-        this.gameObjects.add(spaceShip);
-        crashHandlers.add(new SpaceshipCrashHandler(this, spaceShip));
-        spaceShip.setCourseChecker(new CourseChecker(spaceShip, this.pointsOnScreen, this.screen));
+        Spaceship spaceship = new Spaceship(generateUniqueRandomCoordinates(), userHandler);
+        userHandler.setSpaceship(spaceship);
+        this.pointsOnScreen.add(spaceship);
+        this.gameObjects.add(spaceship);
+        crashHandlers.add(new SpaceshipCrashHandler(this, userHandler, spaceship));
+        spaceship.setCourseChecker(new CourseChecker(spaceship, this.pointsOnScreen, this.screen));
     }
 
     /**

@@ -11,6 +11,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import ru.kiseru.logics.Game
 import ru.kiseru.logics.Screen
+import ru.kiseru.logics.auxiliary.Direction
 import ru.kiseru.logics.auxiliary.Position
 import ru.kiseru.logics.auxiliary.ScreenSize
 import ru.kiseru.logics.auxiliary.Type
@@ -18,40 +19,44 @@ import ru.kiseru.logics.models.Asteroid
 import ru.kiseru.logics.models.Garbage
 import ru.kiseru.logics.models.Point
 import ru.kiseru.logics.models.Spaceship
+import ru.kiseru.server.UserHandler
+import ru.kiseru.server.room.Room
 
 class SpaceshipCrashHandlerTest {
 
     @Test
-    fun `given garbage on spaceship coordinates - when check called - then spaceship and garbage crashed`() {
+    fun `given garbage on spaceship coordinates - when check called - then garbage crash reported and garbage crashed`() {
         // given
         val position = Position(5, 5)
         val spaceship = mockSpaceship(position)
         val garbage = Garbage(position)
         val game = mockGame(spaceship, garbage)
-        val handler = SpaceshipCrashHandler(game, spaceship)
+        val userHandler = mockUserHandler(game)
+        val handler = SpaceshipCrashHandler(game, userHandler, spaceship)
 
         // when
         handler.check()
 
         // then
-        verify(spaceship).crash(Type.GARBAGE)
+        verify(userHandler).crash(Type.GARBAGE)
         assertFalse(garbage.isVisible())
     }
 
     @Test
-    fun `given asteroid on spaceship coordinates - when check called - then spaceship and asteroid crashed`() {
+    fun `given asteroid on spaceship coordinates - when check called - then asteroid crash reported and asteroid crashed`() {
         // given
         val position = Position(5, 5)
         val spaceship = mockSpaceship(position)
         val asteroid = Asteroid(position)
         val game = mockGame(spaceship, asteroid)
-        val handler = SpaceshipCrashHandler(game, spaceship)
+        val userHandler = mockUserHandler(game)
+        val handler = SpaceshipCrashHandler(game, userHandler, spaceship)
 
         // when
         handler.check()
 
         // then
-        verify(spaceship).crash(Type.ASTEROID)
+        verify(userHandler).crash(Type.ASTEROID)
         assertFalse(asteroid.isVisible())
     }
 
@@ -62,13 +67,14 @@ class SpaceshipCrashHandlerTest {
         val spaceship = mockSpaceship(position)
         val anotherSpaceship = mockPoint(Type.SPACESHIP, position, isVisible = true)
         val game = mockGame(spaceship, anotherSpaceship)
-        val handler = SpaceshipCrashHandler(game, spaceship)
+        val userHandler = mockUserHandler(game)
+        val handler = SpaceshipCrashHandler(game, userHandler, spaceship)
 
         // when
         handler.check()
 
         // then
-        verify(spaceship, never()).crash(any())
+        verify(userHandler, never()).crash(any())
     }
 
     @Test
@@ -79,13 +85,14 @@ class SpaceshipCrashHandlerTest {
         val invisibleGarbage = Garbage(position)
         invisibleGarbage.crash()
         val game = mockGame(spaceship, invisibleGarbage)
-        val handler = SpaceshipCrashHandler(game, spaceship)
+        val userHandler = mockUserHandler(game)
+        val handler = SpaceshipCrashHandler(game, userHandler, spaceship)
 
         // when
         handler.check()
 
         // then
-        verify(spaceship, never()).crash(any())
+        verify(userHandler, never()).crash(any())
         assertFalse(invisibleGarbage.isVisible())
     }
 
@@ -95,13 +102,14 @@ class SpaceshipCrashHandlerTest {
         val position = Position(5, 5)
         val spaceship = mockSpaceship(position)
         val game = mockGame(spaceship)
-        val handler = SpaceshipCrashHandler(game, spaceship)
+        val userHandler = mockUserHandler(game)
+        val handler = SpaceshipCrashHandler(game, userHandler, spaceship)
 
         // when
         handler.check()
 
         // then
-        verify(spaceship, never()).crash(any())
+        verify(userHandler, never()).crash(any())
     }
 
     @ParameterizedTest
@@ -111,27 +119,29 @@ class SpaceshipCrashHandlerTest {
         "11, 5",
         "5, 11",
     )
-    fun `given spaceship out of screen bounds - when check called - then spaceship crashed into wall`(
+    fun `given spaceship out of screen bounds - when check called - then wall crash reported`(
         x: Int,
         y: Int,
     ) {
         // given
-        val spaceship = mockSpaceship(Position(x, y))
+        val spaceship = mockSpaceship(Position(x, y), Direction.UP)
         val game = mockGame(spaceship, screen = Screen(ScreenSize(10, 10)))
-        val handler = SpaceshipCrashHandler(game, spaceship)
+        val userHandler = mockUserHandler(game)
+        val handler = SpaceshipCrashHandler(game, userHandler, spaceship)
 
         // when
         handler.check()
 
         // then
-        verify(spaceship).crash(Type.WALL)
+        verify(userHandler).crash(Type.WALL)
     }
 
-    private fun mockSpaceship(position: Position): Spaceship {
+    private fun mockSpaceship(position: Position, direction: Direction = Direction.UP): Spaceship {
         val spaceship = mock<Spaceship>()
         whenever(spaceship.position).thenReturn(position)
         whenever(spaceship.x).thenReturn(position.x())
         whenever(spaceship.y).thenReturn(position.y())
+        whenever(spaceship.direction).thenReturn(direction)
         return spaceship
     }
 
@@ -141,6 +151,14 @@ class SpaceshipCrashHandlerTest {
         whenever(point.position).thenReturn(position)
         whenever(point.isVisible()).thenReturn(isVisible)
         return point
+    }
+
+    private fun mockUserHandler(game: Game): UserHandler {
+        val room = mock<Room>()
+        whenever(room.game).thenReturn(game)
+        val userHandler = mock<UserHandler>()
+        whenever(userHandler.room).thenReturn(room)
+        return userHandler
     }
 
     private fun mockGame(vararg points: Point, screen: Screen = Screen(ScreenSize(10, 10))): Game {
