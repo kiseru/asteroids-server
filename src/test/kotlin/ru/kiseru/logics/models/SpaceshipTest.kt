@@ -202,6 +202,28 @@ class SpaceshipTest {
     }
 
     @Test
+    fun `given alive spaceship - when addScore called - then score increased by 10`() {
+        // given
+        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+
+        // when
+        spaceship.addScore()
+
+        // then
+        assertEquals(10, spaceship.score.value())
+    }
+
+    @Test
+    fun `given destroyed spaceship - when addScore called - then illegal state exception thrown`() {
+        // given
+        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        spaceship.destroy()
+
+        // when & then
+        assertThrows<IllegalStateException> { spaceship.addScore() }
+    }
+
+    @Test
     fun `given new spaceship - when status requested - then alive status returned`() {
         // given
         val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))

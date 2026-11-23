@@ -68,8 +68,11 @@ public class Spaceship extends Point implements Model{
 
     /**
      * Увеличивает очки корабля за собранный мусор
+     *
+     * @throws IllegalStateException если корабль разрушен
      */
     public void addScore() {
+        ensureAlive();
         score = score.increaseBy(10);
     }
 
@@ -89,14 +92,23 @@ public class Spaceship extends Point implements Model{
     /**
      * Разрушает корабль, делая его неживым и невидимым
      *
-     * @throws IllegalStateException если корабль уже разрушен
+     * @throws IllegalStateException если корабль не жив
      */
     public void destroy() {
-        if (status == Status.DESTROYED) {
-            throw new IllegalStateException("spaceship is already destroyed");
-        }
+        ensureAlive();
         status = Status.DESTROYED;
         isVisible = false;
+    }
+
+    /**
+     * Проверяет, что корабль жив
+     *
+     * @throws IllegalStateException если корабль не жив
+     */
+    private void ensureAlive() {
+        if (status != Status.ALIVE) {
+            throw new IllegalStateException("spaceship is not alive");
+        }
     }
 
     public Status getStatus() {
