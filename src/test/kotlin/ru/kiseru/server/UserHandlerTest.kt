@@ -15,6 +15,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import ru.kiseru.logics.CourseChecker
 import ru.kiseru.logics.Game
+import ru.kiseru.logics.Score
 import ru.kiseru.logics.Steps
 import ru.kiseru.logics.User
 import ru.kiseru.logics.auxiliary.Direction
@@ -27,12 +28,30 @@ import java.io.PrintWriter
 class UserHandlerTest {
 
     @Test
-    fun `given new userHandler - when created - then score is 100`() {
+    fun `given userHandler with spaceship - when score requested - then spaceship score returned`() {
+        // given
+        val userHandler = createUserHandler()
+        val spaceship = Spaceship(Position(1, 1), userHandler)
+        spaceship.score = Score(100)
+        userHandler.setSpaceship(spaceship)
+
+        // when
+        val actual = userHandler.score
+
+        // then
+        assertEquals(100, actual)
+    }
+
+    @Test
+    fun `given userHandler without spaceship - when score requested - then zero returned`() {
         // given
         val userHandler = createUserHandler()
 
-        // when & then
-        assertEquals(100, userHandler.score)
+        // when
+        val actual = userHandler.score
+
+        // then
+        assertEquals(0, actual)
     }
 
     @Test
@@ -71,85 +90,11 @@ class UserHandlerTest {
     }
 
     @Test
-    fun `given userHandler in started room - when score added - then score increased by 10`() {
-        // given
-        val room = mock<Room>()
-        whenever(room.isGameStarted).thenReturn(true)
-        val userHandler = createUserHandler(room = room)
-
-        // when
-        userHandler.addScore()
-
-        // then
-        assertEquals(110, userHandler.score)
-    }
-
-    @Test
-    fun `given userHandler in not started room - when score added - then score unchanged`() {
-        // given
-        val room = mock<Room>()
-        whenever(room.isGameStarted).thenReturn(false)
-        val userHandler = createUserHandler(room = room)
-
-        // when
-        userHandler.addScore()
-
-        // then
-        assertEquals(100, userHandler.score)
-    }
-
-    @Test
-    fun `given userHandler in started room - when score subtracted once - then score decreased by 50 and userHandler alive`() {
-        // given
-        val room = mock<Room>()
-        whenever(room.isGameStarted).thenReturn(true)
-        val userHandler = createUserHandler(room = room)
-
-        // when
-        userHandler.subtractScore()
-
-        // then
-        assertEquals(50, userHandler.score)
-        assertTrue(userHandler.isAlive)
-    }
-
-    @Test
-    fun `given userHandler in started room - when score subtracted below zero - then userHandler dies`() {
-        // given
-        val room = mock<Room>()
-        whenever(room.isGameStarted).thenReturn(true)
-        val userHandler = createUserHandler(room = room)
-
-        // when
-        userHandler.subtractScore()
-        userHandler.subtractScore()
-        userHandler.subtractScore()
-
-        // then
-        assertEquals(-50, userHandler.score)
-        assertFalse(userHandler.isAlive)
-    }
-
-    @Test
-    fun `given userHandler in not started room - when score subtracted - then score unchanged and userHandler alive`() {
-        // given
-        val room = mock<Room>()
-        whenever(room.isGameStarted).thenReturn(false)
-        val userHandler = createUserHandler(room = room)
-
-        // when
-        userHandler.subtractScore()
-
-        // then
-        assertEquals(100, userHandler.score)
-        assertTrue(userHandler.isAlive)
-    }
-
-    @Test
     fun `given alive userHandler - when died - then userHandler is not alive and death messages sent`() {
         // given
         val writer = mock<PrintWriter>()
         val userHandler = createUserHandler(writer = writer)
+        userHandler.setSpaceship(mockSpaceship())
 
         // when
         userHandler.died()
@@ -399,7 +344,7 @@ class UserHandlerTest {
         // then
         assertFalse(userHandler.isAlive)
         verify(writer).println("died")
-        verify(writer).println("You have collected 100 score")
+        verify(writer).println("You have collected 0 score")
     }
 
     private fun createUserHandler(
@@ -415,6 +360,7 @@ class UserHandlerTest {
     private fun mockSpaceship(): Spaceship {
         val spaceship = mock<Spaceship>()
         whenever(spaceship.steps).thenReturn(Steps())
+        whenever(spaceship.score).thenReturn(Score(100))
         return spaceship
     }
 

@@ -1,6 +1,7 @@
 package ru.kiseru.logics.models;
 
 import ru.kiseru.logics.CourseChecker;
+import ru.kiseru.logics.Score;
 import ru.kiseru.logics.Screen;
 import ru.kiseru.logics.Steps;
 import ru.kiseru.logics.auxiliary.Position;
@@ -13,6 +14,7 @@ public class Spaceship extends Point implements Model{
     private final UserHandler owner;
 
     private Steps steps = new Steps();
+    private Score score = new Score();
     private Direction direction;
     private CourseChecker courseChecker;
 
@@ -42,9 +44,9 @@ public class Spaceship extends Point implements Model{
     public void crash(Type type) {
         synchronized (owner.getRoom().getGame()) {
             if (type == Type.ASTEROID) {
-                owner.subtractScore();
+                subtractScore();
             } else if (type == Type.GARBAGE) {
-                owner.addScore();
+                addScore();
                 int collected = owner.getRoom().getGame().incrementCollectedGarbageCount();
                 if (collected >= owner.getRoom().getGame().getGarbageNumber()) {
                     synchronized (owner.getRoom()) {
@@ -54,11 +56,31 @@ public class Spaceship extends Point implements Model{
             } else if (type == Type.WALL) {
                 // возвращаемся назад, чтобы не находится на стене
                 position = position.aheadOf(direction.opposite());
-                owner.subtractScore();
+                subtractScore();
             }
             if (!owner.getIsAlive()) {
                 this.destroy();
             }
+        }
+    }
+
+    /**
+     * Увеличивает очки корабля за собранный мусор
+     */
+    public void addScore() {
+        score = score.increaseBy(10);
+    }
+
+    /**
+     * Уменьшает очки корабля при столкновении
+     */
+    public void subtractScore() {
+        if (score.value() < 0) {
+            return;
+        }
+        score = score.decreaseBy(50);
+        if (score.value() < 0) {
+            owner.kill();
         }
     }
 
@@ -75,6 +97,14 @@ public class Spaceship extends Point implements Model{
 
     public void setSteps(Steps steps) {
         this.steps = steps;
+    }
+
+    public Score getScore() {
+        return score;
+    }
+
+    public void setScore(Score score) {
+        this.score = score;
     }
 
     public Direction getDirection() {

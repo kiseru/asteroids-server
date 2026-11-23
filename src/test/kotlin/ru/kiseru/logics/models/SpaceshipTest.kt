@@ -18,6 +18,7 @@ import ru.kiseru.logics.auxiliary.ScreenSize
 import ru.kiseru.logics.auxiliary.Direction
 import ru.kiseru.logics.auxiliary.Type
 import ru.kiseru.logics.CourseChecker
+import ru.kiseru.logics.Score
 import ru.kiseru.server.UserHandler
 import ru.kiseru.server.room.Room
 
@@ -35,6 +36,18 @@ class SpaceshipTest {
         // then
         assertEquals(position, spaceship.position)
         assertTrue(spaceship.isVisible)
+    }
+
+    @Test
+    fun `given coordinates and userHandler - when spaceship created - then score is zero`() {
+        // given
+        val owner = mockUserHandler(mockRoom(mock<Game>()))
+
+        // when
+        val spaceship = Spaceship(Position(3, 7), owner)
+
+        // then
+        assertEquals(0, spaceship.score.value())
     }
 
     @Test
@@ -105,7 +118,22 @@ class SpaceshipTest {
     }
 
     @Test
-    fun `given spaceship crashed into asteroid - when crash called - then owner score subtracted`() {
+    fun `given spaceship with score - when crash into asteroid - then score decreased by 50`() {
+        // given
+        val game = mock<Game>()
+        val owner = mockUserHandler(mockRoom(game))
+        val spaceship = Spaceship(Position(5, 5), owner)
+        spaceship.score = Score(100)
+
+        // when
+        spaceship.crash(Type.ASTEROID)
+
+        // then
+        assertEquals(50, spaceship.score.value())
+    }
+
+    @Test
+    fun `given spaceship with zero score - when crash into asteroid - then owner killed`() {
         // given
         val game = mock<Game>()
         val owner = mockUserHandler(mockRoom(game))
@@ -115,11 +143,12 @@ class SpaceshipTest {
         spaceship.crash(Type.ASTEROID)
 
         // then
-        verify(owner).subtractScore()
+        assertEquals(-50, spaceship.score.value())
+        verify(owner).kill()
     }
 
     @Test
-    fun `given spaceship crashed into garbage - when crash called - then owner score added and game counter incremented`() {
+    fun `given spaceship crashed into garbage - when crash called - then score increased by 10 and game counter incremented`() {
         // given
         val game = mock<Game>()
         whenever(game.incrementCollectedGarbageCount()).thenReturn(1)
@@ -131,12 +160,12 @@ class SpaceshipTest {
         spaceship.crash(Type.GARBAGE)
 
         // then
-        verify(owner).addScore()
+        assertEquals(10, spaceship.score.value())
         verify(game).incrementCollectedGarbageCount()
     }
 
     @Test
-    fun `given spaceship collected last garbage - when crash called - then owner score added and counter incremented`() {
+    fun `given spaceship collected last garbage - when crash called - then score increased by 10 and counter incremented`() {
         // given
         val game = mock<Game>()
         whenever(game.incrementCollectedGarbageCount()).thenReturn(5)
@@ -148,16 +177,17 @@ class SpaceshipTest {
         spaceship.crash(Type.GARBAGE)
 
         // then
-        verify(owner).addScore()
+        assertEquals(10, spaceship.score.value())
         verify(game).incrementCollectedGarbageCount()
     }
 
     @Test
-    fun `given spaceship crashed into wall - when crash called - then coordinates rolled back and owner score subtracted`() {
+    fun `given spaceship crashed into wall - when crash called - then coordinates rolled back and score decreased by 50`() {
         // given
         val game = mock<Game>()
         val owner = mockUserHandler(mockRoom(game))
         val spaceship = Spaceship(Position(5, 5), owner)
+        spaceship.score = Score(100)
         spaceship.direction = Direction.UP
         spaceship.go()
 
@@ -166,7 +196,7 @@ class SpaceshipTest {
 
         // then
         assertEquals(Position(5, 5), spaceship.position)
-        verify(owner).subtractScore()
+        assertEquals(50, spaceship.score.value())
     }
 
     @Test
