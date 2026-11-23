@@ -3,7 +3,6 @@ package ru.kiseru.server
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertSame
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
@@ -55,15 +54,6 @@ class UserHandlerTest {
     }
 
     @Test
-    fun `given new userHandler - when created - then userHandler is alive`() {
-        // given
-        val userHandler = createUserHandler()
-
-        // when & then
-        assertTrue(userHandler.isAlive)
-    }
-
-    @Test
     fun `given userHandler and room - when room requested - then same room returned`() {
         // given
         val room = mock<Room>()
@@ -90,17 +80,18 @@ class UserHandlerTest {
     }
 
     @Test
-    fun `given alive userHandler - when died - then userHandler is not alive and death messages sent`() {
+    fun `given alive spaceship - when died - then spaceship destroyed and death messages sent`() {
         // given
         val writer = mock<PrintWriter>()
         val userHandler = createUserHandler(writer = writer)
-        userHandler.setSpaceship(mockSpaceship())
+        val spaceship = mockSpaceship()
+        userHandler.setSpaceship(spaceship)
 
         // when
         userHandler.died()
 
         // then
-        assertFalse(userHandler.isAlive)
+        verify(spaceship).destroy()
         verify(writer).println("died")
         verify(writer).println("You have collected 100 score")
     }
@@ -199,6 +190,7 @@ class UserHandlerTest {
         runUserHandlerUntilFinished(userHandler)
 
         // then
+        verify(spaceship).destroy()
         verify(room).notifyIfNoAliveUsers()
     }
 
@@ -342,7 +334,7 @@ class UserHandlerTest {
         runUserHandlerUntilFinished(userHandler)
 
         // then
-        assertFalse(userHandler.isAlive)
+        assertFalse(spaceship.isAlive)
         verify(writer).println("died")
         verify(writer).println("You have collected 0 score")
     }
@@ -361,6 +353,7 @@ class UserHandlerTest {
         val spaceship = mock<Spaceship>()
         whenever(spaceship.steps).thenReturn(Steps())
         whenever(spaceship.score).thenReturn(Score(100))
+        whenever(spaceship.isAlive).thenReturn(true)
         return spaceship
     }
 

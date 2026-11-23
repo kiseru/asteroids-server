@@ -15,6 +15,7 @@ public class Spaceship extends Point implements Model{
 
     private Steps steps = new Steps();
     private Score score = new Score();
+    private boolean isAlive = true;
     private Direction direction;
     private CourseChecker courseChecker;
 
@@ -44,7 +45,9 @@ public class Spaceship extends Point implements Model{
     public void crash(Type type) {
         synchronized (owner.getRoom().getGame()) {
             if (type == Type.ASTEROID) {
-                subtractScore();
+                synchronized (this) {
+                    subtractScore();
+                }
             } else if (type == Type.GARBAGE) {
                 addScore();
                 int collected = owner.getRoom().getGame().incrementCollectedGarbageCount();
@@ -56,10 +59,9 @@ public class Spaceship extends Point implements Model{
             } else if (type == Type.WALL) {
                 // возвращаемся назад, чтобы не находится на стене
                 position = position.aheadOf(direction.opposite());
-                subtractScore();
-            }
-            if (!owner.getIsAlive()) {
-                this.destroy();
+                synchronized (this) {
+                    subtractScore();
+                }
             }
         }
     }
@@ -79,16 +81,26 @@ public class Spaceship extends Point implements Model{
             return;
         }
         score = score.decreaseBy(50);
-        if (score.value() < 0) {
-            owner.kill();
+        if (score.value() < 0 && isAlive) {
+            destroy();
         }
     }
 
     /**
-     * Разрушение корабля - прекращение его отображения
+     * Разрушает корабль, делая его неживым и невидимым
+     *
+     * @throws IllegalStateException если корабль уже разрушен
      */
-    private void destroy() {
-        this.isVisible = false;
+    public void destroy() {
+        if (!isAlive) {
+            throw new IllegalStateException("spaceship is already destroyed");
+        }
+        isAlive = false;
+        isVisible = false;
+    }
+
+    public boolean isAlive() {
+        return isAlive;
     }
 
     public Steps getSteps() {
@@ -126,9 +138,5 @@ public class Spaceship extends Point implements Model{
 
     public void setCourseChecker(CourseChecker courseChecker) {
         this.courseChecker = courseChecker;
-    }
-
-    public boolean isOwnerAlive() {
-        return owner.getIsAlive();
     }
 }

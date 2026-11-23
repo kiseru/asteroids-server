@@ -16,7 +16,6 @@ public final class UserHandler {
     private volatile Room room;
 
     private final User user;
-    private volatile boolean isAlive = true;
     private Spaceship spaceship;
 
     public UserHandler(
@@ -55,7 +54,7 @@ public final class UserHandler {
                 e.printStackTrace();
             }
             spaceship.setDirection(Direction.UP);
-            while (!room.isGameFinished() && isAlive) {
+            while (!room.isGameFinished() && spaceship.isAlive()) {
                 String userMessage = reader.readLine();
                 switch (userMessage) {
                     case "go" -> {
@@ -90,17 +89,18 @@ public final class UserHandler {
                 }
                 Steps nextSteps = spaceship.getSteps().increment();
                 spaceship.setSteps(nextSteps);
-                if (nextSteps.getValue() >= 1500) {
-                    died();
-                }
-                if (getScore() < 0) {
+                if (nextSteps.getValue() >= 1500 || getScore() < 0) {
                     died();
                 }
             }
         } catch (IOException e) {
             System.out.println("Connection problems with user " + user.username());
         } finally {
-            isAlive = false;
+            synchronized (spaceship) {
+                if (spaceship != null && spaceship.isAlive()) {
+                    spaceship.destroy();
+                }
+            }
             room.notifyIfNoAliveUsers();
         }
     }
@@ -118,16 +118,12 @@ public final class UserHandler {
         writer.println(message);
     }
 
-    public boolean getIsAlive() {
-        return isAlive;
-    }
-
-    public void kill() {
-        isAlive = false;
-    }
-
     public void died() {
-        isAlive = false;
+        synchronized (spaceship) {
+            if (spaceship.isAlive()) {
+                spaceship.destroy();
+            }
+        }
         this.sendMessage("died");
         String scoreMessage = String.format("You have collected %d score", getScore());
         this.sendMessage(scoreMessage);
@@ -135,6 +131,10 @@ public final class UserHandler {
 
     public void setSpaceship(Spaceship spaceship) {
         this.spaceship = spaceship;
+    }
+
+    public Spaceship getSpaceship() {
+        return spaceship;
     }
 
     public Room getRoom() {

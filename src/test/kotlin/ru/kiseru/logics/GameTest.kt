@@ -255,11 +255,10 @@ class GameTest {
     }
 
     @Test
-    fun `given spaceship with alive owner - when isAnyoneAlive called - then true returned`() {
+    fun `given alive spaceship - when isAnyoneAlive called - then true returned`() {
         // given
         val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
         val userHandler = mock<UserHandler>()
-        whenever(userHandler.getIsAlive()).thenReturn(true)
         game.registerSpaceShipForUser(userHandler)
 
         // when
@@ -270,12 +269,12 @@ class GameTest {
     }
 
     @Test
-    fun `given spaceship with dead owner - when isAnyoneAlive called - then false returned`() {
+    fun `given destroyed spaceship - when isAnyoneAlive called - then false returned`() {
         // given
         val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
         val userHandler = mock<UserHandler>()
-        whenever(userHandler.getIsAlive()).thenReturn(false)
         game.registerSpaceShipForUser(userHandler)
+        game.pointsOnScreen.filterIsInstance<Spaceship>().first().destroy()
 
         // when
         val actual = game.isAnyoneAlive()
@@ -285,15 +284,12 @@ class GameTest {
     }
 
     @Test
-    fun `given two users one alive - when isAnyoneAlive called - then true returned`() {
+    fun `given two spaceships one destroyed - when isAnyoneAlive called - then true returned`() {
         // given
         val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
-        val deadUserHandler = mock<UserHandler>()
-        whenever(deadUserHandler.getIsAlive()).thenReturn(false)
-        val aliveUserHandler = mock<UserHandler>()
-        whenever(aliveUserHandler.getIsAlive()).thenReturn(true)
-        game.registerSpaceShipForUser(deadUserHandler)
-        game.registerSpaceShipForUser(aliveUserHandler)
+        game.registerSpaceShipForUser(mock<UserHandler>())
+        game.registerSpaceShipForUser(mock<UserHandler>())
+        game.pointsOnScreen.filterIsInstance<Spaceship>().first().destroy()
 
         // when
         val actual = game.isAnyoneAlive()

@@ -7,6 +7,7 @@ import java.util.stream.IntStream;
 import ru.kiseru.logics.Game;
 import ru.kiseru.logics.Screen;
 import ru.kiseru.logics.auxiliary.ScreenSize;
+import ru.kiseru.logics.models.Spaceship;
 import ru.kiseru.server.Server;
 import ru.kiseru.server.UserHandler;
 
@@ -77,7 +78,9 @@ public final class Room {
     public long aliveCount() {
         return userHandlers.stream()
                 .filter(Objects::nonNull)
-                .filter(UserHandler::getIsAlive)
+                .map(UserHandler::getSpaceship)
+                .filter(Objects::nonNull)
+                .filter(Spaceship::isAlive)
                 .count();
     }
 

@@ -71,7 +71,7 @@ public class Game {
     public boolean isAnyoneAlive() {
         return pointsOnScreen.stream()
             .filter(point -> point.getType() == Type.SPACESHIP)
-            .anyMatch(point -> point instanceof Spaceship s && s.isOwnerAlive());
+            .anyMatch(point -> point instanceof Spaceship s && s.isAlive());
     }
 
     private Position generateUniqueRandomCoordinates() {

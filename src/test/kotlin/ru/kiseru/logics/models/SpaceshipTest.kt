@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
@@ -133,7 +134,7 @@ class SpaceshipTest {
     }
 
     @Test
-    fun `given spaceship with zero score - when crash into asteroid - then owner killed`() {
+    fun `given spaceship with zero score - when crash into asteroid - then spaceship destroyed`() {
         // given
         val game = mock<Game>()
         val owner = mockUserHandler(mockRoom(game))
@@ -144,7 +145,8 @@ class SpaceshipTest {
 
         // then
         assertEquals(-50, spaceship.score.value())
-        verify(owner).kill()
+        assertFalse(spaceship.isAlive)
+        assertFalse(spaceship.isVisible)
     }
 
     @Test
@@ -200,21 +202,38 @@ class SpaceshipTest {
     }
 
     @Test
-    fun `given spaceship with dead owner - when crash called - then spaceship becomes invisible`() {
+    fun `given new spaceship - when isAlive called - then true returned`() {
         // given
-        val game = mock<Game>()
-        whenever(game.incrementCollectedGarbageCount()).thenReturn(1)
-        whenever(game.garbageNumber).thenReturn(10)
-        val owner = mockUserHandler(mockRoom(game))
-        whenever(owner.getIsAlive()).thenReturn(false)
-        val spaceship = Spaceship(Position(5, 5), owner)
-        assertTrue(spaceship.isVisible)
+        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
 
         // when
-        spaceship.crash(Type.GARBAGE)
+        val actual = spaceship.isAlive
 
         // then
+        assertTrue(actual)
+    }
+
+    @Test
+    fun `given alive spaceship - when destroy called - then spaceship is not alive and invisible`() {
+        // given
+        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+
+        // when
+        spaceship.destroy()
+
+        // then
+        assertFalse(spaceship.isAlive)
         assertFalse(spaceship.isVisible)
+    }
+
+    @Test
+    fun `given destroyed spaceship - when destroy called - then illegal state exception thrown`() {
+        // given
+        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        spaceship.destroy()
+
+        // when & then
+        assertThrows<IllegalStateException> { spaceship.destroy() }
     }
 
     @Test
@@ -242,34 +261,9 @@ class SpaceshipTest {
         assertSame(courseChecker, spaceship.courseChecker)
     }
 
-    @Test
-    fun `given spaceship with alive owner - when isOwnerAlive called - then owner liveness returned`() {
-        // given
-        val owner = mockUserHandler(mockRoom(mock<Game>()))
-        val spaceship = Spaceship(Position(5, 5), owner)
-
-        // when
-        val actual = spaceship.isOwnerAlive
-
-        // then
-        assertTrue(actual)
-    }
-
-    @Test
-    fun `given spaceship with dead owner - when isOwnerAlive called - then false returned`() {
-        // given
-        val owner = mockUserHandler(mockRoom(mock<Game>()))
-        whenever(owner.getIsAlive()).thenReturn(false)
-        val spaceship = Spaceship(Position(5, 5), owner)
-
-        // when & then
-        assertFalse(spaceship.isOwnerAlive)
-    }
-
     private fun mockUserHandler(room: Room): UserHandler {
         val userHandler = mock<UserHandler>()
         whenever(userHandler.room).thenReturn(room)
-        whenever(userHandler.isAlive).thenReturn(true)
         whenever(userHandler.user).thenReturn(User(1, "alice"))
         return userHandler
     }
