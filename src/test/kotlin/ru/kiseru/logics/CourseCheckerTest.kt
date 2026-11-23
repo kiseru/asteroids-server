@@ -10,8 +10,8 @@ import org.mockito.kotlin.whenever
 import ru.kiseru.logics.auxiliary.Position
 import ru.kiseru.logics.auxiliary.ScreenSize
 import ru.kiseru.logics.auxiliary.Direction
-import ru.kiseru.logics.auxiliary.Type
-import ru.kiseru.logics.models.Point
+import ru.kiseru.logics.models.Asteroid
+import ru.kiseru.logics.models.Garbage
 import ru.kiseru.logics.models.Spaceship
 
 class CourseCheckerTest {
@@ -27,7 +27,7 @@ class CourseCheckerTest {
         // given
         val spaceship = mockSpaceship(direction)
         val asteroidCoordinates = adjacentCoordinates(direction)
-        val points = listOf(mockPoint(Type.ASTEROID, asteroidCoordinates))
+        val points = listOf(Asteroid(asteroidCoordinates))
         val courseChecker = CourseChecker(spaceship, points, Screen(ScreenSize(10, 10)))
 
         // when
@@ -47,7 +47,7 @@ class CourseCheckerTest {
     fun `given no asteroid on adjacent cell in spaceship direction - when isAsteroid called - then returns false`(direction: Direction) {
         // given
         val spaceship = mockSpaceship(direction)
-        val points = listOf(mockPoint(Type.ASTEROID, Position(1, 1)))
+        val points = listOf(Asteroid(Position(1, 1)))
         val courseChecker = CourseChecker(spaceship, points, Screen(ScreenSize(10, 10)))
 
         // when
@@ -61,7 +61,7 @@ class CourseCheckerTest {
     fun `given garbage on adjacent cell in spaceship direction - when isAsteroid called - then returns false`() {
         // given
         val spaceship = mockSpaceship(Direction.UP)
-        val points = listOf(mockPoint(Type.GARBAGE, Position(5, 4)))
+        val points = listOf(Garbage(Position(5, 4)))
         val courseChecker = CourseChecker(spaceship, points, Screen(ScreenSize(10, 10)))
 
         // when
@@ -82,7 +82,7 @@ class CourseCheckerTest {
         // given
         val spaceship = mockSpaceship(direction)
         val garbageCoordinates = adjacentCoordinates(direction)
-        val points = listOf(mockPoint(Type.GARBAGE, garbageCoordinates))
+        val points = listOf(Garbage(garbageCoordinates))
         val courseChecker = CourseChecker(spaceship, points, Screen(ScreenSize(10, 10)))
 
         // when
@@ -102,7 +102,7 @@ class CourseCheckerTest {
     fun `given no garbage on adjacent cell in spaceship direction - when isGarbage called - then returns false`(direction: Direction) {
         // given
         val spaceship = mockSpaceship(direction)
-        val points = listOf(mockPoint(Type.GARBAGE, Position(1, 1)))
+        val points = listOf(Garbage(Position(1, 1)))
         val courseChecker = CourseChecker(spaceship, points, Screen(ScreenSize(10, 10)))
 
         // when
@@ -116,7 +116,7 @@ class CourseCheckerTest {
     fun `given asteroid on adjacent cell in spaceship direction - when isGarbage called - then returns false`() {
         // given
         val spaceship = mockSpaceship(Direction.UP)
-        val points = listOf(mockPoint(Type.ASTEROID, Position(5, 4)))
+        val points = listOf(Asteroid(Position(5, 4)))
         val courseChecker = CourseChecker(spaceship, points, Screen(ScreenSize(10, 10)))
 
         // when
@@ -241,13 +241,6 @@ class CourseCheckerTest {
         whenever(spaceship.y).thenReturn(y)
         whenever(spaceship.position).thenReturn(Position(x, y))
         return spaceship
-    }
-
-    private fun mockPoint(type: Type, position: Position): Point {
-        val point = mock<Point>()
-        whenever(point.type).thenReturn(type)
-        whenever(point.position).thenReturn(position)
-        return point
     }
 
     private fun adjacentCoordinates(direction: Direction): Position {
