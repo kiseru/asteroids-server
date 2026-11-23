@@ -78,8 +78,11 @@ public class Spaceship extends Point implements Model{
 
     /**
      * Уменьшает очки корабля при столкновении
+     *
+     * @throws IllegalStateException если корабль разрушен
      */
     public void subtractScore() {
+        ensureAlive();
         if (score.value() < 0) {
             return;
         }

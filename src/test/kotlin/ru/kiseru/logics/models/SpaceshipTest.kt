@@ -224,6 +224,16 @@ class SpaceshipTest {
     }
 
     @Test
+    fun `given destroyed spaceship - when subtractScore called - then illegal state exception thrown`() {
+        // given
+        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        spaceship.destroy()
+
+        // when & then
+        assertThrows<IllegalStateException> { spaceship.subtractScore() }
+    }
+
+    @Test
     fun `given new spaceship - when status requested - then alive status returned`() {
         // given
         val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
