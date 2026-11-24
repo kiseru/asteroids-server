@@ -38,10 +38,7 @@ public class SpaceshipCrashHandler {
             ((Crashable)collisionPoint).crash();
         } else {
             // проверка на столкновение со стеной
-            if (spaceship.getX() == 0
-                    || spaceship.getY() == 0
-                    || spaceship.getX() > game.getScreen().getSize().width()
-                    || spaceship.getY() > game.getScreen().getSize().height()) {
+            if (!game.getScreen().getSize().isInBounds(spaceship.getPosition())) {
                 userHandler.crash(Type.WALL);
             }
         }

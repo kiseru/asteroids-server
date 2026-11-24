@@ -1,8 +1,12 @@
 package ru.kiseru.logics.auxiliary
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 
 class ScreenSizeTest {
 
@@ -30,5 +34,49 @@ class ScreenSizeTest {
         // then
         assertEquals(width, actual.width())
         assertEquals(height, actual.height())
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "1, 1",
+        "1, 5",
+        "10, 1",
+        "10, 5",
+        "5, 3",
+    )
+    fun `given position inside screen - when isInBounds called - then true returned`(x: Int, y: Int) {
+        // given
+        val screenSize = ScreenSize(10, 5)
+        val position = Position(x, y)
+
+        // when
+        val actual = screenSize.isInBounds(position)
+
+        // then
+        assertTrue(actual)
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "0, 1",
+        "0, 5",
+        "1, 0",
+        "10, 0",
+        "11, 1",
+        "11, 5",
+        "1, 6",
+        "10, 6",
+        "11, 6",
+    )
+    fun `given position outside screen - when isInBounds called - then false returned`(x: Int, y: Int) {
+        // given
+        val screenSize = ScreenSize(10, 5)
+        val position = Position(x, y)
+
+        // when
+        val actual = screenSize.isInBounds(position)
+
+        // then
+        assertFalse(actual)
     }
 }

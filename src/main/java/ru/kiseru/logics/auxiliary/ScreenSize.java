@@ -19,4 +19,17 @@ public record ScreenSize(int width, int height) {
             throw new IllegalArgumentException("height must be greater or equal than %d".formatted(MIN_VALUE));
         }
     }
+    
+    /**
+     * Проверяет, находится ли позиция в пределах экрана.
+     *
+     * @param position проверяемая позиция
+     * @return {@code true}, если позиция находится в пределах экрана, иначе {@code false}
+     */
+    public boolean isInBounds(Position position) {
+        return position.x() >= 1
+                && position.y() >= 1
+                && position.x() <= width
+                && position.y() <= height;
+    }
 }
