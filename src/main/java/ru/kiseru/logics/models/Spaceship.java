@@ -4,14 +4,14 @@ import ru.kiseru.logics.CourseChecker;
 import ru.kiseru.logics.Score;
 import ru.kiseru.logics.Screen;
 import ru.kiseru.logics.Steps;
+import ru.kiseru.logics.UserId;
 import ru.kiseru.logics.auxiliary.Position;
 import ru.kiseru.logics.auxiliary.Direction;
 import ru.kiseru.logics.auxiliary.Type;
-import ru.kiseru.server.UserHandler;
 
 public class Spaceship extends Point implements Model{
 
-    private final UserHandler owner;
+    private final UserId userId;
 
     private Steps steps = new Steps();
     private Score score = new Score();
@@ -19,15 +19,21 @@ public class Spaceship extends Point implements Model{
     private Direction direction;
     private CourseChecker courseChecker;
 
-    public Spaceship(Position position, UserHandler owner) {
+    /**
+     * Создаёт корабль пользователя в указанной позиции
+     *
+     * @param position начальная позиция корабля
+     * @param userId идентификатор пользователя, которому принадлежит корабль
+     */
+    public Spaceship(Position position, UserId userId) {
         super(position);
-        this.owner = owner;
+        this.userId = userId;
     }
 
     @Override
     public void render(Screen screen) {
         if (isVisible) {
-            screen.draw(position, String.valueOf(owner.getUser().id().id()));
+            screen.draw(position, String.valueOf(userId.id()));
         }
     }
 

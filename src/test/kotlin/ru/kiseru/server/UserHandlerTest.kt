@@ -32,7 +32,9 @@ class UserHandlerTest {
     fun `given userHandler with spaceship - when score requested - then spaceship score returned`() {
         // given
         val userHandler = createUserHandler()
-        val spaceship = Spaceship(Position(1, 1), userHandler)
+
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(1, 1), userId)
         spaceship.score = Score(100)
         userHandler.setSpaceship(spaceship)
 
@@ -330,7 +332,9 @@ class UserHandlerTest {
         whenever(room.game).thenReturn(game)
         whenever(reader.readLine()).thenAnswer { "go" }
         val userHandler = createUserHandler(reader, writer, room)
-        val spaceship = Spaceship(Position(1, 1500), userHandler)
+
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(1, 1500), userId)
         userHandler.setSpaceship(spaceship)
 
         // when
@@ -347,7 +351,9 @@ class UserHandlerTest {
         // given
         val room = mockRoom(mock<Game>())
         val userHandler = createUserHandler(room = room)
-        val spaceship = Spaceship(Position(5, 5), userHandler)
+
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(5, 5), userId)
         spaceship.score = Score(100)
         userHandler.setSpaceship(spaceship)
 
@@ -363,7 +369,9 @@ class UserHandlerTest {
         // given
         val room = mockRoom(mock<Game>())
         val userHandler = createUserHandler(room = room)
-        val spaceship = Spaceship(Position(5, 5), userHandler)
+
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(5, 5), userId)
         userHandler.setSpaceship(spaceship)
 
         // when
@@ -383,7 +391,9 @@ class UserHandlerTest {
         whenever(game.garbageNumber).thenReturn(10)
         val room = mockRoom(game)
         val userHandler = createUserHandler(room = room)
-        val spaceship = Spaceship(Position(5, 5), userHandler)
+
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(5, 5), userId)
         userHandler.setSpaceship(spaceship)
 
         // when
@@ -402,7 +412,9 @@ class UserHandlerTest {
         whenever(game.garbageNumber).thenReturn(5)
         val room = mockRoom(game)
         val userHandler = createUserHandler(room = room)
-        val spaceship = Spaceship(Position(5, 5), userHandler)
+
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(5, 5), userId)
         userHandler.setSpaceship(spaceship)
 
         // when
@@ -418,7 +430,9 @@ class UserHandlerTest {
         // given
         val room = mockRoom(mock<Game>())
         val userHandler = createUserHandler(room = room)
-        val spaceship = Spaceship(Position(5, 5), userHandler)
+
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(5, 5), userId)
         spaceship.score = Score(100)
         spaceship.direction = Direction.UP
         spaceship.go()

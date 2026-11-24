@@ -8,11 +8,7 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
-import ru.kiseru.logics.Game
 import ru.kiseru.logics.Screen
-import ru.kiseru.logics.User
 import ru.kiseru.logics.auxiliary.Position
 import ru.kiseru.logics.auxiliary.ScreenSize
 import ru.kiseru.logics.auxiliary.Direction
@@ -20,19 +16,17 @@ import ru.kiseru.logics.auxiliary.Type
 import ru.kiseru.logics.CourseChecker
 import ru.kiseru.logics.Score
 import ru.kiseru.logics.UserId
-import ru.kiseru.server.UserHandler
-import ru.kiseru.server.room.Room
 
 class SpaceshipTest {
 
     @Test
-    fun `given coordinates and userHandler - when spaceship created - then it is visible and stores coordinates`() {
+    fun `given coordinates and userId - when spaceship created - then it is visible and stores coordinates`() {
         // given
         val position = Position(3, 7)
-        val owner = mockUserHandler(mockRoom(mock<Game>()))
+        val userId = UserId(1)
 
         // when
-        val spaceship = Spaceship(position, owner)
+        val spaceship = Spaceship(position, userId)
 
         // then
         assertEquals(position, spaceship.position)
@@ -40,12 +34,12 @@ class SpaceshipTest {
     }
 
     @Test
-    fun `given coordinates and userHandler - when spaceship created - then score is zero`() {
+    fun `given coordinates and userId - when spaceship created - then score is zero`() {
         // given
-        val owner = mockUserHandler(mockRoom(mock<Game>()))
+        val userId = UserId(1)
 
         // when
-        val spaceship = Spaceship(Position(3, 7), owner)
+        val spaceship = Spaceship(Position(3, 7), userId)
 
         // then
         assertEquals(0, spaceship.score.value())
@@ -54,7 +48,8 @@ class SpaceshipTest {
     @Test
     fun `given spaceship - when getType called - then SPACESHIP type returned`() {
         // given
-        val spaceship = Spaceship(Position(1, 2), mockUserHandler(mockRoom(mock<Game>())))
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(1, 2), userId)
 
         // when
         val actual = spaceship.type
@@ -67,8 +62,8 @@ class SpaceshipTest {
     fun `given visible spaceship - when render called - then owner id drawn on screen`() {
         // given
         val screen = Screen(ScreenSize(5, 5))
-        val owner = mockUserHandler(mockRoom(mock<Game>()))
-        val spaceship = Spaceship(Position(2, 3), owner)
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(2, 3), userId)
 
         // when
         spaceship.render(screen)
@@ -82,7 +77,8 @@ class SpaceshipTest {
     fun `given invisible spaceship - when render called - then nothing drawn on screen`() {
         // given
         val screen = Screen(ScreenSize(5, 5))
-        val spaceship = Spaceship(Position(2, 3), mockUserHandler(mockRoom(mock<Game>())))
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(2, 3), userId)
         spaceship.isVisible = false
 
         // when
@@ -108,7 +104,8 @@ class SpaceshipTest {
         expectedY: Int,
     ) {
         // given
-        val spaceship = Spaceship(Position(initialX, initialY), mockUserHandler(mockRoom(mock<Game>())))
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(initialX, initialY), userId)
         spaceship.direction = direction
 
         // when
@@ -121,7 +118,8 @@ class SpaceshipTest {
     @Test
     fun `given alive spaceship - when addScore called - then score increased by 10`() {
         // given
-        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(5, 5), userId)
 
         // when
         spaceship.addScore()
@@ -133,7 +131,8 @@ class SpaceshipTest {
     @Test
     fun `given destroyed spaceship - when addScore called - then illegal state exception thrown`() {
         // given
-        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(5, 5), userId)
         spaceship.destroy()
 
         // when & then
@@ -143,7 +142,8 @@ class SpaceshipTest {
     @Test
     fun `given destroyed spaceship - when subtractScore called - then illegal state exception thrown`() {
         // given
-        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(5, 5), userId)
         spaceship.destroy()
 
         // when & then
@@ -153,7 +153,8 @@ class SpaceshipTest {
     @Test
     fun `given alive spaceship with score - when subtractScore called - then score decreased by 50 and spaceship stays alive`() {
         // given
-        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(5, 5), userId)
         spaceship.score = Score(100)
 
         // when
@@ -168,7 +169,8 @@ class SpaceshipTest {
     @Test
     fun `given alive spaceship with score equal to penalty - when subtractScore called - then score is zero and spaceship stays alive`() {
         // given
-        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(5, 5), userId)
         spaceship.score = Score(50)
 
         // when
@@ -183,7 +185,8 @@ class SpaceshipTest {
     @Test
     fun `given alive spaceship with score less than penalty - when subtractScore called - then score is negative and spaceship destroyed`() {
         // given
-        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(5, 5), userId)
         spaceship.score = Score(30)
 
         // when
@@ -198,7 +201,8 @@ class SpaceshipTest {
     @Test
     fun `given alive spaceship with zero score - when subtractScore called - then score decreased by 50 and spaceship destroyed`() {
         // given
-        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(5, 5), userId)
 
         // when
         spaceship.subtractScore()
@@ -212,7 +216,8 @@ class SpaceshipTest {
     @Test
     fun `given alive spaceship with negative score - when subtractScore called - then score unchanged`() {
         // given
-        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(5, 5), userId)
         spaceship.score = Score(-10)
 
         // when
@@ -227,7 +232,8 @@ class SpaceshipTest {
     @Test
     fun `given new spaceship - when status requested - then alive status returned`() {
         // given
-        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(5, 5), userId)
 
         // when
         val actual = spaceship.status
@@ -239,7 +245,8 @@ class SpaceshipTest {
     @Test
     fun `given alive spaceship - when destroy called - then spaceship is destroyed and invisible`() {
         // given
-        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(5, 5), userId)
 
         // when
         spaceship.destroy()
@@ -252,7 +259,8 @@ class SpaceshipTest {
     @Test
     fun `given destroyed spaceship - when destroy called - then illegal state exception thrown`() {
         // given
-        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(5, 5), userId)
         spaceship.destroy()
 
         // when & then
@@ -262,7 +270,8 @@ class SpaceshipTest {
     @Test
     fun `given spaceship - when setDirection called - then direction stored`() {
         // given
-        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(5, 5), userId)
 
         // when
         spaceship.direction = Direction.LEFT
@@ -274,7 +283,8 @@ class SpaceshipTest {
     @Test
     fun `given spaceship - when setCourseChecker called - then course checker stored`() {
         // given
-        val spaceship = Spaceship(Position(5, 5), mockUserHandler(mockRoom(mock<Game>())))
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(5, 5), userId)
         val courseChecker = CourseChecker(spaceship, emptyList(), Screen(ScreenSize(5, 5)))
 
         // when
@@ -282,18 +292,5 @@ class SpaceshipTest {
 
         // then
         assertSame(courseChecker, spaceship.courseChecker)
-    }
-
-    private fun mockUserHandler(room: Room): UserHandler {
-        val userHandler = mock<UserHandler>()
-        whenever(userHandler.room).thenReturn(room)
-        whenever(userHandler.user).thenReturn(User(UserId(1), "alice"))
-        return userHandler
-    }
-
-    private fun mockRoom(game: Game): Room {
-        val room = mock<Room>()
-        whenever(room.game).thenReturn(game)
-        return room
     }
 }

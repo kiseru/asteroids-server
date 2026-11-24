@@ -114,7 +114,7 @@ public final class Room {
             game = new Game(new Screen(new ScreenSize(30, 30)), 150, 50);
             userHandlers.stream()
                     .filter(Objects::nonNull)
-                    .forEach(game::registerSpaceShipForUser);
+                    .forEach(userHandler -> game.registerSpaceShipForUser(userHandler, userHandler.getUser().id()));
             userHandlers.stream()
                     .filter(Objects::nonNull)
                     .forEach(userHandler -> userHandler.sendMessage("start"));
