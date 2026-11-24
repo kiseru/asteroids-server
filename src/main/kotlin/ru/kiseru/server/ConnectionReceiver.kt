@@ -7,6 +7,7 @@ import java.io.PrintWriter
 import java.net.ServerSocket
 import java.util.concurrent.atomic.AtomicLong
 import ru.kiseru.logics.User
+import ru.kiseru.logics.UserId
 import ru.kiseru.server.room.Room
 
 class ConnectionReceiver(private val connectionReceiver: ServerSocket) {
@@ -24,7 +25,8 @@ class ConnectionReceiver(private val connectionReceiver: ServerSocket) {
                 val writer = PrintWriter(newConnection.outputStream, true)
                 writer.println("Welcome To Asteroids Server")
                 writer.println("Please, introduce yourself!")
-                val user = User(ID_GENERATOR.incrementAndGet(), reader.readLine())
+                val userId = UserId(ID_GENERATOR.incrementAndGet())
+                val user = User(userId, reader.readLine())
                 val userHandler = UserHandler(reader, writer, notFullRoom, user)
                 Thread(userHandler::run).start()
             } catch (e: IOException) {

@@ -16,6 +16,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import ru.kiseru.logics.User
+import ru.kiseru.logics.UserId
 import ru.kiseru.logics.models.Spaceship
 import ru.kiseru.server.UserHandler
 
@@ -274,7 +275,7 @@ class RoomTest {
         val spaceship = mock<Spaceship>()
         whenever(spaceship.status).thenReturn(Spaceship.Status.ALIVE)
         whenever(userHandler.spaceship).thenReturn(spaceship)
-        whenever(userHandler.user).thenReturn(User(1, "alice"))
+        whenever(userHandler.user).thenReturn(User(UserId(1), "alice"))
         whenever(userHandler.toString()).thenReturn("alice 100")
         room.addUser(userHandler)
         val thread = Thread(room::run)
@@ -304,7 +305,7 @@ class RoomTest {
         val spaceship = mock<Spaceship>()
         whenever(spaceship.status).thenReturn(Spaceship.Status.ALIVE)
         whenever(userHandler.spaceship).thenReturn(spaceship)
-        whenever(userHandler.user).thenReturn(User(1, "alice"))
+        whenever(userHandler.user).thenReturn(User(UserId(1), "alice"))
         whenever(userHandler.toString()).thenReturn("alice 100")
         room.addUser(userHandler)
         val thread = Thread(room::run)
@@ -325,7 +326,7 @@ class RoomTest {
         // given
         val room = Room()
         val userHandler = mockUserHandlerWithSpaceship(Spaceship.Status.DESTROYED)
-        whenever(userHandler.user).thenReturn(User(1, "alice"))
+        whenever(userHandler.user).thenReturn(User(UserId(1), "alice"))
         whenever(userHandler.toString()).thenReturn("alice 100")
         room.addUser(userHandler)
 
@@ -344,7 +345,7 @@ class RoomTest {
         // given
         val room = Room()
         val userHandler = mockUserHandlerWithSpaceship(Spaceship.Status.ALIVE)
-        whenever(userHandler.user).thenReturn(User(1, "alice"))
+        whenever(userHandler.user).thenReturn(User(UserId(1), "alice"))
         whenever(userHandler.toString()).thenReturn("alice 100")
         room.addUser(userHandler)
 

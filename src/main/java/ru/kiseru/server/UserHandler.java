@@ -42,7 +42,7 @@ public final class UserHandler {
         try {
             System.out.println(user.username() + " has joined the server!");
             writer.println("You need to keep a space garbage.");
-            writer.println("Your ID is " + getUser().id());
+            writer.println("Your ID is " + getUser().id().id());
             writer.println("Good luck, Commander!");
             room = room.addUser(this);
             if (room.isFull()) {

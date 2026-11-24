@@ -19,6 +19,7 @@ import ru.kiseru.logics.auxiliary.Direction
 import ru.kiseru.logics.auxiliary.Type
 import ru.kiseru.logics.CourseChecker
 import ru.kiseru.logics.Score
+import ru.kiseru.logics.UserId
 import ru.kiseru.server.UserHandler
 import ru.kiseru.server.room.Room
 
@@ -286,7 +287,7 @@ class SpaceshipTest {
     private fun mockUserHandler(room: Room): UserHandler {
         val userHandler = mock<UserHandler>()
         whenever(userHandler.room).thenReturn(room)
-        whenever(userHandler.user).thenReturn(User(1, "alice"))
+        whenever(userHandler.user).thenReturn(User(UserId(1), "alice"))
         return userHandler
     }
 

@@ -24,6 +24,7 @@ import ru.kiseru.logics.models.Spaceship
 import ru.kiseru.server.room.Room
 import java.io.BufferedReader
 import java.io.PrintWriter
+import ru.kiseru.logics.UserId
 
 class UserHandlerTest {
 
@@ -125,7 +126,8 @@ class UserHandlerTest {
     @Test
     fun `given user - when userHandler created - then same user returned`() {
         // given
-        val user = User(7, "alice")
+        val userId = UserId(7)
+        val user = User(userId, "alice")
 
         // when
         val userHandler = createUserHandler(user = user)
@@ -145,7 +147,7 @@ class UserHandlerTest {
         whenever(actualRoom.isFull).thenReturn(false)
         whenever(actualRoom.isGameFinished).thenReturn(false, true)
         whenever(reader.readLine()).thenReturn("unknown")
-        val userHandler = UserHandler(reader, mock(), initialRoom, User(1, "alice"))
+        val userHandler = UserHandler(reader, mock(), initialRoom, User(UserId(1), "alice"))
         userHandler.setSpaceship(spaceship)
 
         // when
@@ -434,7 +436,7 @@ class UserHandlerTest {
         reader: BufferedReader = mock(),
         writer: PrintWriter = mock(),
         room: Room = mock(),
-        user: User = User(1, "alice"),
+        user: User = User(UserId(1), "alice"),
     ): UserHandler {
         whenever(room.addUser(any())).thenReturn(room)
         return UserHandler(reader, writer, room, user)
