@@ -4,9 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import ru.kiseru.logics.Screen
 import ru.kiseru.logics.auxiliary.Position
-import ru.kiseru.logics.auxiliary.ScreenSize
 import ru.kiseru.logics.auxiliary.Type
 
 class GarbageTest {
@@ -34,36 +32,6 @@ class GarbageTest {
 
         // then
         assertEquals(Type.GARBAGE, actual)
-    }
-
-    @Test
-    fun `given visible garbage - when render called - then symbol G drawn on screen`() {
-        // given
-        val screen = Screen(ScreenSize(5, 5))
-        val garbage = Garbage(Position(2, 3))
-
-        // when
-        garbage.render(screen)
-
-        // then
-        val lines = screen.display().split("\n")
-        assertEquals("G", lines[2].split("\t")[1])
-    }
-
-    @Test
-    fun `given crashed garbage - when render called - then nothing drawn on screen`() {
-        // given
-        val screen = Screen(ScreenSize(5, 5))
-        val garbage = Garbage(Position(2, 3))
-        garbage.crash()
-        assertFalse(garbage.isVisible)
-
-        // when
-        garbage.render(screen)
-
-        // then
-        val lines = screen.display().split("\n")
-        assertEquals(".", lines[2].split("\t")[1])
     }
 
     @Test

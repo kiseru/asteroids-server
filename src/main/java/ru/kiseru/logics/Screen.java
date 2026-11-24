@@ -3,6 +3,10 @@ package ru.kiseru.logics;
 import java.util.Arrays;
 import ru.kiseru.logics.auxiliary.Position;
 import ru.kiseru.logics.auxiliary.ScreenSize;
+import ru.kiseru.logics.models.Asteroid;
+import ru.kiseru.logics.models.Garbage;
+import ru.kiseru.logics.models.Model;
+import ru.kiseru.logics.models.Spaceship;
 
 public class Screen {
 
@@ -16,11 +20,31 @@ public class Screen {
     }
 
     /**
+     * Рисует модель на экране, если она видима
+     * @param model - модель, которую нужно отобразить
+     */
+    public void drawModel(Model model) {
+        if (model instanceof Asteroid a) {
+            if (a.isVisible()) {
+                draw(a.getPosition(), "A");
+            }
+        } else if (model instanceof Garbage g) {
+            if (g.isVisible()) {
+                draw(g.getPosition(), "G");
+            }
+        } else if (model instanceof Spaceship s) {
+            if (s.isVisible()) {
+                draw(s.getPosition(), String.valueOf(s.getUserId().id()));
+            }
+        }
+    }
+
+    /**
      * Рисует на экране точку
      * @param position - по какой координате
      * @param symbol - символ, которым отображается точка
      */
-    public synchronized void draw(Position position, String symbol) {
+    private synchronized void draw(Position position, String symbol) {
         if (mainMatrix[position.y()][position.x()].equals(".")) {
             mainMatrix[position.y()][position.x()] = symbol;
         } else {

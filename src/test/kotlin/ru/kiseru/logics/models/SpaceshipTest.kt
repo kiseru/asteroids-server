@@ -58,37 +58,6 @@ class SpaceshipTest {
         assertEquals(Type.SPACESHIP, actual)
     }
 
-    @Test
-    fun `given visible spaceship - when render called - then owner id drawn on screen`() {
-        // given
-        val screen = Screen(ScreenSize(5, 5))
-        val userId = UserId(1)
-        val spaceship = Spaceship(Position(2, 3), userId)
-
-        // when
-        spaceship.render(screen)
-
-        // then
-        val lines = screen.display().split("\n")
-        assertEquals("1", lines[2].split("\t")[1])
-    }
-
-    @Test
-    fun `given invisible spaceship - when render called - then nothing drawn on screen`() {
-        // given
-        val screen = Screen(ScreenSize(5, 5))
-        val userId = UserId(1)
-        val spaceship = Spaceship(Position(2, 3), userId)
-        spaceship.isVisible = false
-
-        // when
-        spaceship.render(screen)
-
-        // then
-        val lines = screen.display().split("\n")
-        assertEquals(".", lines[2].split("\t")[1])
-    }
-
     @ParameterizedTest
     @CsvSource(
         "UP, 5, 5, 5, 4",

@@ -1,6 +1,5 @@
 package ru.kiseru.logics.models;
 
-import ru.kiseru.logics.Screen;
 import ru.kiseru.logics.auxiliary.Position;
 import ru.kiseru.logics.auxiliary.Type;
 
@@ -12,13 +11,6 @@ public class Garbage extends Point implements Model, Crashable {
 
     public void crash() {
         this.isVisible = false;
-    }
-
-    @Override
-    public void render(Screen screen) {
-        if (isVisible) {
-            screen.draw(position, "G");
-        }
     }
 
     @Override

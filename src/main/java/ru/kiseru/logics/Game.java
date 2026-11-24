@@ -65,7 +65,7 @@ public class Game {
     public synchronized void refresh() {
         screen.update();
         crashHandlers.forEach(SpaceshipCrashHandler::check);
-        gameObjects.forEach(o -> o.render(screen));
+        gameObjects.forEach(screen::drawModel);
     }
 
     public boolean isAnyoneAlive() {

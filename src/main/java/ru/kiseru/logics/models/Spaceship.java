@@ -2,7 +2,6 @@ package ru.kiseru.logics.models;
 
 import ru.kiseru.logics.CourseChecker;
 import ru.kiseru.logics.Score;
-import ru.kiseru.logics.Screen;
 import ru.kiseru.logics.Steps;
 import ru.kiseru.logics.UserId;
 import ru.kiseru.logics.auxiliary.Position;
@@ -28,13 +27,6 @@ public class Spaceship extends Point implements Model{
     public Spaceship(Position position, UserId userId) {
         super(position);
         this.userId = userId;
-    }
-
-    @Override
-    public void render(Screen screen) {
-        if (isVisible) {
-            screen.draw(position, String.valueOf(userId.id()));
-        }
     }
 
     /**
@@ -135,6 +127,10 @@ public class Spaceship extends Point implements Model{
 
     public void setPosition(Position position) {
         this.position = position;
+    }
+
+    public UserId getUserId() {
+        return userId;
     }
 
     public enum Status {
