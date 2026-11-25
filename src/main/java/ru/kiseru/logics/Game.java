@@ -12,7 +12,6 @@ import ru.kiseru.server.UserHandler;
 
 public class Game {
 
-    private final List<Model> gameObjects;
     private final List<Point> pointsOnScreen;
     private final Screen screen;
     private final List<SpaceshipCrashHandler> crashHandlers;
@@ -29,20 +28,17 @@ public class Game {
         this.garbageNumber = garbageNumber;
         this.screen = screen;
         this.pointsOnScreen = new ArrayList<>();
-        this.gameObjects = new ArrayList<>();
         this.crashHandlers = new ArrayList<>();
 
         // генерируем мусор
         for (int i = 0; i < garbageNumber; i++) {
             Garbage garbage = new Garbage(generateUniqueRandomCoordinates());
             pointsOnScreen.add(garbage);
-            gameObjects.add(garbage);
         }
         // генерируем астероиды
         for (int i = 0; i < asteroidNumber; i++) {
             Asteroid asteroid = new Asteroid(generateUniqueRandomCoordinates());
             pointsOnScreen.add(asteroid);
-            gameObjects.add(asteroid);
         }
     }
 
@@ -54,7 +50,6 @@ public class Game {
         var spaceship = new Spaceship(generateUniqueRandomCoordinates(), userId);
         userHandler.setSpaceship(spaceship);
         this.pointsOnScreen.add(spaceship);
-        this.gameObjects.add(spaceship);
         crashHandlers.add(new SpaceshipCrashHandler(this, userHandler, spaceship));
         spaceship.setCourseChecker(new CourseChecker(spaceship, this.pointsOnScreen, this.screen));
     }
@@ -65,7 +60,7 @@ public class Game {
     public synchronized void refresh() {
         screen.update();
         crashHandlers.forEach(SpaceshipCrashHandler::check);
-        gameObjects.forEach(screen::drawModel);
+        pointsOnScreen.forEach(screen::drawPoint);
     }
 
     public boolean isAnyoneAlive() {
@@ -87,10 +82,6 @@ public class Game {
     private boolean isGameObjectsContainsCoordinates(Position position) {
         return pointsOnScreen.stream()
                 .anyMatch(p -> p.getPosition().equals(position));
-    }
-
-    public List<Model> getGameObjects() {
-        return gameObjects;
     }
 
     public List<Point> getPointsOnScreen() {

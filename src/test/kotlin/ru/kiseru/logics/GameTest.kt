@@ -37,18 +37,6 @@ class GameTest {
     }
 
     @Test
-    fun `given screen and counts - when game created - then game objects contain the same points as screen`() {
-        // given
-        val screen = Screen(ScreenSize(10, 10))
-
-        // when
-        val game = Game(screen, 2, 2)
-
-        // then
-        assertEquals(game.pointsOnScreen, game.gameObjects)
-    }
-
-    @Test
     fun `given screen and counts - when game created - then all coordinates unique and within screen bounds`() {
         // given
         val screen = Screen(ScreenSize(10, 10))
@@ -84,7 +72,6 @@ class GameTest {
 
         // then
         assertTrue(game.pointsOnScreen.isEmpty())
-        assertTrue(game.gameObjects.isEmpty())
     }
 
     @Test
@@ -247,8 +234,8 @@ class GameTest {
         // given
         val screen = Screen(ScreenSize(10, 10))
         val game = Game(screen, 1, 1)
-        val garbage = game.gameObjects.filterIsInstance<Garbage>().first()
-        val asteroid = game.gameObjects.filterIsInstance<Asteroid>().first()
+        val garbage = game.pointsOnScreen.filterIsInstance<Garbage>().first()
+        val asteroid = game.pointsOnScreen.filterIsInstance<Asteroid>().first()
 
         // when
         game.refresh()

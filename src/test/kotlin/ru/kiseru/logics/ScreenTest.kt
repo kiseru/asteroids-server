@@ -50,7 +50,7 @@ class ScreenTest {
     }
 
     @Test
-    fun `given visible asteroid and garbage at same position - when drawModel called - then symbol AG drawn on screen`() {
+    fun `given visible asteroid and garbage at same position - when drawPoint called - then symbol AG drawn on screen`() {
         // given
         val screen = Screen(ScreenSize(1, 1))
 
@@ -59,8 +59,8 @@ class ScreenTest {
         val garbage = Garbage(position)
 
         // when
-        screen.drawModel(asteroid)
-        screen.drawModel(garbage)
+        screen.drawPoint(asteroid)
+        screen.drawPoint(garbage)
 
         // then
         val lines = screen.display().split("\n")
@@ -68,13 +68,13 @@ class ScreenTest {
     }
 
     @Test
-    fun `given visible asteroid - when drawModel called - then symbol A drawn on screen`() {
+    fun `given visible asteroid - when drawPoint called - then symbol A drawn on screen`() {
         // given
         val screen = Screen(ScreenSize(1, 1))
         val asteroid = Asteroid(Position(1, 1))
 
         // when
-        screen.drawModel(asteroid)
+        screen.drawPoint(asteroid)
 
         // then
         val lines = screen.display().split("\n")
@@ -82,14 +82,14 @@ class ScreenTest {
     }
 
     @Test
-    fun `given invisible asteroid - when drawModel called - then nothing drawn on screen`() {
+    fun `given invisible asteroid - when drawPoint called - then nothing drawn on screen`() {
         // given
         val screen = Screen(ScreenSize(1, 1))
         val asteroid = Asteroid(Position(1, 1))
         asteroid.crash()
 
         // when
-        screen.drawModel(asteroid)
+        screen.drawPoint(asteroid)
 
         // then
         val lines = screen.display().split("\n")
@@ -98,13 +98,13 @@ class ScreenTest {
 
 
     @Test
-    fun `given visible garbage - when drawModel called - then symbol G drawn on screen`() {
+    fun `given visible garbage - when drawPoint called - then symbol G drawn on screen`() {
         // given
         val screen = Screen(ScreenSize(1, 1))
         val garbage = Garbage(Position(1, 1))
 
         // when
-        screen.drawModel(garbage)
+        screen.drawPoint(garbage)
 
         // then
         val lines = screen.display().split("\n")
@@ -112,14 +112,14 @@ class ScreenTest {
     }
 
     @Test
-    fun `given invisible garbage - when drawModel called - then nothing drawn on screen`() {
+    fun `given invisible garbage - when drawPoint called - then nothing drawn on screen`() {
         // given
         val screen = Screen(ScreenSize(1, 1))
         val garbage = Garbage(Position(1, 1))
         garbage.crash()
 
         // when
-        screen.drawModel(garbage)
+        screen.drawPoint(garbage)
 
         // then
         val lines = screen.display().split("\n")
@@ -127,13 +127,13 @@ class ScreenTest {
     }
 
     @Test
-    fun `given visible spaceship - when drawModel called - then owner id drawn on screen`() {
+    fun `given visible spaceship - when drawPoint called - then owner id drawn on screen`() {
         // given
         val screen = Screen(ScreenSize(1, 1))
         val spaceship = Spaceship(Position(1, 1), UserId(1))
 
         // when
-        screen.drawModel(spaceship)
+        screen.drawPoint(spaceship)
 
         // then
         val lines = screen.display().split("\n")
@@ -141,14 +141,14 @@ class ScreenTest {
     }
 
     @Test
-    fun `given invisible spaceship - when drawModel called - then nothing drawn on screen`() {
+    fun `given invisible spaceship - when drawPoint called - then nothing drawn on screen`() {
         // given
         val screen = Screen(ScreenSize(1, 1))
         val spaceship = Spaceship(Position(1, 1), UserId(1))
         spaceship.destroy()
 
         // when
-        screen.drawModel(spaceship)
+        screen.drawPoint(spaceship)
 
         // then
         val lines = screen.display().split("\n")

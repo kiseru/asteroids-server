@@ -8,7 +8,7 @@ import ru.kiseru.logics.auxiliary.Position;
 import ru.kiseru.logics.auxiliary.Direction;
 import ru.kiseru.logics.auxiliary.Type;
 
-public class Spaceship extends Point implements Model{
+public class Spaceship extends Point {
 
     private final UserId userId;
 

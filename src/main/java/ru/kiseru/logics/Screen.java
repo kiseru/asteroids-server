@@ -5,7 +5,7 @@ import ru.kiseru.logics.auxiliary.Position;
 import ru.kiseru.logics.auxiliary.ScreenSize;
 import ru.kiseru.logics.models.Asteroid;
 import ru.kiseru.logics.models.Garbage;
-import ru.kiseru.logics.models.Model;
+import ru.kiseru.logics.models.Point;
 import ru.kiseru.logics.models.Spaceship;
 
 public class Screen {
@@ -20,19 +20,21 @@ public class Screen {
     }
 
     /**
-     * Рисует модель на экране, если она видима
-     * @param model - модель, которую нужно отобразить
+     * Рисует точку на экране, если она видима. Символ отображения зависит от типа точки:
+     * астероид отображается символом "A", мусор - "G", корабль - идентификатором пользователя
+     *
+     * @param point - точка, которую нужно отобразить
      */
-    public void drawModel(Model model) {
-        if (model instanceof Asteroid a) {
+    public void drawPoint(Point point) {
+        if (point instanceof Asteroid a) {
             if (a.isVisible()) {
                 draw(a.getPosition(), "A");
             }
-        } else if (model instanceof Garbage g) {
+        } else if (point instanceof Garbage g) {
             if (g.isVisible()) {
                 draw(g.getPosition(), "G");
             }
-        } else if (model instanceof Spaceship s) {
+        } else if (point instanceof Spaceship s) {
             if (s.isVisible()) {
                 draw(s.getPosition(), String.valueOf(s.getUserId().id()));
             }

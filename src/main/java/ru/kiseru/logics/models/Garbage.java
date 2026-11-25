@@ -3,7 +3,7 @@ package ru.kiseru.logics.models;
 import ru.kiseru.logics.auxiliary.Position;
 import ru.kiseru.logics.auxiliary.Type;
 
-public class Garbage extends Point implements Model, Crashable {
+public class Garbage extends Point implements Crashable {
 
     public Garbage(Position position) {
         super(position);
