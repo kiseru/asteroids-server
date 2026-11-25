@@ -44,9 +44,10 @@ public class Game {
 
     /**
      * Создает и регистрирует новый корабль
+     *
      * @param userHandler - юзер, для которого регистрируется корабль
      */
-    public void registerSpaceShipForUser(UserHandler userHandler, UserId userId) {
+    public void registerSpaceshipForUser(UserHandler userHandler, UserId userId) {
         var spaceship = new Spaceship(generateUniqueRandomCoordinates(), userId);
         userHandler.setSpaceship(spaceship);
         this.pointsOnScreen.add(spaceship);

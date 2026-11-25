@@ -94,7 +94,7 @@ class GameTest {
         val userId = UserId(1)
 
         // when
-        game.registerSpaceShipForUser(userHandler, userId)
+        game.registerSpaceshipForUser(userHandler, userId)
 
         // then
         val captor = argumentCaptor<Spaceship>()
@@ -111,7 +111,7 @@ class GameTest {
         val userId = UserId(1)
 
         // when
-        game.registerSpaceShipForUser(userHandler, userId)
+        game.registerSpaceshipForUser(userHandler, userId)
 
         // then
         val captor = argumentCaptor<Spaceship>()
@@ -127,7 +127,7 @@ class GameTest {
         val userId = UserId(1)
 
         // when
-        game.registerSpaceShipForUser(userHandler, userId)
+        game.registerSpaceshipForUser(userHandler, userId)
 
         // then
         assertEquals(1, game.crashHandlers.size)
@@ -141,7 +141,7 @@ class GameTest {
         val userId = UserId(1)
 
         // when
-        game.registerSpaceShipForUser(userHandler, userId)
+        game.registerSpaceshipForUser(userHandler, userId)
 
         // then
         val captor = argumentCaptor<Spaceship>()
@@ -157,7 +157,7 @@ class GameTest {
         val userId = UserId(1)
 
         // when
-        game.registerSpaceShipForUser(userHandler, userId)
+        game.registerSpaceshipForUser(userHandler, userId)
 
         // then
         val captor = argumentCaptor<Spaceship>()
@@ -252,7 +252,7 @@ class GameTest {
         val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
         val userHandler = mock<UserHandler>()
         val userId = UserId(1)
-        game.registerSpaceShipForUser(userHandler, userId)
+        game.registerSpaceshipForUser(userHandler, userId)
 
         // when
         val actual = game.isAnyoneAlive()
@@ -267,7 +267,7 @@ class GameTest {
         val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
         val userHandler = mock<UserHandler>()
         val userId = UserId(1)
-        game.registerSpaceShipForUser(userHandler, userId)
+        game.registerSpaceshipForUser(userHandler, userId)
         game.pointsOnScreen.filterIsInstance<Spaceship>().first().destroy()
 
         // when
@@ -281,8 +281,8 @@ class GameTest {
     fun `given two spaceships one destroyed - when isAnyoneAlive called - then true returned`() {
         // given
         val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
-        game.registerSpaceShipForUser(mock<UserHandler>(), UserId(1))
-        game.registerSpaceShipForUser(mock<UserHandler>(), UserId(2))
+        game.registerSpaceshipForUser(mock<UserHandler>(), UserId(1))
+        game.registerSpaceshipForUser(mock<UserHandler>(), UserId(2))
         game.pointsOnScreen.filterIsInstance<Spaceship>().first().destroy()
 
         // when

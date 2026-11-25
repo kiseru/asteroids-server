@@ -82,7 +82,7 @@ public final class Room {
         synchronized (this) {
             status = Status.GAMING;
             game = new Game(new Screen(new ScreenSize(30, 30)), 150, 50);
-            userHandlers.forEach(userHandler -> game.registerSpaceShipForUser(userHandler, userHandler.getUser().id()));
+            userHandlers.forEach(userHandler -> game.registerSpaceshipForUser(userHandler, userHandler.getUser().id()));
             userHandlers.forEach(userHandler -> userHandler.sendMessage("start"));
             notifyAll();
         }
