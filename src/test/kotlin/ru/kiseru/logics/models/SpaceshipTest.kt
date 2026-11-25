@@ -262,4 +262,28 @@ class SpaceshipTest {
         // then
         assertSame(courseChecker, spaceship.courseChecker)
     }
+
+    @ParameterizedTest
+    @CsvSource(
+        "UP,5,4",
+        "DOWN,5,6",
+        "LEFT,4,5",
+        "RIGHT,6,5",
+    )
+    fun `given spaceship - when positionAhead called - then returns position ahead of spaceship`(
+        direction: Direction,
+        expectedX: Int,
+        expectedY: Int,
+    ) {
+        // given
+        val userId = UserId(1)
+        val spaceship = Spaceship(Position(5, 5), userId)
+        spaceship.direction = direction
+
+        // when
+        val actual = spaceship.positionAhead()
+
+        // then
+        assertEquals(Position(expectedX, expectedY), actual)
+    }
 }

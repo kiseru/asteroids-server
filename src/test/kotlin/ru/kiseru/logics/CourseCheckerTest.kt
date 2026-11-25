@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import ru.kiseru.logics.auxiliary.Position
 import ru.kiseru.logics.auxiliary.ScreenSize
 import ru.kiseru.logics.auxiliary.Direction
@@ -25,7 +23,7 @@ class CourseCheckerTest {
     )
     fun `given asteroid on adjacent cell in spaceship direction - when isAsteroid called - then returns true`(direction: Direction) {
         // given
-        val spaceship = mockSpaceship(direction)
+        val spaceship = createSpaceship(direction)
         val asteroidCoordinates = adjacentCoordinates(direction)
         val points = listOf(Asteroid(asteroidCoordinates))
         val courseChecker = CourseChecker(spaceship, points, Screen(ScreenSize(10, 10)))
@@ -46,7 +44,7 @@ class CourseCheckerTest {
     )
     fun `given no asteroid on adjacent cell in spaceship direction - when isAsteroid called - then returns false`(direction: Direction) {
         // given
-        val spaceship = mockSpaceship(direction)
+        val spaceship = createSpaceship(direction)
         val points = listOf(Asteroid(Position(1, 1)))
         val courseChecker = CourseChecker(spaceship, points, Screen(ScreenSize(10, 10)))
 
@@ -60,7 +58,7 @@ class CourseCheckerTest {
     @Test
     fun `given garbage on adjacent cell in spaceship direction - when isAsteroid called - then returns false`() {
         // given
-        val spaceship = mockSpaceship(Direction.UP)
+        val spaceship = createSpaceship(Direction.UP)
         val points = listOf(Garbage(Position(5, 4)))
         val courseChecker = CourseChecker(spaceship, points, Screen(ScreenSize(10, 10)))
 
@@ -80,7 +78,7 @@ class CourseCheckerTest {
     )
     fun `given garbage on adjacent cell in spaceship direction - when isGarbage called - then returns true`(direction: Direction) {
         // given
-        val spaceship = mockSpaceship(direction)
+        val spaceship = createSpaceship(direction)
         val garbageCoordinates = adjacentCoordinates(direction)
         val points = listOf(Garbage(garbageCoordinates))
         val courseChecker = CourseChecker(spaceship, points, Screen(ScreenSize(10, 10)))
@@ -101,7 +99,7 @@ class CourseCheckerTest {
     )
     fun `given no garbage on adjacent cell in spaceship direction - when isGarbage called - then returns false`(direction: Direction) {
         // given
-        val spaceship = mockSpaceship(direction)
+        val spaceship = createSpaceship(direction)
         val points = listOf(Garbage(Position(1, 1)))
         val courseChecker = CourseChecker(spaceship, points, Screen(ScreenSize(10, 10)))
 
@@ -115,7 +113,7 @@ class CourseCheckerTest {
     @Test
     fun `given asteroid on adjacent cell in spaceship direction - when isGarbage called - then returns false`() {
         // given
-        val spaceship = mockSpaceship(Direction.UP)
+        val spaceship = createSpaceship(Direction.UP)
         val points = listOf(Asteroid(Position(5, 4)))
         val courseChecker = CourseChecker(spaceship, points, Screen(ScreenSize(10, 10)))
 
@@ -129,7 +127,7 @@ class CourseCheckerTest {
     @Test
     fun `given spaceship moving up on top border - when isWall called - then returns true`() {
         // given
-        val spaceship = mockSpaceship(Direction.UP, x = 5, y = 1)
+        val spaceship = createSpaceship(Direction.UP, x = 5, y = 1)
         val courseChecker = CourseChecker(spaceship, emptyList(), Screen(ScreenSize(10, 10)))
 
         // when
@@ -142,7 +140,7 @@ class CourseCheckerTest {
     @Test
     fun `given spaceship moving up not on top border - when isWall called - then returns false`() {
         // given
-        val spaceship = mockSpaceship(Direction.UP, x = 5, y = 5)
+        val spaceship = createSpaceship(Direction.UP, x = 5, y = 5)
         val courseChecker = CourseChecker(spaceship, emptyList(), Screen(ScreenSize(10, 10)))
 
         // when
@@ -155,7 +153,7 @@ class CourseCheckerTest {
     @Test
     fun `given spaceship moving right on right border - when isWall called - then returns true`() {
         // given
-        val spaceship = mockSpaceship(Direction.RIGHT, x = 10, y = 5)
+        val spaceship = createSpaceship(Direction.RIGHT, x = 10, y = 5)
         val courseChecker = CourseChecker(spaceship, emptyList(), Screen(ScreenSize(10, 10)))
 
         // when
@@ -168,7 +166,7 @@ class CourseCheckerTest {
     @Test
     fun `given spaceship moving right not on right border - when isWall called - then returns false`() {
         // given
-        val spaceship = mockSpaceship(Direction.RIGHT, x = 5, y = 5)
+        val spaceship = createSpaceship(Direction.RIGHT, x = 5, y = 5)
         val courseChecker = CourseChecker(spaceship, emptyList(), Screen(ScreenSize(10, 10)))
 
         // when
@@ -181,7 +179,7 @@ class CourseCheckerTest {
     @Test
     fun `given spaceship moving down on bottom border - when isWall called - then returns true`() {
         // given
-        val spaceship = mockSpaceship(Direction.DOWN, x = 5, y = 10)
+        val spaceship = createSpaceship(Direction.DOWN, x = 5, y = 10)
         val courseChecker = CourseChecker(spaceship, emptyList(), Screen(ScreenSize(10, 10)))
 
         // when
@@ -194,7 +192,7 @@ class CourseCheckerTest {
     @Test
     fun `given spaceship moving down not on bottom border - when isWall called - then returns false`() {
         // given
-        val spaceship = mockSpaceship(Direction.DOWN, x = 5, y = 5)
+        val spaceship = createSpaceship(Direction.DOWN, x = 5, y = 5)
         val courseChecker = CourseChecker(spaceship, emptyList(), Screen(ScreenSize(10, 10)))
 
         // when
@@ -207,7 +205,7 @@ class CourseCheckerTest {
     @Test
     fun `given spaceship moving left on left border - when isWall called - then returns true`() {
         // given
-        val spaceship = mockSpaceship(Direction.LEFT, x = 1, y = 5)
+        val spaceship = createSpaceship(Direction.LEFT, x = 1, y = 5)
         val courseChecker = CourseChecker(spaceship, emptyList(), Screen(ScreenSize(10, 10)))
 
         // when
@@ -220,7 +218,7 @@ class CourseCheckerTest {
     @Test
     fun `given spaceship moving left not on left border - when isWall called - then returns false`() {
         // given
-        val spaceship = mockSpaceship(Direction.LEFT, x = 5, y = 5)
+        val spaceship = createSpaceship(Direction.LEFT, x = 5, y = 5)
         val courseChecker = CourseChecker(spaceship, emptyList(), Screen(ScreenSize(10, 10)))
 
         // when
@@ -230,16 +228,15 @@ class CourseCheckerTest {
         assertFalse(result)
     }
 
-    private fun mockSpaceship(
+    private fun createSpaceship(
         direction: Direction,
         x: Int = 5,
         y: Int = 5,
     ): Spaceship {
-        val spaceship = mock<Spaceship>()
-        whenever(spaceship.direction).thenReturn(direction)
-        whenever(spaceship.x).thenReturn(x)
-        whenever(spaceship.y).thenReturn(y)
-        whenever(spaceship.position).thenReturn(Position(x, y))
+        val position = Position(x, y)
+        val userId = UserId(1)
+        val spaceship = Spaceship(position, userId)
+        spaceship.direction = direction
         return spaceship
     }
 

@@ -45,7 +45,7 @@ public class CourseChecker {
     }
 
     private boolean checkContaining(List<Position> container) {
-        var position = spaceship.getPosition().aheadOf(spaceship.getDirection());
+        var position = spaceship.positionAhead();
         return container.contains(position);
     }
 }

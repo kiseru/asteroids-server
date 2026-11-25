@@ -74,6 +74,15 @@ public class Spaceship extends Point {
     }
 
     /**
+     * Возвращает позицию, в которую переместится корабль при следующем шаге
+     *
+     * @return позиция на один шаг впереди в текущем направлении
+     */
+    public Position positionAhead() {
+        return position.aheadOf(direction);
+    }
+
+    /**
      * Проверяет, что корабль жив
      *
      * @throws IllegalStateException если корабль не жив
