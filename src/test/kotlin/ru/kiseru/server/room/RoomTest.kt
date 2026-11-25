@@ -129,7 +129,7 @@ class RoomTest {
         // then
         verify(secondUserHandler, never()).sendMessage(anyString())
         assertNotEquals(room, actual)
-        assertTrue(actual.rating.contains("bob 100\n"))
+        assertTrue(actual.rating.contains("bob 100"))
     }
 
     @Test
@@ -145,7 +145,7 @@ class RoomTest {
         val actual = room.rating
 
         // then
-        assertEquals("alice 100\n", actual)
+        assertEquals("alice 100", actual)
     }
 
     @Test
@@ -164,7 +164,7 @@ class RoomTest {
         val actual = room.rating
 
         // then
-        assertEquals("alice 100\nbob 200\n", actual)
+        assertEquals("alice 100\nbob 200", actual)
     }
 
     @Test
@@ -294,7 +294,7 @@ class RoomTest {
         verify(userHandler, atLeastOnce()).sendMessage(captor.capture())
         assertTrue(captor.firstValue == "start")
         assertTrue(captor.allValues.contains("finish"))
-        assertTrue(captor.allValues.contains("alice 100\n"))
+        assertTrue(captor.allValues.contains("alice 100"))
     }
 
     @Test
