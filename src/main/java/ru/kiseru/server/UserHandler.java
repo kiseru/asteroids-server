@@ -57,35 +57,36 @@ public final class UserHandler {
             spaceship.setDirection(Direction.UP);
             while (!room.isGameFinished() && spaceship.getStatus() == Spaceship.Status.ALIVE) {
                 String userMessage = reader.readLine();
+                var game = room.getGame();
                 switch (userMessage) {
                     case "go" -> {
                         spaceship.go();
-                        room.getGame().refresh();
+                        game.refresh();
                         sendMessage(Integer.toString(getScore()));
                     }
                     case "left" -> {
                         spaceship.setDirection(Direction.LEFT);
-                        room.getGame().refresh();
+                        game.refresh();
                         sendMessage("success");
                     }
                     case "right" -> {
                         spaceship.setDirection(Direction.RIGHT);
-                        room.getGame().refresh();
+                        game.refresh();
                         sendMessage("success");
                     }
                     case "up" -> {
                         spaceship.setDirection(Direction.UP);
-                        room.getGame().refresh();
+                        game.refresh();
                         sendMessage("success");
                     }
                     case "down" -> {
                         spaceship.setDirection(Direction.DOWN);
-                        room.getGame().refresh();
+                        game.refresh();
                         sendMessage("success");
                     }
-                    case "isAsteroid" -> sendMessage(spaceship.isAsteroid() ? "t" : "f");
-                    case "isGarbage" -> sendMessage(spaceship.isGarbage() ? "t" : "f");
-                    case "isWall" -> sendMessage(spaceship.isWall() ? "t" : "f");
+                    case "isAsteroid" -> sendMessage(game.isAsteroidAheadOf(spaceship) ? "t" : "f");
+                    case "isGarbage" -> sendMessage(game.isGarbageAheadOf(spaceship) ? "t" : "f");
+                    case "isWall" -> sendMessage(game.isWallAheadOf(spaceship) ? "t" : "f");
                     default -> sendMessage("Unknown command");
                 }
                 Steps nextSteps = spaceship.getSteps().increment();

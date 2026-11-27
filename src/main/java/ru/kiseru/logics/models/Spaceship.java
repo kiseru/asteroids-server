@@ -1,6 +1,5 @@
 package ru.kiseru.logics.models;
 
-import ru.kiseru.logics.CourseChecker;
 import ru.kiseru.logics.Score;
 import ru.kiseru.logics.Steps;
 import ru.kiseru.logics.UserId;
@@ -16,7 +15,6 @@ public class Spaceship extends Point {
     private Score score = new Score();
     private Status status = Status.ALIVE;
     private Direction direction;
-    private CourseChecker courseChecker;
 
     /**
      * Создаёт корабль пользователя в указанной позиции
@@ -124,37 +122,6 @@ public class Spaceship extends Point {
     @Override
     public Type getType() {
         return Type.SPACESHIP;
-    }
-
-    /**
-     * Проверяет, что на позиции впереди корабля находится астероид
-     *
-     * @return {@code true}, если следующий шаг приведёт к столкновению с астероидом
-     */
-    public boolean isAsteroid() {
-        return courseChecker.isAsteroid();
-    }
-
-    /**
-     * Проверяет, что на позиции впереди корабля находится мусор
-     *
-     * @return {@code true}, если следующий шаг приведёт к сбору мусора
-     */
-    public boolean isGarbage() {
-        return courseChecker.isGarbage();
-    }
-
-    /**
-     * Проверяет, что на позиции впереди корабля находится стена
-     *
-     * @return {@code true}, если следующий шаг приведёт корабль к границе экрана
-     */
-    public boolean isWall() {
-        return courseChecker.isWall();
-    }
-
-    public void setCourseChecker(CourseChecker courseChecker) {
-        this.courseChecker = courseChecker;
     }
 
     public void setPosition(Position position) {

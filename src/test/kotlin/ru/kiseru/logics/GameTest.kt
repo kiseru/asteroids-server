@@ -12,6 +12,8 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import ru.kiseru.logics.auxiliary.Direction
+import ru.kiseru.logics.auxiliary.Position
 import ru.kiseru.logics.auxiliary.ScreenSize
 import ru.kiseru.logics.auxiliary.Type
 import ru.kiseru.logics.handlers.SpaceshipCrashHandler
@@ -308,5 +310,221 @@ class GameTest {
         // then
         assertEquals(1, first)
         assertEquals(2, second)
+    }
+
+    @Test
+    fun `given asteroid directly ahead of spaceship - when isAsteroidAheadOf called - then true returned`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        val spaceship = Spaceship(Position(5, 5), UserId(1)).apply { direction = Direction.RIGHT }
+        game.pointsOnScreen.add(Asteroid(Position(6, 5)))
+
+        // when
+        val actual = game.isAsteroidAheadOf(spaceship)
+
+        // then
+        assertTrue(actual)
+    }
+
+    @Test
+    fun `given asteroid behind spaceship - when isAsteroidAheadOf called - then false returned`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        val spaceship = Spaceship(Position(5, 5), UserId(1)).apply { direction = Direction.RIGHT }
+        game.pointsOnScreen.add(Asteroid(Position(4, 5)))
+
+        // when
+        val actual = game.isAsteroidAheadOf(spaceship)
+
+        // then
+        assertFalse(actual)
+    }
+
+    @Test
+    fun `given asteroid ahead in vertical direction - when isAsteroidAheadOf called - then true returned`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        val spaceship = Spaceship(Position(5, 5), UserId(1)).apply { direction = Direction.DOWN }
+        game.pointsOnScreen.add(Asteroid(Position(5, 6)))
+
+        // when
+        val actual = game.isAsteroidAheadOf(spaceship)
+
+        // then
+        assertTrue(actual)
+    }
+
+    @Test
+    fun `given only garbage ahead of spaceship - when isAsteroidAheadOf called - then false returned`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        val spaceship = Spaceship(Position(5, 5), UserId(1)).apply { direction = Direction.RIGHT }
+        game.pointsOnScreen.add(Garbage(Position(6, 5)))
+
+        // when
+        val actual = game.isAsteroidAheadOf(spaceship)
+
+        // then
+        assertFalse(actual)
+    }
+
+    @Test
+    fun `given garbage directly ahead of spaceship - when isGarbageAheadOf called - then true returned`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        val spaceship = Spaceship(Position(5, 5), UserId(1)).apply { direction = Direction.LEFT }
+        game.pointsOnScreen.add(Garbage(Position(4, 5)))
+
+        // when
+        val actual = game.isGarbageAheadOf(spaceship)
+
+        // then
+        assertTrue(actual)
+    }
+
+    @Test
+    fun `given garbage behind spaceship - when isGarbageAheadOf called - then false returned`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        val spaceship = Spaceship(Position(5, 5), UserId(1)).apply { direction = Direction.LEFT }
+        game.pointsOnScreen.add(Garbage(Position(6, 5)))
+
+        // when
+        val actual = game.isGarbageAheadOf(spaceship)
+
+        // then
+        assertFalse(actual)
+    }
+
+    @Test
+    fun `given garbage ahead in vertical direction - when isGarbageAheadOf called - then true returned`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        val spaceship = Spaceship(Position(5, 5), UserId(1)).apply { direction = Direction.UP }
+        game.pointsOnScreen.add(Garbage(Position(5, 4)))
+
+        // when
+        val actual = game.isGarbageAheadOf(spaceship)
+
+        // then
+        assertTrue(actual)
+    }
+
+    @Test
+    fun `given only asteroid ahead of spaceship - when isGarbageAheadOf called - then false returned`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        val spaceship = Spaceship(Position(5, 5), UserId(1)).apply { direction = Direction.LEFT }
+        game.pointsOnScreen.add(Asteroid(Position(4, 5)))
+
+        // when
+        val actual = game.isGarbageAheadOf(spaceship)
+
+        // then
+        assertFalse(actual)
+    }
+
+    @Test
+    fun `given spaceship at top edge facing up - when isWallAheadOf called - then true returned`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        val spaceship = Spaceship(Position(5, 1), UserId(1)).apply { direction = Direction.UP }
+
+        // when
+        val actual = game.isWallAheadOf(spaceship)
+
+        // then
+        assertTrue(actual)
+    }
+
+    @Test
+    fun `given spaceship not at top edge facing up - when isWallAheadOf called - then false returned`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        val spaceship = Spaceship(Position(5, 2), UserId(1)).apply { direction = Direction.UP }
+
+        // when
+        val actual = game.isWallAheadOf(spaceship)
+
+        // then
+        assertFalse(actual)
+    }
+
+    @Test
+    fun `given spaceship at right edge facing right - when isWallAheadOf called - then true returned`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        val spaceship = Spaceship(Position(10, 5), UserId(1)).apply { direction = Direction.RIGHT }
+
+        // when
+        val actual = game.isWallAheadOf(spaceship)
+
+        // then
+        assertTrue(actual)
+    }
+
+    @Test
+    fun `given spaceship not at right edge facing right - when isWallAheadOf called - then false returned`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        val spaceship = Spaceship(Position(9, 5), UserId(1)).apply { direction = Direction.RIGHT }
+
+        // when
+        val actual = game.isWallAheadOf(spaceship)
+
+        // then
+        assertFalse(actual)
+    }
+
+    @Test
+    fun `given spaceship at bottom edge facing down - when isWallAheadOf called - then true returned`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        val spaceship = Spaceship(Position(5, 10), UserId(1)).apply { direction = Direction.DOWN }
+
+        // when
+        val actual = game.isWallAheadOf(spaceship)
+
+        // then
+        assertTrue(actual)
+    }
+
+    @Test
+    fun `given spaceship not at bottom edge facing down - when isWallAheadOf called - then false returned`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        val spaceship = Spaceship(Position(5, 9), UserId(1)).apply { direction = Direction.DOWN }
+
+        // when
+        val actual = game.isWallAheadOf(spaceship)
+
+        // then
+        assertFalse(actual)
+    }
+
+    @Test
+    fun `given spaceship at left edge facing left - when isWallAheadOf called - then true returned`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        val spaceship = Spaceship(Position(1, 5), UserId(1)).apply { direction = Direction.LEFT }
+
+        // when
+        val actual = game.isWallAheadOf(spaceship)
+
+        // then
+        assertTrue(actual)
+    }
+
+    @Test
+    fun `given spaceship not at left edge facing left - when isWallAheadOf called - then false returned`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        val spaceship = Spaceship(Position(2, 5), UserId(1)).apply { direction = Direction.LEFT }
+
+        // when
+        val actual = game.isWallAheadOf(spaceship)
+
+        // then
+        assertFalse(actual)
     }
 }

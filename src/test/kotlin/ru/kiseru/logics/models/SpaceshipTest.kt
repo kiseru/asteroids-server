@@ -3,18 +3,15 @@ package ru.kiseru.logics.models
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import ru.kiseru.logics.auxiliary.Position
-import ru.kiseru.logics.auxiliary.Direction
-import ru.kiseru.logics.auxiliary.Type
-import ru.kiseru.logics.CourseChecker
 import ru.kiseru.logics.Score
 import ru.kiseru.logics.UserId
+import ru.kiseru.logics.auxiliary.Direction
+import ru.kiseru.logics.auxiliary.Position
+import ru.kiseru.logics.auxiliary.Type
 
 class SpaceshipTest {
 
@@ -270,47 +267,5 @@ class SpaceshipTest {
 
         // then
         assertEquals(Position(expectedX, expectedY), actual)
-    }
-
-    @Test
-    fun `given spaceship with courseChecker - when isAsteroid called - then courseChecker isAsteroid called`() {
-        // given
-        val courseChecker = mock<CourseChecker>()
-        val spaceship = Spaceship(Position(5, 5), UserId(1))
-        spaceship.setCourseChecker(courseChecker)
-
-        // when
-        spaceship.isAsteroid
-
-        // then
-        verify(courseChecker).isAsteroid
-    }
-
-    @Test
-    fun `given spaceship with courseChecker - when isGarbage called - then courseChecker isGarbage called`() {
-        // given
-        val courseChecker = mock<CourseChecker>()
-        val spaceship = Spaceship(Position(5, 5), UserId(1))
-        spaceship.setCourseChecker(courseChecker)
-
-        // when
-        spaceship.isGarbage
-
-        // then
-        verify(courseChecker).isGarbage
-    }
-
-    @Test
-    fun `given spaceship with courseChecker - when isWall called - then courseChecker isWall called`() {
-        // given
-        val courseChecker = mock<CourseChecker>()
-        val spaceship = Spaceship(Position(5, 5), UserId(1))
-        spaceship.setCourseChecker(courseChecker)
-
-        // when
-        spaceship.isWall
-
-        // then
-        verify(courseChecker).isWall
     }
 }

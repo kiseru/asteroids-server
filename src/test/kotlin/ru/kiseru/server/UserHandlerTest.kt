@@ -8,6 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
@@ -16,6 +17,7 @@ import ru.kiseru.logics.Game
 import ru.kiseru.logics.Score
 import ru.kiseru.logics.Steps
 import ru.kiseru.logics.User
+import ru.kiseru.logics.UserId
 import ru.kiseru.logics.auxiliary.Direction
 import ru.kiseru.logics.auxiliary.Position
 import ru.kiseru.logics.auxiliary.Type
@@ -23,7 +25,6 @@ import ru.kiseru.logics.models.Spaceship
 import ru.kiseru.server.room.Room
 import java.io.BufferedReader
 import java.io.PrintWriter
-import ru.kiseru.logics.UserId
 
 class UserHandlerTest {
 
@@ -255,11 +256,15 @@ class UserHandlerTest {
         // given
         val reader = mock<BufferedReader>()
         val writer = mock<PrintWriter>()
-        val room = mock<Room>()
         val spaceship = mockSpaceship()
+
+        val game = mock<Game>()
+        whenever(game.isAsteroidAheadOf(eq(spaceship))).thenReturn(true)
+
+        val room = mock<Room>()
+        whenever(room.game).thenReturn(game)
         whenever(room.isFull).thenReturn(false)
         whenever(room.isGameFinished).thenReturn(false, true)
-        whenever(spaceship.isAsteroid).thenReturn(true)
         whenever(reader.readLine()).thenReturn("isAsteroid")
         val userHandler = createUserHandler(reader, writer, room)
         userHandler.setSpaceship(spaceship)
@@ -276,11 +281,15 @@ class UserHandlerTest {
         // given
         val reader = mock<BufferedReader>()
         val writer = mock<PrintWriter>()
-        val room = mock<Room>()
         val spaceship = mockSpaceship()
+
+        val game = mock<Game>()
+        whenever(game.isGarbageAheadOf(eq(spaceship))).thenReturn(false)
+
+        val room = mock<Room>()
+        whenever(room.game).thenReturn(game)
         whenever(room.isFull).thenReturn(false)
         whenever(room.isGameFinished).thenReturn(false, true)
-        whenever(spaceship.isGarbage).thenReturn(false)
         whenever(reader.readLine()).thenReturn("isGarbage")
         val userHandler = createUserHandler(reader, writer, room)
         userHandler.setSpaceship(spaceship)
@@ -297,11 +306,15 @@ class UserHandlerTest {
         // given
         val reader = mock<BufferedReader>()
         val writer = mock<PrintWriter>()
-        val room = mock<Room>()
         val spaceship = mockSpaceship()
+
+        val game = mock<Game>()
+        whenever(game.isWallAheadOf(eq(spaceship))).thenReturn(true)
+
+        val room = mock<Room>()
+        whenever(room.game).thenReturn(game)
         whenever(room.isFull).thenReturn(false)
         whenever(room.isGameFinished).thenReturn(false, true)
-        whenever(spaceship.isWall).thenReturn(true)
         whenever(reader.readLine()).thenReturn("isWall")
         val userHandler = createUserHandler(reader, writer, room)
         userHandler.setSpaceship(spaceship)
