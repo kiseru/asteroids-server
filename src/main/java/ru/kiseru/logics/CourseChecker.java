@@ -3,6 +3,7 @@ package ru.kiseru.logics;
 import java.util.List;
 import java.util.stream.Collectors;
 import ru.kiseru.logics.auxiliary.Position;
+import ru.kiseru.logics.auxiliary.ScreenSize;
 import ru.kiseru.logics.auxiliary.Type;
 import ru.kiseru.logics.models.Point;
 import ru.kiseru.logics.models.Spaceship;
@@ -11,12 +12,12 @@ public class CourseChecker {
 
     private final Spaceship spaceship;
     private final List<Point> pointsOnMap;
-    private final Screen screen;
+    private final ScreenSize screenSize;
 
-    public CourseChecker(Spaceship spaceship, List<Point> pointsOnMap, Screen screen) {
+    public CourseChecker(Spaceship spaceship, List<Point> pointsOnMap, ScreenSize screenSize) {
         this.spaceship = spaceship;
         this.pointsOnMap = pointsOnMap;
-        this.screen = screen;
+        this.screenSize = screenSize;
     }
 
     public boolean isAsteroid() {
@@ -38,8 +39,8 @@ public class CourseChecker {
     public boolean isWall() {
         return switch (spaceship.getDirection()) {
             case UP -> spaceship.getY() == 1;
-            case RIGHT -> spaceship.getX() == screen.getSize().width();
-            case DOWN -> spaceship.getY() == screen.getSize().height();
+            case RIGHT -> spaceship.getX() == screenSize.width();
+            case DOWN -> spaceship.getY() == screenSize.height();
             case LEFT -> spaceship.getX() == 1;
         };
     }

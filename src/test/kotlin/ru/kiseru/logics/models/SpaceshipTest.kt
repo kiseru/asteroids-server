@@ -8,7 +8,6 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import ru.kiseru.logics.Screen
 import ru.kiseru.logics.auxiliary.Position
 import ru.kiseru.logics.auxiliary.ScreenSize
 import ru.kiseru.logics.auxiliary.Direction
@@ -254,7 +253,7 @@ class SpaceshipTest {
         // given
         val userId = UserId(1)
         val spaceship = Spaceship(Position(5, 5), userId)
-        val courseChecker = CourseChecker(spaceship, emptyList(), Screen(ScreenSize(5, 5)))
+        val courseChecker = CourseChecker(spaceship, emptyList(), ScreenSize(5, 5))
 
         // when
         spaceship.courseChecker = courseChecker

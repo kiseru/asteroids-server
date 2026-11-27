@@ -52,7 +52,7 @@ public class Game {
         userHandler.setSpaceship(spaceship);
         this.pointsOnScreen.add(spaceship);
         crashHandlers.add(new SpaceshipCrashHandler(this, userHandler, spaceship));
-        spaceship.setCourseChecker(new CourseChecker(spaceship, this.pointsOnScreen, this.screen));
+        spaceship.setCourseChecker(new CourseChecker(spaceship, pointsOnScreen, screen.getSize()));
     }
 
     /**
