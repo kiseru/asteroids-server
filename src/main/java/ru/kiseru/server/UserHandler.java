@@ -83,9 +83,9 @@ public final class UserHandler {
                         room.getGame().refresh();
                         sendMessage("success");
                     }
-                    case "isAsteroid" -> sendMessage(spaceship.getCourseChecker().isAsteroid() ? "t" : "f");
-                    case "isGarbage" -> sendMessage(spaceship.getCourseChecker().isGarbage() ? "t" : "f");
-                    case "isWall" -> sendMessage(spaceship.getCourseChecker().isWall() ? "t" : "f");
+                    case "isAsteroid" -> sendMessage(spaceship.isAsteroid() ? "t" : "f");
+                    case "isGarbage" -> sendMessage(spaceship.isGarbage() ? "t" : "f");
+                    case "isWall" -> sendMessage(spaceship.isWall() ? "t" : "f");
                     default -> sendMessage("Unknown command");
                 }
                 Steps nextSteps = spaceship.getSteps().increment();

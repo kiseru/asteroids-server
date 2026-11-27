@@ -5,7 +5,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -131,22 +130,6 @@ class GameTest {
 
         // then
         assertEquals(1, game.crashHandlers.size)
-    }
-
-    @Test
-    fun `given userHandler - when spaceship registered - then course checker set to spaceship`() {
-        // given
-        val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
-        val userHandler = mock<UserHandler>()
-        val userId = UserId(1)
-
-        // when
-        game.registerSpaceshipForUser(userHandler, userId)
-
-        // then
-        val captor = argumentCaptor<Spaceship>()
-        verify(userHandler).setSpaceship(captor.capture())
-        assertNotNull(captor.firstValue.courseChecker)
     }
 
     @Test

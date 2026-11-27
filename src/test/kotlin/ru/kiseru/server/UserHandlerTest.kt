@@ -12,7 +12,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import ru.kiseru.logics.CourseChecker
 import ru.kiseru.logics.Game
 import ru.kiseru.logics.Score
 import ru.kiseru.logics.Steps
@@ -258,11 +257,9 @@ class UserHandlerTest {
         val writer = mock<PrintWriter>()
         val room = mock<Room>()
         val spaceship = mockSpaceship()
-        val courseChecker = mock<CourseChecker>()
         whenever(room.isFull).thenReturn(false)
         whenever(room.isGameFinished).thenReturn(false, true)
-        whenever(spaceship.courseChecker).thenReturn(courseChecker)
-        whenever(courseChecker.isAsteroid()).thenReturn(true)
+        whenever(spaceship.isAsteroid).thenReturn(true)
         whenever(reader.readLine()).thenReturn("isAsteroid")
         val userHandler = createUserHandler(reader, writer, room)
         userHandler.setSpaceship(spaceship)
@@ -281,11 +278,9 @@ class UserHandlerTest {
         val writer = mock<PrintWriter>()
         val room = mock<Room>()
         val spaceship = mockSpaceship()
-        val courseChecker = mock<CourseChecker>()
         whenever(room.isFull).thenReturn(false)
         whenever(room.isGameFinished).thenReturn(false, true)
-        whenever(spaceship.courseChecker).thenReturn(courseChecker)
-        whenever(courseChecker.isGarbage()).thenReturn(false)
+        whenever(spaceship.isGarbage).thenReturn(false)
         whenever(reader.readLine()).thenReturn("isGarbage")
         val userHandler = createUserHandler(reader, writer, room)
         userHandler.setSpaceship(spaceship)
@@ -304,11 +299,9 @@ class UserHandlerTest {
         val writer = mock<PrintWriter>()
         val room = mock<Room>()
         val spaceship = mockSpaceship()
-        val courseChecker = mock<CourseChecker>()
         whenever(room.isFull).thenReturn(false)
         whenever(room.isGameFinished).thenReturn(false, true)
-        whenever(spaceship.courseChecker).thenReturn(courseChecker)
-        whenever(courseChecker.isWall).thenReturn(true)
+        whenever(spaceship.isWall).thenReturn(true)
         whenever(reader.readLine()).thenReturn("isWall")
         val userHandler = createUserHandler(reader, writer, room)
         userHandler.setSpaceship(spaceship)

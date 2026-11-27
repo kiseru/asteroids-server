@@ -126,8 +126,31 @@ public class Spaceship extends Point {
         return Type.SPACESHIP;
     }
 
-    public CourseChecker getCourseChecker() {
-        return courseChecker;
+    /**
+     * Проверяет, что на позиции впереди корабля находится астероид
+     *
+     * @return {@code true}, если следующий шаг приведёт к столкновению с астероидом
+     */
+    public boolean isAsteroid() {
+        return courseChecker.isAsteroid();
+    }
+
+    /**
+     * Проверяет, что на позиции впереди корабля находится мусор
+     *
+     * @return {@code true}, если следующий шаг приведёт к сбору мусора
+     */
+    public boolean isGarbage() {
+        return courseChecker.isGarbage();
+    }
+
+    /**
+     * Проверяет, что на позиции впереди корабля находится стена
+     *
+     * @return {@code true}, если следующий шаг приведёт корабль к границе экрана
+     */
+    public boolean isWall() {
+        return courseChecker.isWall();
     }
 
     public void setCourseChecker(CourseChecker courseChecker) {
