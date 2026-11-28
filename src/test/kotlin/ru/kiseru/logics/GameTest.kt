@@ -1,13 +1,12 @@
 package ru.kiseru.logics
 
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicInteger
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -16,11 +15,13 @@ import ru.kiseru.logics.auxiliary.Direction
 import ru.kiseru.logics.auxiliary.Position
 import ru.kiseru.logics.auxiliary.ScreenSize
 import ru.kiseru.logics.auxiliary.Type
-import ru.kiseru.logics.handlers.SpaceshipCrashHandler
 import ru.kiseru.logics.models.Asteroid
 import ru.kiseru.logics.models.Garbage
 import ru.kiseru.logics.models.Spaceship
 import ru.kiseru.server.UserHandler
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
 class GameTest {
 
@@ -121,20 +122,6 @@ class GameTest {
     }
 
     @Test
-    fun `given userHandler - when spaceship registered - then crash handler created`() {
-        // given
-        val game = Game(Screen(ScreenSize(10, 10)), 1, 1)
-        val userHandler = mock<UserHandler>()
-        val userId = UserId(1)
-
-        // when
-        game.registerSpaceshipForUser(userHandler, userId)
-
-        // then
-        assertEquals(1, game.crashHandlers.size)
-    }
-
-    @Test
     fun `given userHandler - when spaceship registered - then spaceship not collide with other points`() {
         // given
         val game = Game(Screen(ScreenSize(10, 10)), 4, 4)
@@ -196,22 +183,6 @@ class GameTest {
 
         // then
         verify(screen).update()
-    }
-
-    @Test
-    fun `given game with crash handlers - when refresh called - then all crash handlers checked`() {
-        // given
-        val screen = mock<Screen>()
-        whenever(screen.size).thenReturn(ScreenSize(10, 10))
-        val game = Game(screen, 1, 1)
-        val crashHandler = mock<SpaceshipCrashHandler>()
-        game.crashHandlers.add(crashHandler)
-
-        // when
-        game.refresh()
-
-        // then
-        verify(crashHandler).check()
     }
 
     @Test
@@ -526,5 +497,219 @@ class GameTest {
 
         // then
         assertFalse(actual)
+    }
+
+    @Test
+    fun `given asteroid at spaceship position - when refresh called - then asteroid hidden and spaceship score decreased`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        game.registerSpaceshipForUser(mock<UserHandler>(), UserId(1))
+        val spaceship = game.pointsOnScreen.filterIsInstance<Spaceship>().first()
+        spaceship.position = Position(5, 5)
+        val asteroid = Asteroid(Position(5, 5))
+        game.pointsOnScreen.add(asteroid)
+
+        // when
+        game.refresh()
+
+        // then
+        assertFalse(asteroid.isVisible)
+        assertEquals(-50, spaceship.score.value())
+    }
+
+    @Test
+    fun `given positive score and asteroid at spaceship position - when refresh called - then score decreased but spaceship alive`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        game.registerSpaceshipForUser(mock<UserHandler>(), UserId(1))
+        val spaceship = game.pointsOnScreen.filterIsInstance<Spaceship>().first()
+        spaceship.position = Position(5, 5)
+        spaceship.score = Score(50)
+        game.pointsOnScreen.add(Asteroid(Position(5, 5)))
+
+        // when
+        game.refresh()
+
+        // then
+        assertEquals(0, spaceship.score.value())
+        assertEquals(Spaceship.Status.ALIVE, spaceship.status)
+    }
+
+    @Test
+    fun `given garbage at spaceship position - when refresh called - then garbage hidden and spaceship score increased`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 5, 0)
+        game.registerSpaceshipForUser(mock<UserHandler>(), UserId(1))
+        val spaceship = game.pointsOnScreen.filterIsInstance<Spaceship>().first()
+        spaceship.position = Position(5, 5)
+        val garbage = Garbage(Position(5, 5))
+        game.pointsOnScreen.add(garbage)
+
+        // when
+        game.refresh()
+
+        // then
+        assertFalse(garbage.isVisible)
+        assertEquals(10, spaceship.score.value())
+        assertEquals(2, game.incrementCollectedGarbageCount())
+    }
+
+    @Test
+    fun `given invisible asteroid at spaceship position - when refresh called - then spaceship score unchanged`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        game.registerSpaceshipForUser(mock<UserHandler>(), UserId(1))
+        val spaceship = game.pointsOnScreen.filterIsInstance<Spaceship>().first()
+        spaceship.position = Position(5, 5)
+        val asteroid = Asteroid(Position(5, 5))
+        asteroid.crash()
+        game.pointsOnScreen.add(asteroid)
+
+        // when
+        game.refresh()
+
+        // then
+        assertEquals(0, spaceship.score.value())
+        assertTrue(spaceship.isVisible)
+    }
+
+    @Test
+    fun `given invisible garbage at spaceship position - when refresh called - then garbage not collected`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 5, 0)
+        game.registerSpaceshipForUser(mock<UserHandler>(), UserId(1))
+        val spaceship = game.pointsOnScreen.filterIsInstance<Spaceship>().first()
+        spaceship.position = Position(5, 5)
+        val garbage = Garbage(Position(5, 5))
+        garbage.crash()
+        game.pointsOnScreen.add(garbage)
+
+        // when
+        game.refresh()
+
+        // then
+        assertEquals(0, spaceship.score.value())
+        assertEquals(1, game.incrementCollectedGarbageCount())
+    }
+
+    @Test
+    fun `given another spaceship at spaceship position - when refresh called - then no collision happens`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        game.registerSpaceshipForUser(mock<UserHandler>(), UserId(1))
+        val spaceship = game.pointsOnScreen.filterIsInstance<Spaceship>().first()
+        spaceship.position = Position(5, 5)
+        val anotherSpaceship = Spaceship(Position(5, 5), UserId(2))
+        game.pointsOnScreen.add(anotherSpaceship)
+
+        // when
+        game.refresh()
+
+        // then
+        assertEquals(0, spaceship.score.value())
+        assertTrue(spaceship.isVisible)
+        assertTrue(anotherSpaceship.isVisible)
+    }
+
+    @Test
+    fun `given spaceship without collisions - when refresh called - then spaceship state unchanged`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        game.registerSpaceshipForUser(mock<UserHandler>(), UserId(1))
+        val spaceship = game.pointsOnScreen.filterIsInstance<Spaceship>().first()
+        spaceship.position = Position(5, 5)
+        spaceship.direction = Direction.RIGHT
+
+        // when
+        game.refresh()
+
+        // then
+        assertEquals(Position(5, 5), spaceship.position)
+        assertEquals(0, spaceship.score.value())
+        assertEquals(Spaceship.Status.ALIVE, spaceship.status)
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "5, 0, UP, 5, 1",
+        "5, 11, DOWN, 5, 10",
+        "0, 5, LEFT, 1, 5",
+        "11, 5, RIGHT, 10, 5",
+    )
+    fun `given spaceship out of bounds - when refresh called - then spaceship moved back inside and score decreased`(
+        x: Int,
+        y: Int,
+        direction: Direction,
+        expectedX: Int,
+        expectedY: Int,
+    ) {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        game.registerSpaceshipForUser(mock<UserHandler>(), UserId(1))
+        val spaceship = game.pointsOnScreen.filterIsInstance<Spaceship>().first()
+        spaceship.position = Position(x, y)
+        spaceship.direction = direction
+
+        // when
+        game.refresh()
+
+        // then
+        assertEquals(Position(expectedX, expectedY), spaceship.position)
+        assertEquals(-50, spaceship.score.value())
+        assertEquals(Spaceship.Status.DESTROYED, spaceship.status)
+    }
+
+    @Test
+    fun `given spaceship out of bounds and asteroid at same position - when refresh called - then only asteroid collision applied`() {
+        // given
+        val game = Game(Screen(ScreenSize(10, 10)), 0, 0)
+        game.registerSpaceshipForUser(mock<UserHandler>(), UserId(1))
+        val spaceship = game.pointsOnScreen.filterIsInstance<Spaceship>().first()
+        spaceship.position = Position(11, 5)
+        spaceship.direction = Direction.RIGHT
+        val asteroid = Asteroid(Position(11, 5))
+        game.pointsOnScreen.add(asteroid)
+
+        // when
+        game.refresh()
+
+        // then
+        assertFalse(asteroid.isVisible)
+        assertEquals(Position(11, 5), spaceship.position)
+        assertEquals(-50, spaceship.score.value())
+    }
+
+    @Test
+    fun `given game with one garbage and callback - when last garbage collected - then callback invoked`() {
+        // given
+        val callbackCalls = AtomicInteger()
+        val game = Game(Screen(ScreenSize(10, 10)), 1, 0) { callbackCalls.incrementAndGet() }
+        game.registerSpaceshipForUser(mock<UserHandler>(), UserId(1))
+        val spaceship = game.pointsOnScreen.filterIsInstance<Spaceship>().first()
+        spaceship.position = Position(5, 5)
+        game.pointsOnScreen.add(Garbage(Position(5, 5)))
+
+        // when
+        game.refresh()
+
+        // then
+        assertEquals(1, callbackCalls.get())
+    }
+
+    @Test
+    fun `given game with two garbage and callback - when only one garbage collected - then callback not invoked`() {
+        // given
+        val callbackCalls = AtomicInteger()
+        val game = Game(Screen(ScreenSize(10, 10)), 2, 0) { callbackCalls.incrementAndGet() }
+        game.registerSpaceshipForUser(mock<UserHandler>(), UserId(1))
+        val spaceship = game.pointsOnScreen.filterIsInstance<Spaceship>().first()
+        spaceship.position = Position(5, 5)
+        game.pointsOnScreen.add(Garbage(Position(5, 5)))
+
+        // when
+        game.refresh()
+
+        // then
+        assertEquals(0, callbackCalls.get())
     }
 }

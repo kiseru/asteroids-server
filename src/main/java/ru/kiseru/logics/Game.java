@@ -3,8 +3,8 @@ package ru.kiseru.logics;
 import ru.kiseru.logics.auxiliary.Position;
 import ru.kiseru.logics.auxiliary.ScreenSize;
 import ru.kiseru.logics.auxiliary.Type;
-import ru.kiseru.logics.handlers.SpaceshipCrashHandler;
 import ru.kiseru.logics.models.Asteroid;
+import ru.kiseru.logics.models.Crashable;
 import ru.kiseru.logics.models.Garbage;
 import ru.kiseru.logics.models.Point;
 import ru.kiseru.logics.models.Spaceship;
@@ -21,9 +21,10 @@ public class Game {
     private final List<Point> pointsOnScreen;
     private final Screen screen;
     private final ScreenSize screenSize;
-    private final List<SpaceshipCrashHandler> crashHandlers;
+    private final List<Spaceship> spaceships = new ArrayList<>();
     private final AtomicInteger collectedGarbageCount = new AtomicInteger(0);
     private final int garbageNumber;
+    private final Runnable onAllGarbageCollected;
 
     /**
      * Конструктор создания игровой сессии
@@ -32,11 +33,22 @@ public class Game {
      * @param asteroidNumber - количество астероидов для первоначальной генерации
      */
     public Game(Screen screen, int garbageNumber, int asteroidNumber) {
+        this(screen, garbageNumber, asteroidNumber, () -> {});
+    }
+
+    /**
+     * Конструктор создания игровой сессии с обработчиком сбора всего мусора
+     * @param screen - экран
+     * @param garbageNumber - количество мусора для первоначальной генерации
+     * @param asteroidNumber - количество астероидов для первоначальной генерации
+     * @param onAllGarbageCollected - действие, выполняемое при сборе всего мусора
+     */
+    public Game(Screen screen, int garbageNumber, int asteroidNumber, Runnable onAllGarbageCollected) {
         this.garbageNumber = garbageNumber;
         this.screen = screen;
         this.screenSize = screen.getSize();
         this.pointsOnScreen = new ArrayList<>();
-        this.crashHandlers = new ArrayList<>();
+        this.onAllGarbageCollected = onAllGarbageCollected;
 
         // генерируем мусор
         for (int i = 0; i < garbageNumber; i++) {
@@ -51,24 +63,76 @@ public class Game {
     }
 
     /**
-     * Создает и регистрирует новый корабль
+     * Создает корабль на свободных координатах, привязывает его к пользователю и регистрирует в игре
      *
      * @param userHandler - юзер, для которого регистрируется корабль
+     * @param userId - идентификатор пользователя, которому принадлежит корабль
      */
     public void registerSpaceshipForUser(UserHandler userHandler, UserId userId) {
         var spaceship = new Spaceship(generateUniqueRandomCoordinates(), userId);
         userHandler.setSpaceship(spaceship);
         this.pointsOnScreen.add(spaceship);
-        crashHandlers.add(new SpaceshipCrashHandler(this, userHandler, spaceship));
+        spaceships.add(spaceship);
     }
 
     /**
-     * Запускает и поддерживает жизненный цикл игры
+     * Выполняет один шаг игрового цикла: обновляет экран, проверяет столкновения всех кораблей и отрисовывает объекты
      */
     public synchronized void refresh() {
         screen.update();
-        crashHandlers.forEach(SpaceshipCrashHandler::check);
+        spaceships.forEach(this::check);
         pointsOnScreen.forEach(screen::drawPoint);
+    }
+
+    /**
+     * Проверяет столкновения корабля с объектами на экране и со стеной и применяет последствия столкновения
+     *
+     * @param spaceship - корабль, для которого проверяются столкновения
+     */
+    private void check(Spaceship spaceship) {
+        var isCollision = false;
+        Point collisionPoint = null;
+        for (var point : pointsOnScreen) {
+            if (point.getType() != Type.SPACESHIP &&
+                    point.isVisible() &&
+                    point.getPosition().equals(spaceship.getPosition())) {
+                isCollision = true;
+                collisionPoint = point;
+                break;
+            }
+        }
+        if (isCollision) {
+            crash(collisionPoint.getType(), spaceship);
+            ((Crashable) collisionPoint).crash();
+        } else {
+            // проверка на столкновение со стеной
+            if (!this.getScreen().getSize().isInBounds(spaceship.getPosition())) {
+                crash(Type.WALL, spaceship);
+            }
+        }
+    }
+
+    /**
+     * Вызывается при выявлении столкновения корабля с чем-либо
+     *
+     * @param type      - тип объекта, с которым произошло столкновение
+     * @param spaceship - корабль, столкнувшийся с объектом
+     */
+    private synchronized void crash(Type type, Spaceship spaceship) {
+        if (type == Type.ASTEROID) {
+            spaceship.subtractScore();
+        } else if (type == Type.GARBAGE) {
+            spaceship.addScore();
+            var collected = incrementCollectedGarbageCount();
+            if (collected >= getGarbageNumber()) {
+                onAllGarbageCollected.run();
+            }
+        } else if (type == Type.WALL) {
+            // возвращаемся назад, чтобы не находится на стене
+            var position = spaceship.getPosition();
+            spaceship.setPosition(position.aheadOf(spaceship.getDirection().opposite()));
+            spaceship.subtractScore();
+        }
     }
 
     public boolean isAnyoneAlive() {
@@ -102,10 +166,6 @@ public class Game {
 
     public int getGarbageNumber() {
         return garbageNumber;
-    }
-
-    public List<SpaceshipCrashHandler> getCrashHandlers() {
-        return crashHandlers;
     }
 
     public int incrementCollectedGarbageCount() {

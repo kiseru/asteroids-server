@@ -72,6 +72,10 @@ public final class Room {
         return status == Status.FINISHED;
     }
 
+    private synchronized void notifyAllGarbageCollected() {
+        notify();
+    }
+
     public synchronized void notifyIfNoAliveUsers() {
         if (aliveCount() == 0) {
             notifyAll();
@@ -81,7 +85,7 @@ public final class Room {
     public void run() {
         synchronized (this) {
             status = Status.GAMING;
-            game = new Game(new Screen(new ScreenSize(30, 30)), 150, 50);
+            game = new Game(new Screen(new ScreenSize(30, 30)), 150, 50, this::notifyAllGarbageCollected);
             userHandlers.forEach(userHandler -> game.registerSpaceshipForUser(userHandler, userHandler.getUser().id()));
             userHandlers.forEach(userHandler -> userHandler.sendMessage("start"));
             notifyAll();

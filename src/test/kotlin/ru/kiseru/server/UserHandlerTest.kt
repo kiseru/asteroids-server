@@ -1,7 +1,6 @@
 package ru.kiseru.server
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -20,7 +19,6 @@ import ru.kiseru.logics.User
 import ru.kiseru.logics.UserId
 import ru.kiseru.logics.auxiliary.Direction
 import ru.kiseru.logics.auxiliary.Position
-import ru.kiseru.logics.auxiliary.Type
 import ru.kiseru.logics.models.Spaceship
 import ru.kiseru.server.room.Room
 import java.io.BufferedReader
@@ -352,106 +350,6 @@ class UserHandlerTest {
         verify(writer).println("You have collected 0 score")
     }
 
-    @Test
-    fun `given spaceship with score - when asteroid crash handled - then score decreased by 50`() {
-        // given
-        val room = mockRoom(mock<Game>())
-        val userHandler = createUserHandler(room = room)
-
-        val userId = UserId(1)
-        val spaceship = Spaceship(Position(5, 5), userId)
-        spaceship.score = Score(100)
-        userHandler.setSpaceship(spaceship)
-
-        // when
-        userHandler.crash(Type.ASTEROID)
-
-        // then
-        assertEquals(50, spaceship.score.value())
-    }
-
-    @Test
-    fun `given spaceship with zero score - when asteroid crash handled - then spaceship destroyed`() {
-        // given
-        val room = mockRoom(mock<Game>())
-        val userHandler = createUserHandler(room = room)
-
-        val userId = UserId(1)
-        val spaceship = Spaceship(Position(5, 5), userId)
-        userHandler.setSpaceship(spaceship)
-
-        // when
-        userHandler.crash(Type.ASTEROID)
-
-        // then
-        assertEquals(-50, spaceship.score.value())
-        assertEquals(Spaceship.Status.DESTROYED, spaceship.status)
-        assertFalse(spaceship.isVisible)
-    }
-
-    @Test
-    fun `given spaceship crashed into garbage - when garbage crash handled - then score increased by 10 and game counter incremented`() {
-        // given
-        val game = mock<Game>()
-        whenever(game.incrementCollectedGarbageCount()).thenReturn(1)
-        whenever(game.garbageNumber).thenReturn(10)
-        val room = mockRoom(game)
-        val userHandler = createUserHandler(room = room)
-
-        val userId = UserId(1)
-        val spaceship = Spaceship(Position(5, 5), userId)
-        userHandler.setSpaceship(spaceship)
-
-        // when
-        userHandler.crash(Type.GARBAGE)
-
-        // then
-        assertEquals(10, spaceship.score.value())
-        verify(game).incrementCollectedGarbageCount()
-    }
-
-    @Test
-    fun `given spaceship collected last garbage - when garbage crash handled - then score increased by 10 and game counter incremented`() {
-        // given
-        val game = mock<Game>()
-        whenever(game.incrementCollectedGarbageCount()).thenReturn(5)
-        whenever(game.garbageNumber).thenReturn(5)
-        val room = mockRoom(game)
-        val userHandler = createUserHandler(room = room)
-
-        val userId = UserId(1)
-        val spaceship = Spaceship(Position(5, 5), userId)
-        userHandler.setSpaceship(spaceship)
-
-        // when
-        userHandler.crash(Type.GARBAGE)
-
-        // then
-        assertEquals(10, spaceship.score.value())
-        verify(game).incrementCollectedGarbageCount()
-    }
-
-    @Test
-    fun `given spaceship crashed into wall - when wall crash handled - then coordinates rolled back and score decreased by 50`() {
-        // given
-        val room = mockRoom(mock<Game>())
-        val userHandler = createUserHandler(room = room)
-
-        val userId = UserId(1)
-        val spaceship = Spaceship(Position(5, 5), userId)
-        spaceship.score = Score(100)
-        spaceship.direction = Direction.UP
-        spaceship.go()
-        userHandler.setSpaceship(spaceship)
-
-        // when
-        userHandler.crash(Type.WALL)
-
-        // then
-        assertEquals(Position(5, 5), spaceship.position)
-        assertEquals(50, spaceship.score.value())
-    }
-
     private fun createUserHandler(
         reader: BufferedReader = mock(),
         writer: PrintWriter = mock(),
@@ -460,12 +358,6 @@ class UserHandlerTest {
     ): UserHandler {
         whenever(room.addUser(any())).thenReturn(room)
         return UserHandler(reader, writer, room, user)
-    }
-
-    private fun mockRoom(game: Game): Room {
-        val room = mock<Room>()
-        whenever(room.game).thenReturn(game)
-        return room
     }
 
     private fun mockSpaceship(): Spaceship {
